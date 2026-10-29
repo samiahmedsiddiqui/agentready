@@ -2,3 +2,4 @@
 .phpcs-cache
 .DS_Store
 /.cache/
+.phpunit.result.cache
