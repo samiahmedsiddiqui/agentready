@@ -10,7 +10,7 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 - A `.md` version of every page, for example `/about.md`.
 - All public post types enabled by default, with a setting to exclude any of them.
 - Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
-- Per-page description override for `llms.txt`.
+- Per-page description for `llms.txt`. When empty it uses the meta description from Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework, then the excerpt. The page content is never used, so a page without any of these is listed without a description.
 - Preview tool to test the generated Markdown for any URL.
 - Works behind HTTP Basic authentication.
 - Generated Markdown is stored and refreshed when a page is saved, so agents get a fast answer.
@@ -107,6 +107,7 @@ Uninstalling always drops the table. Your settings and the per-page choices are 
 | `agentready_strip_selectors` | CSS selectors for elements to remove. |
 | `agentready_markdown` | Final Markdown for a page. |
 | `agentready_description` | The description used in the metadata and `llms.txt`. |
+| `agentready_meta_description_keys` | Post meta keys read as the SEO meta description, in order. |
 | `agentready_llms_txt` | Final `llms.txt` content. |
 | `agentready_llms_max_items` | Entries per post type in `llms.txt` (default 500). |
 | `agentready_content_type` | Content type of the Markdown response. |

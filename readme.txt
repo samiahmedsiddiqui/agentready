@@ -18,7 +18,7 @@ AgentReady builds a Markdown version of each page from its rendered output, so A
 * A `.md` version of every page, for example `/about.md`. The homepage is `/index.md`.
 * All public post types are served by default, with a setting to exclude any of them.
 * Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
-* Per-page description override for `llms.txt`.
+* Per-page description for `llms.txt`. When empty it uses the SEO plugin's meta description, then the excerpt. The page content is never used.
 * A preview tool to test the generated Markdown for any URL.
 * Works on sites protected with HTTP Basic authentication.
 * Generated Markdown is stored and refreshed when a page is saved.
@@ -99,6 +99,7 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 == Changelog ==
 
 = Unreleased =
+* `llms.txt` descriptions come from the per-page description, then the SEO meta description, then the excerpt. They no longer fall back to text taken from the page content.
 * Stored Markdown with background refresh, on-demand generation and manual regenerate and clear controls.
 * Environment control: production by default, optional staging, development and local, allowed URLs, and the `AGENTREADY_ENABLED` and `AGENTREADY_ALLOWED_URLS` constants.
 * Settings split into tabs, with system info.
