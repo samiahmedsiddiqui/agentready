@@ -1,5 +1,4 @@
 /vendor/
-composer.lock
 .phpcs-cache
 .DS_Store
 /.cache/
