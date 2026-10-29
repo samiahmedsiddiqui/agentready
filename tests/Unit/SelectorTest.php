@@ -23,6 +23,17 @@ final class SelectorTest extends TestCase {
 		$this->assertSame( $expected, ( new Selector() )->to_xpaths( $selector ) );
 	}
 
+	public function test_splits_on_top_level_commas(): void {
+		$this->assertSame( array( 'a', '[x="1,2"]', 'p > b' ), ( new Selector() )->split( ' a , [x="1,2"],, p > b ' ) );
+	}
+
+	public function test_parse_list_separates_valid_from_invalid(): void {
+		$list = ( new Selector() )->parse_list( ".cookie\narticle footer, p:hover\n\n#x" );
+
+		$this->assertSame( array( '.cookie', 'article footer', '#x' ), $list['valid'] );
+		$this->assertSame( array( 'p:hover' ), $list['invalid'] );
+	}
+
 	/**
 	 * @return array<string, array{string, string[]}>
 	 */

@@ -28,13 +28,17 @@ final class Generator {
 		private Description $description
 	) {}
 
-	public function generate( WP_Post $post ): GeneratedPage {
-		$render   = $this->renderer->render( $post );
-		$url      = (string) $this->urls->permalink( $post );
-		$selector = (string) $this->options->get( 'content_selector', Options::DEFAULT_SELECTOR );
-		$node     = $this->extractor->extract( $render->html, $selector, $url );
-		$body     = null === $node ? '' : $this->converter->convert( $node );
-		$title    = trim( html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' ) );
+	/**
+	 * @param array{selector?: string, strip?: string[]} $overrides Settings to use instead of the saved ones.
+	 */
+	public function generate( WP_Post $post, array $overrides = array() ): GeneratedPage {
+		$render    = $this->renderer->render( $post );
+		$url       = (string) $this->urls->permalink( $post );
+		$selector  = ! empty( $overrides['selector'] ) ? $overrides['selector'] : (string) $this->options->get( 'content_selector', Options::DEFAULT_SELECTOR );
+		$extractor = ! empty( $overrides['strip'] ) ? $this->extractor->with_extra( $overrides['strip'] ) : $this->extractor;
+		$node      = $extractor->extract( $render->html, $selector, $url );
+		$body      = null === $node ? '' : $this->converter->convert( $node );
+		$title     = trim( html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' ) );
 
 		if ( '' !== $title && ( null === $node || 0 === $node->getElementsByTagName( 'h1' )->length ) ) {
 			$body = "# {$title}\n\n" . $body;

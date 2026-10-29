@@ -26,6 +26,7 @@ final class Options {
 			'excluded_posts'      => '',
 			'excluded_terms'      => array(),
 			'content_selector'    => self::DEFAULT_SELECTOR,
+			'strip_selectors'     => '',
 			'http_auth_enabled'   => false,
 			'http_auth_user'      => '',
 			'http_auth_password'  => '',

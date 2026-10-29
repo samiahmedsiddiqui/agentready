@@ -70,7 +70,13 @@ final class Plugin {
 			$options,
 			$urls,
 			new Renderer( $options, $urls ),
-			new Extractor( new Selector(), (array) apply_filters( 'agentready_strip_selectors', Extractor::DEFAULT_STRIP ) ),
+			new Extractor(
+				new Selector(),
+				(array) apply_filters(
+					'agentready_strip_selectors',
+					array_merge( Extractor::DEFAULT_STRIP, ( new Selector() )->parse_list( (string) $options->get( 'strip_selectors', '' ) )['valid'] )
+				)
+			),
 			new Converter(),
 			new FrontMatter(),
 			$description

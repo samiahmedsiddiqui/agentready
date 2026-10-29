@@ -21,10 +21,9 @@ final class Selector {
 	 */
 	public function to_xpaths( string $selector ): array {
 		$xpaths = array();
-		$parts  = preg_split( '/,(?![^\[]*\])/', $selector );
 
-		foreach ( false === $parts ? array() : $parts as $part ) {
-			$xpath = $this->compile( trim( $part ) );
+		foreach ( $this->split( $selector ) as $part ) {
+			$xpath = $this->compile( $part );
 
 			if ( null !== $xpath ) {
 				$xpaths[] = $xpath;
@@ -32,6 +31,42 @@ final class Selector {
 		}
 
 		return $xpaths;
+	}
+
+	/**
+	 * @return string[] The comma-separated selectors, trimmed, ignoring commas inside brackets.
+	 */
+	public function split( string $selector ): array {
+		$parts = preg_split( '/,(?![^\[]*\])/', $selector );
+
+		return array_values(
+			array_filter(
+				array_map( 'trim', false === $parts ? array() : $parts ),
+				static function ( string $part ): bool {
+					return '' !== $part;
+				}
+			)
+		);
+	}
+
+	/**
+	 * Splits text with one or more selectors per line into supported and unsupported ones.
+	 *
+	 * @return array{valid: string[], invalid: string[]}
+	 */
+	public function parse_list( string $text ): array {
+		$result = array(
+			'valid'   => array(),
+			'invalid' => array(),
+		);
+
+		foreach ( (array) preg_split( '/[\r\n]+/', $text ) as $line ) {
+			foreach ( $this->split( (string) $line ) as $part ) {
+				$result[ array() === $this->to_xpaths( $part ) ? 'invalid' : 'valid' ][] = $part;
+			}
+		}
+
+		return $result;
 	}
 
 	private function compile( string $selector ): ?string {

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace AgentReady\Settings;
 
 use AgentReady\Content\PostTypes;
+use AgentReady\Rendering\Selector;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -40,17 +41,42 @@ final class Sanitizer {
 			? array_values( array_filter( array_map( 'absint', $input['excluded_terms'] ) ) )
 			: array();
 
-		$selector = isset( $input['content_selector'] ) ? sanitize_text_field( $input['content_selector'] ) : '';
+		$selectors = new Selector();
+		$content   = $selectors->parse_list( isset( $input['content_selector'] ) ? sanitize_text_field( $input['content_selector'] ) : '' );
+		$strip     = $selectors->parse_list( isset( $input['strip_selectors'] ) ? sanitize_textarea_field( $input['strip_selectors'] ) : '' );
+
+		$this->report_invalid( array_merge( $content['invalid'], $strip['invalid'] ) );
 
 		$settings = array(
 			'excluded_post_types' => $excluded,
 			'excluded_posts'      => isset( $input['excluded_posts'] ) ? sanitize_textarea_field( $input['excluded_posts'] ) : '',
 			'excluded_terms'      => $terms,
-			'content_selector'    => '' === $selector ? Options::DEFAULT_SELECTOR : $selector,
+			'content_selector'    => empty( $content['valid'] ) ? Options::DEFAULT_SELECTOR : implode( ', ', $content['valid'] ),
+			'strip_selectors'     => implode( "\n", $strip['valid'] ),
 			'http_auth_enabled'   => ! empty( $input['http_auth_enabled'] ),
 		);
 
 		return array_merge( $settings, $this->http_auth( $input, $cleaned ) );
+	}
+
+	/**
+	 * @param string[] $invalid Selectors that could not be used.
+	 */
+	private function report_invalid( array $invalid ): void {
+		if ( empty( $invalid ) ) {
+			return;
+		}
+
+		add_settings_error(
+			Options::KEY,
+			'agentready_invalid_selector',
+			sprintf(
+				/* translators: %s: list of CSS selectors. */
+				__( 'These selectors are not supported and were ignored: %s', 'agentready' ),
+				implode( ', ', $invalid )
+			),
+			'warning'
+		);
 	}
 
 	/**

@@ -62,6 +62,11 @@ final class ConverterTest extends TestCase {
 			'definition list'       => array( '<dl><dt>Term</dt><dd>Meaning</dd></dl>', "**Term**\n\nMeaning\n" ),
 			'colspan'               => array( '<table><tr><th colspan="2">H</th></tr><tr><td>a</td><td>b</td></tr></table>', "| H |  |\n| --- | --- |\n| a | b |\n" ),
 			'heading-like text'     => array( '<p># not a heading</p>', "\\# not a heading\n" ),
+			'site header and footer' => array( '<header class="site-header"><p>Brand</p></header><p>Body</p><footer><p>Copyright</p></footer>', "Body\n" ),
+			'wrapped site header'   => array( '<div id="page"><header><p>Brand</p></header><p>Body</p></div>', "Body\n" ),
+			'article header kept'   => array( '<article><header><h1>Title</h1></header><p>Text</p><footer><p>By Ann</p></footer></article>', "# Title\n\nText\n\nBy Ann\n" ),
+			'banner role gone'      => array( '<div role="banner"><p>Logo</p></div><p>Body</p>', "Body\n" ),
+			'contentinfo role gone' => array( '<p>Body</p><div role="contentinfo"><p>Legal</p></div>', "Body\n" ),
 		);
 	}
 
@@ -84,6 +89,20 @@ final class ConverterTest extends TestCase {
 
 	public function test_empty_html_returns_null(): void {
 		$this->assertNull( ( new Extractor( new Selector() ) )->extract( '  ', 'main', 'https://example.com/' ) );
+	}
+
+	public function test_keeps_header_and_footer_inside_the_selected_main(): void {
+		$html = '<header><p>Site</p></header><main><header><h1>T</h1></header><p>x</p><footer><p>f</p></footer></main>';
+
+		$this->assertSame( "# T\n\nx\n\nf\n", $this->markdown( $html, 'main' ) );
+	}
+
+	public function test_extra_selectors_are_added_to_the_built_in_list(): void {
+		$extractor = ( new Extractor( new Selector() ) )->with_extra( array( '.cookie', 'article footer' ) );
+		$html      = '<body><div class="cookie">Accept</div><article><p>Read</p><footer><p>By Ann</p></footer></article><script>x</script></body>';
+		$node      = $extractor->extract( $html, 'article', 'https://example.com/' );
+
+		$this->assertSame( "Read\n", ( new Converter() )->convert( $node ) );
 	}
 
 	public function test_custom_strip_selectors(): void {

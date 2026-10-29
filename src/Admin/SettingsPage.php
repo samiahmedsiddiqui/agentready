@@ -12,6 +12,7 @@ namespace AgentReady\Admin;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Http\Urls;
+use AgentReady\Rendering\Extractor;
 use AgentReady\Settings\Options;
 use AgentReady\Settings\Sanitizer;
 
@@ -212,6 +213,18 @@ final class SettingsPage implements Hookable {
 					<td>
 						<input type="text" id="agentready-selector" class="large-text code" name="<?php echo esc_attr( $name ); ?>[content_selector]" value="<?php echo esc_attr( (string) $this->options->get( 'content_selector', Options::DEFAULT_SELECTOR ) ); ?>" />
 						<p class="description"><?php esc_html_e( 'Comma-separated CSS selectors, tried in order, that mark the main content of a page. Supports tag, #id, .class and [attribute]. If none match, the whole body is used.', 'agentready' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="agentready-strip"><?php esc_html_e( 'Elements to exclude', 'agentready' ); ?></label></th>
+					<td>
+						<textarea id="agentready-strip" name="<?php echo esc_attr( $name ); ?>[strip_selectors]" rows="4" class="large-text code"><?php echo esc_textarea( (string) $this->options->get( 'strip_selectors', '' ) ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'One CSS selector per line, for example .cookie-banner or article footer. These are removed from the content in addition to the built-in list. Unsupported selectors are ignored.', 'agentready' ); ?></p>
+						<details style="margin-top:8px">
+							<summary><?php esc_html_e( 'Built-in exclusions', 'agentready' ); ?></summary>
+							<p><code><?php echo esc_html( implode( ', ', Extractor::DEFAULT_STRIP ) ); ?></code></p>
+							<p class="description"><?php esc_html_e( 'Also removed: elements with role="banner" or role="contentinfo", and any header or footer that is not inside an article, main or section element. Headers and footers inside an article are kept.', 'agentready' ); ?></p>
+						</details>
 					</td>
 				</tr>
 				<tr>

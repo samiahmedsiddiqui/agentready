@@ -12,6 +12,7 @@ namespace AgentReady\Rendering;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use DOMNodeList;
 use DOMXPath;
 
 defined( 'ABSPATH' ) || exit;
@@ -44,6 +45,13 @@ final class Extractor {
 		'.sharedaddy',
 	);
 
+	public const STRIP_XPATHS = array(
+		'.//*[@role="banner"]',
+		'.//*[@role="contentinfo"]',
+		'.//header[not(ancestor::article or ancestor::main or ancestor::section)]',
+		'.//footer[not(ancestor::article or ancestor::main or ancestor::section)]',
+	);
+
 	private const LAZY_ATTRIBUTES = array( 'data-src', 'data-lazy-src', 'data-original' );
 
 	/**
@@ -53,6 +61,13 @@ final class Extractor {
 		private Selector $selector,
 		private array $strip = self::DEFAULT_STRIP
 	) {}
+
+	/**
+	 * @param string[] $selectors Extra CSS selectors for elements to remove.
+	 */
+	public function with_extra( array $selectors ): self {
+		return new self( $this->selector, array_merge( $this->strip, $selectors ) );
+	}
 
 	public function extract( string $html, string $selector, string $base_url ): ?DOMElement {
 		$dom = $this->load( $html );
@@ -140,27 +155,49 @@ final class Extractor {
 	}
 
 	private function strip( DOMXPath $xpath, DOMElement $root ): void {
-		$queries = array( './/comment()' );
+		$relative = array_merge( array( './/comment()' ), self::STRIP_XPATHS );
+		$document = array();
 
 		foreach ( $this->strip as $selector ) {
-			foreach ( $this->selector->to_xpaths( $selector ) as $query ) {
-				$queries[] = '.' . $query;
-			}
+			$document = array_merge( $document, $this->selector->to_xpaths( $selector ) );
 		}
 
-		foreach ( $queries as $query ) {
-			$list = $xpath->query( $query, $root );
+		foreach ( $relative as $query ) {
+			$this->remove( $xpath->query( $query, $root ), $root );
+		}
 
-			if ( false === $list ) {
-				continue;
-			}
+		foreach ( $document as $query ) {
+			$this->remove( $xpath->query( $query ), $root );
+		}
+	}
 
-			foreach ( iterator_to_array( $list ) as $node ) {
-				if ( $node->parentNode instanceof DOMNode ) {
-					$node->parentNode->removeChild( $node );
-				}
+	/**
+	 * @param DOMNodeList<DOMNode>|false $nodes Nodes to remove when they sit inside the root.
+	 */
+	private function remove( $nodes, DOMElement $root ): void {
+		if ( false === $nodes ) {
+			return;
+		}
+
+		foreach ( iterator_to_array( $nodes ) as $node ) {
+			if ( $node !== $root && $node->parentNode instanceof DOMNode && $this->is_inside( $node, $root ) ) {
+				$node->parentNode->removeChild( $node );
 			}
 		}
+	}
+
+	private function is_inside( DOMNode $node, DOMElement $root ): bool {
+		$parent = $node->parentNode;
+
+		while ( null !== $parent ) {
+			if ( $parent === $root ) {
+				return true;
+			}
+
+			$parent = $parent->parentNode;
+		}
+
+		return false;
 	}
 
 	private function prepare_media( DOMXPath $xpath, DOMElement $root ): void {
