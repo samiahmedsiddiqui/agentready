@@ -288,3 +288,69 @@
 	font-size: 12px;
 	margin-left: auto;
 }
+
+.agentready .agentready-tabs.is-tabbed .agentready-panel {
+	display: none;
+}
+
+.agentready .agentready-tabs.is-tabbed .agentready-panel.is-active {
+	display: block;
+}
+
+.agentready .agentready-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 12px 0 0;
+}
+
+.agentready .agentready-system {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 4px 12px;
+	margin: 0;
+}
+
+.agentready .agentready-system dt {
+	font-weight: 600;
+}
+
+.agentready .agentready-system dd {
+	margin: 0;
+}
+
+.agentready-box .agentready-line {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin: 0 0 4px;
+	font-weight: 600;
+}
+
+.agentready-box .agentready-dot {
+	flex: none;
+	width: 10px;
+	height: 10px;
+	margin-top: 5px;
+	border-radius: 50%;
+	background: #8c8f94;
+}
+
+.agentready-box [data-agentready-state="fresh"] .agentready-dot {
+	background: #00a32a;
+}
+
+.agentready-box [data-agentready-state="stale"] .agentready-dot,
+.agentready-box [data-agentready-state="outdated"] .agentready-dot {
+	background: #dba617;
+}
+
+.agentready-box [data-agentready-state="unavailable"] .agentready-dot {
+	background: #d63638;
+}
+
+.agentready-box .agentready-box-actions {
+	display: flex;
+	gap: 8px;
+	margin: 10px 0 6px;
+}

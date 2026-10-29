@@ -1,6 +1,6 @@
 <?php
 /**
- * Editor box with per-page controls: hide from AgentReady and description override.
+ * Editor box: stored Markdown status and refresh, hide from AgentReady, and description override.
  *
  * @package AgentReady
  */
@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace AgentReady\Admin;
 
+use AgentReady\Cache\PageStatus;
 use AgentReady\Content\PostMeta;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
@@ -24,12 +25,14 @@ final class MetaBox implements Hookable {
 
 	public function __construct(
 		private PostTypes $post_types,
-		private Options $options
+		private Options $options,
+		private PageStatus $status
 	) {}
 
 	public function register(): void {
 		add_action( 'add_meta_boxes', array( $this, 'add' ) );
 		add_action( 'save_post', array( $this, 'save' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
 	public function add(): void {
@@ -48,23 +51,27 @@ final class MetaBox implements Hookable {
 		add_meta_box( 'agentready', __( 'AgentReady', 'agentready' ), array( $this, 'render' ), $types, 'side' );
 	}
 
-	public function render( WP_Post $post ): void {
-		$excluded    = (bool) get_post_meta( $post->ID, PostMeta::EXCLUDE, true );
-		$description = (string) get_post_meta( $post->ID, PostMeta::DESCRIPTION, true );
+	public function enqueue( string $hook ): void {
+		if ( 'post.php' !== $hook ) {
+			return;
+		}
 
+		Assets::style();
+		wp_enqueue_script( 'agentready-editor', AGENTREADY_URL . 'assets/js/editor.js', array( 'wp-api-fetch' ), Assets::version( 'assets/js/editor.js' ), true );
+	}
+
+	public function render( WP_Post $post ): void {
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
-		?>
-		<p>
-			<label>
-				<input type="checkbox" name="agentready_exclude" value="1" <?php checked( $excluded ); ?> />
-				<?php esc_html_e( 'Hide this page from AgentReady', 'agentready' ); ?>
-			</label>
-		</p>
-		<p>
-			<label for="agentready_description"><?php esc_html_e( 'Description for llms.txt', 'agentready' ); ?></label>
-			<textarea id="agentready_description" name="agentready_description" class="widefat" rows="3" maxlength="300"><?php echo esc_textarea( $description ); ?></textarea>
-		</p>
-		<?php
+
+		View::render(
+			'metabox',
+			array(
+				'post'        => $post,
+				'excluded'    => (bool) get_post_meta( $post->ID, PostMeta::EXCLUDE, true ),
+				'description' => (string) get_post_meta( $post->ID, PostMeta::DESCRIPTION, true ),
+				'status'      => $this->status->for_post( $post ),
+			)
+		);
 	}
 
 	public function save( int $post_id ): void {

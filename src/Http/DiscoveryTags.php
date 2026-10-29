@@ -11,6 +11,7 @@ namespace AgentReady\Http;
 
 use AgentReady\Content\Eligibility;
 use AgentReady\Contracts\Hookable;
+use AgentReady\Environment\Environment;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -19,7 +20,8 @@ final class DiscoveryTags implements Hookable {
 
 	public function __construct(
 		private Eligibility $eligibility,
-		private Urls $urls
+		private Urls $urls,
+		private Environment $environment
 	) {}
 
 	public function register(): void {
@@ -27,7 +29,7 @@ final class DiscoveryTags implements Hookable {
 	}
 
 	public function render(): void {
-		if ( ! is_singular() ) {
+		if ( ! is_singular() || ! $this->environment->is_active() ) {
 			return;
 		}
 
