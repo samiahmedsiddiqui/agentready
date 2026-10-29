@@ -1,0 +1,13 @@
+.git
+.gitignore
+.distignore
+.editorconfig
+.wordpress-org
+.github
+README.md
+composer.json
+composer.lock
+phpcs.xml.dist
+tests
+vendor
+.DS_Store

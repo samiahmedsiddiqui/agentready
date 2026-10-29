@@ -1,0 +1,38 @@
+{
+	"name": "yasglobal/agentready",
+	"description": "Serves an llms.txt index and a Markdown version of every page for AI agents. Works with ACF, Gutenberg, Elementor and classic content.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"keywords": [ "wordpress", "plugin", "llms-txt", "markdown", "ai", "llm" ],
+	"authors": [
+		{
+			"name": "Sami Ahmed Siddiqui"
+		}
+	],
+	"require": {
+		"php": ">=8.0",
+		"composer/installers": "^2.0"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"wp-coding-standards/wpcs": "^3.0",
+		"phpcompatibility/phpcompatibility-wp": "^2.1"
+	},
+	"autoload": {
+		"psr-4": {
+			"AgentReady\\": "src/"
+		}
+	},
+	"config": {
+		"optimize-autoloader": true,
+		"sort-packages": true,
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"lint": "phpcs",
+		"fix": "phpcbf"
+	}
+}
