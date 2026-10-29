@@ -90,7 +90,7 @@ final class Converter {
 		$tag = strtolower( $element->nodeName );
 
 		if ( 1 === preg_match( '/^h([1-6])$/', $tag, $level ) ) {
-			$text = (string) preg_replace( '/^(\*{1,3})([^*]+)\1$/', '$2', $this->inline( $element, $depth, $pre ) );
+			$text = (string) preg_replace( '/^\*{1,4}([^*]+)\*{1,4}$/', '$1', $this->inline( $element, $depth, $pre ) );
 
 			return '' === $text ? '' : "\n\n" . str_repeat( '#', (int) $level[1] ) . ' ' . $text . "\n\n";
 		}
@@ -250,6 +250,13 @@ final class Converter {
 
 	private function wrap( string $marker, string $content ): string {
 		if ( ! preg_match( '/^(\s*)(.*?)(\s*)$/s', $content, $match ) || '' === $match[2] ) {
+			return $content;
+		}
+
+		// Already wrapped by the same marker, for example <strong><strong>text</strong></strong>.
+		$quoted = preg_quote( $marker, '/' );
+
+		if ( 1 === preg_match( '/^' . $quoted . '(?!\*).*(?<!\*)' . $quoted . '$/s', $match[2] ) ) {
 			return $content;
 		}
 
