@@ -16,6 +16,9 @@ defined( 'ABSPATH' ) || exit;
 
 final class Sanitizer {
 
+	/** @var array<string, mixed>|null */
+	private ?array $last = null;
+
 	public function __construct( private PostTypes $post_types, private Options $options ) {}
 
 	/**
@@ -23,40 +26,39 @@ final class Sanitizer {
 	 * @return array<string, mixed>
 	 */
 	public function sanitize( mixed $input ): array {
-		$input = is_array( $input ) ? $input : array();
-
-		// WordPress runs the callback a second time on the first save, with the cleaned result.
-		$cleaned = array_key_exists( 'excluded_post_types', $input ) && ! array_key_exists( 'enabled_post_types', $input );
-
-		if ( $cleaned ) {
-			$excluded = array_values( array_map( 'sanitize_key', (array) $input['excluded_post_types'] ) );
-		} else {
-			$enabled  = isset( $input['enabled_post_types'] ) && is_array( $input['enabled_post_types'] )
-				? array_map( 'sanitize_key', $input['enabled_post_types'] )
-				: array();
-			$excluded = array_values( array_diff( $this->post_types->available(), $enabled ) );
+		// WordPress calls the sanitizer a second time with its own output on the first save.
+		if ( is_array( $input ) && null !== $this->last && $input === $this->last ) {
+			return $input;
 		}
 
-		$terms = isset( $input['excluded_terms'] ) && is_array( $input['excluded_terms'] )
-			? array_values( array_filter( array_map( 'absint', $input['excluded_terms'] ) ) )
-			: array();
-
+		$input     = is_array( $input ) ? $input : array();
 		$selectors = new Selector();
 		$content   = $selectors->parse_list( isset( $input['content_selector'] ) ? sanitize_text_field( $input['content_selector'] ) : '' );
 		$strip     = $selectors->parse_list( isset( $input['strip_selectors'] ) ? sanitize_textarea_field( $input['strip_selectors'] ) : '' );
 
 		$this->report_invalid( array_merge( $content['invalid'], $strip['invalid'] ) );
 
-		$settings = array(
-			'excluded_post_types' => $excluded,
-			'excluded_posts'      => isset( $input['excluded_posts'] ) ? sanitize_textarea_field( $input['excluded_posts'] ) : '',
-			'excluded_terms'      => $terms,
-			'content_selector'    => empty( $content['valid'] ) ? Options::DEFAULT_SELECTOR : implode( ', ', $content['valid'] ),
-			'strip_selectors'     => implode( "\n", $strip['valid'] ),
-			'http_auth_enabled'   => ! empty( $input['http_auth_enabled'] ),
+		$post_types = isset( $input['excluded_post_types'] ) && is_array( $input['excluded_post_types'] )
+			? array_values( array_intersect( $this->post_types->available(), array_map( 'sanitize_key', $input['excluded_post_types'] ) ) )
+			: array();
+
+		$terms = isset( $input['excluded_terms'] ) && is_array( $input['excluded_terms'] )
+			? array_values( array_filter( array_map( 'absint', $input['excluded_terms'] ) ) )
+			: array();
+
+		$this->last = array_merge(
+			array(
+				'excluded_post_types' => $post_types,
+				'excluded_posts'      => isset( $input['excluded_posts'] ) ? sanitize_textarea_field( $input['excluded_posts'] ) : '',
+				'excluded_terms'      => $terms,
+				'content_selector'    => implode( ', ', $content['valid'] ),
+				'strip_selectors'     => implode( "\n", $strip['valid'] ),
+				'http_auth_enabled'   => ! empty( $input['http_auth_enabled'] ),
+			),
+			$this->http_auth( $input )
 		);
 
-		return array_merge( $settings, $this->http_auth( $input, $cleaned ) );
+		return $this->last;
 	}
 
 	/**
@@ -80,11 +82,10 @@ final class Sanitizer {
 	}
 
 	/**
-	 * @param array<string, mixed> $input   Raw submitted values.
-	 * @param bool                 $cleaned Whether the input already went through this sanitizer.
+	 * @param array<string, mixed> $input Raw submitted values.
 	 * @return array<string, string>
 	 */
-	private function http_auth( array $input, bool $cleaned ): array {
+	private function http_auth( array $input ): array {
 		$current = $this->options->all();
 
 		if ( $this->options->http_auth_from_constants() ) {
@@ -100,15 +101,6 @@ final class Sanitizer {
 			return array(
 				'http_auth_user'     => '',
 				'http_auth_password' => '',
-			);
-		}
-
-		if ( $cleaned ) {
-			$stored = isset( $input['http_auth_password'] ) ? (string) $input['http_auth_password'] : '';
-
-			return array(
-				'http_auth_user'     => $user,
-				'http_auth_password' => 0 === strpos( $stored, 'v1:' ) ? $stored : (string) $current['http_auth_password'],
 			);
 		}
 

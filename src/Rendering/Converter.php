@@ -20,6 +20,8 @@ final class Converter {
 
 	private const MAX_DEPTH = 100;
 
+	private const ICONS = array( '✓', '✔', '✗', '✘', '✕', '✖', '×', '•', '●', '◦', '▪', '★', '☆', '✦', '→', '←', '↗', '➜', '✅', '❌', '⭐' );
+
 	private const CONTAINERS = array(
 		'html',
 		'body',
@@ -53,8 +55,7 @@ final class Converter {
 		$markdown = str_replace( "\r", '', $markdown );
 		$markdown = (string) preg_replace( '/[ \t]+\n/', "\n", $markdown );
 		$markdown = str_replace( self::BREAK, '  ', $markdown );
-		$markdown = (string) preg_replace( "/\n{3,}/", "\n\n", $markdown );
-		$markdown = trim( $markdown );
+		$markdown = trim( $this->polish( trim( $markdown ) ) );
 
 		return '' === $markdown ? '' : $markdown . "\n";
 	}
@@ -89,7 +90,7 @@ final class Converter {
 		$tag = strtolower( $element->nodeName );
 
 		if ( 1 === preg_match( '/^h([1-6])$/', $tag, $level ) ) {
-			$text = $this->inline( $element, $depth, $pre );
+			$text = (string) preg_replace( '/^(\*{1,3})([^*]+)\1$/', '$2', $this->inline( $element, $depth, $pre ) );
 
 			return '' === $text ? '' : "\n\n" . str_repeat( '#', (int) $level[1] ) . ' ' . $text . "\n\n";
 		}
@@ -109,6 +110,8 @@ final class Converter {
 			case 's':
 			case 'strike':
 				return $this->wrap( '~~', $this->children( $element, $depth, $pre ) );
+			case 'sup':
+				return $this->superscript( trim( $this->inline( $element, $depth, $pre ) ) );
 			case 'q':
 				return '"' . trim( $this->children( $element, $depth, $pre ) ) . '"';
 			case 'code':
@@ -157,6 +160,92 @@ final class Converter {
 		$text = str_replace( self::BREAK, ' ', $this->children( $node, $depth, $pre ) );
 
 		return trim( (string) preg_replace( '/\s*\n\s*/', ' ', $text ) );
+	}
+
+	private function superscript( string $text ): string {
+		if ( '' === $text || 1 === preg_match( '/^[™®©]+$/u', $text ) ) {
+			return $text;
+		}
+
+		return 1 === preg_match( '/^[\w*†‡§]{1,4}$/u', $text ) ? '^' . $text : ' (' . $text . ')';
+	}
+
+	/**
+	 * Joins lone icon blocks to the text after them and drops images whose alt text repeats a neighbouring block.
+	 */
+	private function polish( string $markdown ): string {
+		$blocks = $this->blocks( $markdown );
+		$kept   = array();
+		$count  = count( $blocks );
+
+		for ( $i = 0; $i < $count; $i++ ) {
+			$block = $blocks[ $i ];
+
+			if ( in_array( $block, self::ICONS, true ) && $i + 1 < $count && $this->is_plain( $blocks[ $i + 1 ] ) ) {
+				$blocks[ $i + 1 ] = $block . ' ' . $blocks[ $i + 1 ];
+				continue;
+			}
+
+			$alt = $this->standalone_alt( $block );
+
+			if ( null !== $alt && ( $this->same_text( $alt, (string) end( $kept ) ) || ( $i + 1 < $count && $this->same_text( $alt, $blocks[ $i + 1 ] ) ) ) ) {
+				continue;
+			}
+
+			$kept[] = $block;
+		}
+
+		return implode( "\n\n", $kept );
+	}
+
+	/**
+	 * @return string[] Blocks separated by blank lines, keeping fenced code intact.
+	 */
+	private function blocks( string $markdown ): array {
+		$blocks  = array();
+		$current = array();
+		$fence   = '';
+
+		foreach ( explode( "\n", $markdown ) as $line ) {
+			if ( '' === $fence && 1 === preg_match( '/^(`{3,})/', $line, $open ) ) {
+				$fence = $open[1];
+			} elseif ( '' !== $fence && trim( $line ) === $fence ) {
+				$fence = '';
+			} elseif ( '' === $fence && '' === trim( $line ) ) {
+				if ( ! empty( $current ) ) {
+					$blocks[] = implode( "\n", $current );
+					$current  = array();
+				}
+				continue;
+			}
+
+			$current[] = $line;
+		}
+
+		if ( ! empty( $current ) ) {
+			$blocks[] = implode( "\n", $current );
+		}
+
+		return $blocks;
+	}
+
+	private function is_plain( string $block ): bool {
+		return 0 === preg_match( '/^(#|[-*+] |\d+[.)] |>|\||`{3}|!\[)/', $block ) && ! in_array( $block, self::ICONS, true );
+	}
+
+	private function standalone_alt( string $block ): ?string {
+		return 1 === preg_match( '/^!\[([^\]]*)\]\([^)]*\)$/', $block, $match ) && '' !== trim( $match[1] ) ? $match[1] : null;
+	}
+
+	private function same_text( string $a, string $b ): bool {
+		return $this->plain( $a ) === $this->plain( $b ) && '' !== $this->plain( $a );
+	}
+
+	private function plain( string $text ): string {
+		$text = (string) preg_replace( '/^#+\s+/', '', trim( $text ) );
+		$text = (string) preg_replace( '/[\\*_`]/', '', $text );
+
+		return strtolower( trim( (string) preg_replace( '/\s+/u', ' ', $text ) ) );
 	}
 
 	private function wrap( string $marker, string $content ): string {
@@ -277,9 +366,26 @@ final class Converter {
 		}
 
 		$alt = trim( (string) preg_replace( '/\s+/', ' ', $element->getAttribute( 'alt' ) ) );
+
+		if ( $this->repeats_parent_text( $element, $alt ) ) {
+			return '';
+		}
+
 		$alt = str_replace( array( '[', ']' ), array( '\\[', '\\]' ), $alt );
 
 		return '![' . $alt . '](' . $this->destination( $src ) . ')';
+	}
+
+	private function repeats_parent_text( DOMElement $image, string $alt ): bool {
+		$parent = $image->parentNode;
+
+		if ( '' === $alt || ! $parent instanceof DOMElement || 'figure' === strtolower( $parent->nodeName ) ) {
+			return false;
+		}
+
+		$text = $this->plain( $parent->textContent );
+
+		return strlen( $text ) <= 80 && str_contains( $text, $this->plain( $alt ) );
 	}
 
 	private function embed( DOMElement $element, string $label ): string {

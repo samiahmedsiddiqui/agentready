@@ -25,7 +25,8 @@ final class Generator {
 		private Extractor $extractor,
 		private Converter $converter,
 		private FrontMatter $front_matter,
-		private Description $description
+		private Description $description,
+		private Summary $summary
 	) {}
 
 	/**
@@ -34,10 +35,12 @@ final class Generator {
 	public function generate( WP_Post $post, array $overrides = array() ): GeneratedPage {
 		$render    = $this->renderer->render( $post );
 		$url       = (string) $this->urls->permalink( $post );
-		$selector  = ! empty( $overrides['selector'] ) ? $overrides['selector'] : (string) $this->options->get( 'content_selector', Options::DEFAULT_SELECTOR );
+		$selector  = ! empty( $overrides['selector'] ) ? $overrides['selector'] : $this->options->content_selector();
+		$selector  = '' === $selector ? Options::DEFAULT_SELECTOR : $selector;
 		$extractor = ! empty( $overrides['strip'] ) ? $this->extractor->with_extra( $overrides['strip'] ) : $this->extractor;
 		$node      = $extractor->extract( $render->html, $selector, $url );
 		$body      = null === $node ? '' : $this->converter->convert( $node );
+		$summary   = $this->summary->from_markdown( $body );
 		$title     = trim( html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' ) );
 
 		if ( '' !== $title && ( null === $node || 0 === $node->getElementsByTagName( 'h1' )->length ) ) {
@@ -48,7 +51,7 @@ final class Generator {
 			array(
 				'title'       => $title,
 				'url'         => $url,
-				'description' => $this->description->get( $post ),
+				'description' => $this->description_for( $post, $summary ),
 				'type'        => $post->post_type,
 				'modified'    => (string) get_post_modified_time( 'c', true, $post ),
 				'language'    => str_replace( '_', '-', get_locale() ),
@@ -58,5 +61,11 @@ final class Generator {
 		$markdown = (string) apply_filters( 'agentready_markdown', $front . "\n" . trim( $body ) . "\n", $post );
 
 		return new GeneratedPage( $markdown, $render->source, $render->notice );
+	}
+
+	private function description_for( WP_Post $post, string $summary ): string {
+		$description = $this->description->get( $post );
+
+		return '' !== $description ? $description : $summary;
 	}
 }

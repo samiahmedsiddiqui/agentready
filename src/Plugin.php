@@ -34,6 +34,7 @@ use AgentReady\Rendering\FrontMatter;
 use AgentReady\Rendering\Generator;
 use AgentReady\Rendering\Renderer;
 use AgentReady\Rendering\Selector;
+use AgentReady\Rendering\Summary;
 use AgentReady\Robots\RobotsTxt;
 use AgentReady\Settings\Options;
 use AgentReady\Settings\Sanitizer;
@@ -79,7 +80,8 @@ final class Plugin {
 			),
 			new Converter(),
 			new FrontMatter(),
-			$description
+			$description,
+			new Summary()
 		);
 
 		$this->components = array(

@@ -25,7 +25,7 @@ final class Options {
 			'excluded_post_types' => array(),
 			'excluded_posts'      => '',
 			'excluded_terms'      => array(),
-			'content_selector'    => self::DEFAULT_SELECTOR,
+			'content_selector'    => '',
 			'strip_selectors'     => '',
 			'http_auth_enabled'   => false,
 			'http_auth_user'      => '',
@@ -46,6 +46,15 @@ final class Options {
 		$all = $this->all();
 
 		return $all[ $key ] ?? $fallback;
+	}
+
+	/**
+	 * @return string The saved content selector, or an empty string to auto-detect.
+	 */
+	public function content_selector(): string {
+		$selector = trim( (string) $this->get( 'content_selector', '' ) );
+
+		return self::DEFAULT_SELECTOR === $selector ? '' : $selector;
 	}
 
 	public function http_auth_from_constants(): bool {
