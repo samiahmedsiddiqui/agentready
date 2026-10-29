@@ -38,7 +38,9 @@ final class PostTypes {
 	 * @return string[]
 	 */
 	public function enabled(): array {
-		return array_values( array_diff( $this->available(), $this->excluded() ) );
+		$excluded = array_map( 'strval', (array) apply_filters( 'agentready_excluded_post_types', $this->excluded() ) );
+
+		return array_values( array_diff( $this->available(), $excluded ) );
 	}
 
 	public function is_enabled( string $post_type ): bool {

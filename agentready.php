@@ -6,6 +6,7 @@
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Sami Ahmed Siddiqui
+ * Author URI:        https://www.linkedin.com/in/sami-ahmed-siddiqui/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       agentready
@@ -28,8 +29,5 @@ if ( is_readable( AGENTREADY_PATH . 'vendor/autoload.php' ) ) {
 	require_once AGENTREADY_PATH . 'src/Autoloader.php';
 	AgentReady\Autoloader::register( 'AgentReady\\', AGENTREADY_PATH . 'src/' );
 }
-
-register_activation_hook( __FILE__, array( AgentReady\Activator::class, 'activate' ) );
-register_deactivation_hook( __FILE__, array( AgentReady\Deactivator::class, 'deactivate' ) );
 
 add_action( 'plugins_loaded', array( AgentReady\Plugin::class, 'boot' ) );

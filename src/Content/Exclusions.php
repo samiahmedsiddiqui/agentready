@@ -66,7 +66,15 @@ final class Exclusions {
 	private function matches_term( WP_Post $post ): bool {
 		$terms = array_map( 'absint', (array) $this->options->get( 'excluded_terms', array() ) );
 
-		return ! empty( $terms ) && has_term( $terms, '', $post );
+		$taxonomies = get_object_taxonomies( $post->post_type );
+
+		if ( empty( $terms ) || empty( $taxonomies ) ) {
+			return false;
+		}
+
+		$assigned = wp_get_object_terms( $post->ID, $taxonomies, array( 'fields' => 'ids' ) );
+
+		return ! is_wp_error( $assigned ) && array() !== array_intersect( $terms, array_map( 'intval', $assigned ) );
 	}
 
 	private function relative_path( WP_Post $post ): string {

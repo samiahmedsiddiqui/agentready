@@ -12,6 +12,7 @@ namespace AgentReady\Admin;
 use AgentReady\Content\PostMeta;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
+use AgentReady\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -21,7 +22,10 @@ final class MetaBox implements Hookable {
 	private const NONCE_ACTION = 'agentready_save_post';
 	private const NONCE_NAME   = 'agentready_nonce';
 
-	public function __construct( private PostTypes $post_types ) {}
+	public function __construct(
+		private PostTypes $post_types,
+		private Options $options
+	) {}
 
 	public function register(): void {
 		add_action( 'add_meta_boxes', array( $this, 'add' ) );
@@ -29,13 +33,19 @@ final class MetaBox implements Hookable {
 	}
 
 	public function add(): void {
-		add_meta_box(
-			'agentready',
-			__( 'AgentReady', 'agentready' ),
-			array( $this, 'render' ),
-			$this->post_types->enabled(),
-			'side'
+		$setting = (bool) $this->options->get( 'show_meta_box', true );
+		$types   = array_values(
+			array_filter(
+				$this->post_types->enabled(),
+				static fn( string $type ): bool => (bool) apply_filters( 'agentready_show_meta_box', $setting, $type )
+			)
 		);
+
+		if ( empty( $types ) ) {
+			return;
+		}
+
+		add_meta_box( 'agentready', __( 'AgentReady', 'agentready' ), array( $this, 'render' ), $types, 'side' );
 	}
 
 	public function render( WP_Post $post ): void {
