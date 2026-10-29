@@ -234,6 +234,18 @@ final class SettingsPage implements Hookable {
 					</section>
 
 					<section class="agentready-card">
+						<h2><?php esc_html_e( 'Editor', 'agentready' ); ?></h2>
+						<p class="agentready-intro"><?php esc_html_e( 'Choose whether editors see AgentReady on the edit screen.', 'agentready' ); ?></p>
+						<div class="agentready-field">
+							<label>
+								<input type="checkbox" name="<?php echo esc_attr( $name ); ?>[show_meta_box]" value="1" <?php checked( (bool) $this->options->get( 'show_meta_box', true ) ); ?> />
+								<?php esc_html_e( 'Show the AgentReady box on the edit screen', 'agentready' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'The box lets editors hide a page and write its llms.txt description. Hiding the box does not remove anything already saved on a page.', 'agentready' ); ?></p>
+						</div>
+					</section>
+
+					<section class="agentready-card">
 						<h2><?php esc_html_e( 'Page content', 'agentready' ); ?></h2>
 						<p class="agentready-intro"><?php esc_html_e( 'Choose which part of each page becomes the Markdown. Use the Preview tab to try changes before saving.', 'agentready' ); ?></p>
 						<div class="agentready-field">

@@ -103,7 +103,7 @@ final class Plugin {
 				new Sanitizer( $post_types, $options ),
 				new PreviewTool( $urls, $eligibility, $generator )
 			);
-			$this->components[] = new MetaBox( $post_types );
+			$this->components[] = new MetaBox( $post_types, $options );
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {

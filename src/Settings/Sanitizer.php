@@ -53,6 +53,7 @@ final class Sanitizer {
 				'excluded_terms'      => $terms,
 				'content_selector'    => implode( ', ', $content['valid'] ),
 				'strip_selectors'     => implode( "\n", $strip['valid'] ),
+				'show_meta_box'       => ! empty( $input['show_meta_box'] ),
 				'http_auth_enabled'   => ! empty( $input['http_auth_enabled'] ),
 			),
 			$this->http_auth( $input )

@@ -62,6 +62,14 @@ Tick "This site is protected with HTTP Basic authentication" in Settings > Agent
 
 AgentReady falls back to the post content. That output is thinner, because fields printed by your theme are missing. The Preview tab shows when this happens and why.
 
+= Can I exclude pages with code? =
+
+Yes. Use the `agentready_is_eligible` filter to leave out a single post, `agentready_excluded_post_types` to leave out post types, and `agentready_show_meta_box` to hide the box on the edit screen. Examples are in the plugin's GitHub README.
+
+= Can I hide the AgentReady box on the edit screen? =
+
+Yes. Untick "Show the AgentReady box on the edit screen" in Settings > AgentReady. Anything already saved on a page, such as hiding it or its description, keeps working.
+
 = Can I change what counts as the main content? =
 
 Yes. Set the content selector in Settings > AgentReady. The default tries `main`, `[role="main"]`, `#content`, `#main`, `.site-content` and `article`, then the whole body.

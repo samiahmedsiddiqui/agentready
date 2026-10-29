@@ -56,7 +56,9 @@ define( 'AGENTREADY_HTTP_AUTH_PASSWORD', 'password' );
 
 | Filter | Purpose |
 | --- | --- |
-| `agentready_is_eligible` | Exclude a post programmatically. |
+| `agentready_is_eligible` | Exclude a post programmatically. Receives `$eligible` and the `WP_Post`. |
+| `agentready_excluded_post_types` | Add or remove excluded post types in code. |
+| `agentready_show_meta_box` | Show or hide the editor box. Receives the setting and the post type. |
 | `agentready_resolve_post` | Map a request path to a post. |
 | `agentready_use_loopback` | Return `false` to skip fetching the page and use the post content. |
 | `agentready_loopback_timeout` | Seconds to wait for the page request (default 15). |
@@ -67,6 +69,23 @@ define( 'AGENTREADY_HTTP_AUTH_PASSWORD', 'password' );
 | `agentready_llms_max_items` | Entries per post type in `llms.txt` (default 500). |
 | `agentready_content_type` | Content type of the Markdown response. |
 | `agentready_response_headers` | Response headers. |
+
+### Excluding from code
+
+```php
+// Leave out one page.
+add_filter( 'agentready_is_eligible', function ( $eligible, $post ) {
+	return 'private-docs' === $post->post_name ? false : $eligible;
+}, 10, 2 );
+
+// Leave out a whole post type.
+add_filter( 'agentready_excluded_post_types', function ( $types ) {
+	return array_merge( $types, array( 'product' ) );
+} );
+
+// Hide the editor box for everyone.
+add_filter( 'agentready_show_meta_box', '__return_false' );
+```
 
 ## Installation
 

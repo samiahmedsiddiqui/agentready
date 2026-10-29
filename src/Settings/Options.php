@@ -27,6 +27,7 @@ final class Options {
 			'excluded_terms'      => array(),
 			'content_selector'    => '',
 			'strip_selectors'     => '',
+			'show_meta_box'       => true,
 			'http_auth_enabled'   => false,
 			'http_auth_user'      => '',
 			'http_auth_password'  => '',
