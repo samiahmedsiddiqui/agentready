@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace AgentReady\Http;
 
+use AgentReady\Cache\PageCache;
 use AgentReady\Content\Eligibility;
 use AgentReady\Contracts\Hookable;
+use AgentReady\Environment\Environment;
 use AgentReady\Index\LlmsTxt;
-use AgentReady\Rendering\Generator;
 use WP;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,7 +23,8 @@ final class Router implements Hookable {
 	public function __construct(
 		private Urls $urls,
 		private Eligibility $eligibility,
-		private Generator $generator,
+		private PageCache $pages,
+		private Environment $environment,
 		private LlmsTxt $llms,
 		private MarkdownResponse $response
 	) {}
@@ -32,7 +34,7 @@ final class Router implements Hookable {
 	}
 
 	public function maybe_serve( WP $wp ): void {
-		if ( ! Urls::has_pretty_permalinks() || ! $this->is_read_request() ) {
+		if ( ! Urls::has_pretty_permalinks() || ! $this->is_read_request() || ! $this->environment->is_active() ) {
 			return;
 		}
 
@@ -58,13 +60,19 @@ final class Router implements Hookable {
 			return;
 		}
 
-		$page = $this->generator->generate( $post );
+		$served = $this->pages->fetch( $post );
+
+		if ( null === $served ) {
+			$this->response->unavailable();
+			$this->terminate();
+		}
 
 		$this->response->send(
-			$page->markdown,
+			$served->entry->markdown,
 			(string) apply_filters( 'agentready_content_type', MarkdownResponse::MARKDOWN, $post ),
 			(string) $this->urls->permalink( $post ),
-			(int) strtotime( $post->post_modified_gmt . ' UTC' )
+			(int) strtotime( $post->post_modified_gmt . ' UTC' ),
+			array( 'X-AgentReady-Cache' => $served->cache )
 		);
 
 		$this->terminate();

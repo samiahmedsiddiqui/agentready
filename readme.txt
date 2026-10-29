@@ -15,12 +15,14 @@ Serves an llms.txt index and a clean Markdown version of every page, so AI agent
 AgentReady builds a Markdown version of each page from its rendered output, so ACF fields, Gutenberg blocks, Elementor layouts and classic editor content are all included, whatever theme you use.
 
 * `/llms.txt`, a Markdown index of your pages.
-* A `.md` version of every page, for example `/about.md`. The homepage is `/index.html.md`.
+* A `.md` version of every page, for example `/about.md`. The homepage is `/index.md`.
 * All public post types are served by default, with a setting to exclude any of them.
 * Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
-* Per-page description override for `llms.txt`.
+* Per-page description for `llms.txt`. When empty it uses the SEO plugin's meta description, then the excerpt. The page content is never used.
 * A preview tool to test the generated Markdown for any URL.
 * Works on sites protected with HTTP Basic authentication.
+* Generated Markdown is stored and refreshed when a page is saved.
+* Runs on production by default. Staging, development and local sites are opt-in.
 * Drafts, private and password-protected content are never exposed.
 
 **Pretty permalinks are required.** Plain permalinks such as `?p=123` are not supported: no Markdown pages or `llms.txt` are served, and the settings page shows a notice.
@@ -28,6 +30,10 @@ AgentReady builds a Markdown version of each page from its rendered output, so A
 = How it works =
 
 When an agent requests `/about.md`, AgentReady reads the public page `/about/` the same way a visitor would, keeps the main content, removes navigation, scripts and forms, and converts the result to Markdown with a short metadata header. Each Markdown response carries a canonical link to the HTML page and a `noindex` header, so search engines do not treat it as duplicate content.
+
+= Stored Markdown =
+
+The generated Markdown is stored in its own database table and refreshed in the background when you save a page. You can regenerate or clear it from the settings page, the edit screen, the post lists and WP-CLI.
 
 == Installation ==
 
@@ -40,7 +46,7 @@ When an agent requests `/about.md`, AgentReady reads the public page `/about/` t
 
 = What are the Markdown URLs? =
 
-Add `.md` to the page URL without the trailing slash: `/about/` becomes `/about.md` and `/services/web/` becomes `/services/web.md`. The homepage is `/index.html.md`. `/about/index.html.md`, `/about/index.md` and `/index.md` also work.
+Add `.md` to the page URL without the trailing slash: `/about/` becomes `/about.md` and `/services/web/` becomes `/services/web.md`. The homepage is `/index.md`. `/about/index.html.md`, `/about/index.md` and `/index.html.md` also work. You can choose `/index.html.md` as the homepage URL under Settings > AgentReady > Content > Homepage; the chosen one is listed in llms.txt.
 
 = Why do I get a 404 for a page? =
 
@@ -53,6 +59,22 @@ Yes. Pages, posts and custom post types that have a custom URL set by the Custom
 = Does it work with plain permalinks? =
 
 No. Pages that use `?p=123` style URLs are never converted. Choose another structure in Settings > Permalinks.
+
+= Why does AgentReady do nothing on my staging site? =
+
+It only runs on production by default. Open Settings > AgentReady > Environment and tick your environment, or define `WP_ENVIRONMENT_TYPE` as `production`. To limit it to certain domains, set "Allowed URLs", or define `AGENTREADY_ALLOWED_URLS` in `wp-config.php`. `define( 'AGENTREADY_ENABLED', false );` switches it off completely.
+
+= I changed a page but the .md or llms.txt still shows the old text. =
+
+Your host, a CDN or the browser may be keeping the file for a few minutes. AgentReady allows 5 minutes. Add a query string to the address, for example `/about.md?t=123` or `/llms.txt?t=123`, to skip that cache. Also check that the page was saved: it is refreshed in the background a few seconds after saving.
+
+= How do I refresh the stored Markdown? =
+
+Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.
+
+= What is removed when I delete the plugin? =
+
+The stored Markdown table is always removed, and so are any saved HTTP Basic credentials. Your other settings and the choices saved on pages are removed only if you tick "Delete all data on uninstall" on the Environment tab.
 
 = My site asks for a username and password. =
 
@@ -79,6 +101,18 @@ Yes. Set the content selector in Settings > AgentReady. The default tries `main`
 Yes. Add CSS selectors, one per line, under "Elements to exclude". They are removed in addition to the built-in list (navigation, sidebars, forms, scripts, hidden elements, and any site-level header or footer). Headers and footers inside an article are kept. The Preview tab lets you try selectors without saving them.
 
 == Changelog ==
+
+= Unreleased =
+* The Markdown front matter description follows the same order as llms.txt and is left out when none is set, instead of using a summary of the page body.
+* Post types, pages and taxonomy terms share one Exclusions card.
+* Saved HTTP Basic credentials are always removed when the plugin is deleted.
+* `llms.txt` descriptions come from the per-page description, then the SEO meta description, then the excerpt. They no longer fall back to text taken from the page content.
+* Stored Markdown with background refresh, on-demand generation and manual regenerate and clear controls.
+* Environment control: production by default, optional staging, development and local, allowed URLs, and the `AGENTREADY_ENABLED` and `AGENTREADY_ALLOWED_URLS` constants.
+* Settings split into tabs, with system info.
+* The homepage Markdown URL is now `/index.md`, with a setting to use `/index.html.md` instead. Both keep working.
+* "Delete all data on uninstall" option.
+* WP-CLI commands `wp agentready cache clear|regenerate|status`.
 
 = 0.1.0 =
 * Initial release.

@@ -4,6 +4,11 @@
 	document.addEventListener( 'click', function ( event ) {
 		var chip = event.target.closest( '[data-agentready-add]' );
 		var copy = event.target.closest( '[data-agentready-copy]' );
+		var confirmButton = event.target.closest( '[data-agentready-confirm]' );
+
+		if ( confirmButton && ! window.confirm( confirmButton.getAttribute( 'data-agentready-confirm' ) ) ) {
+			event.preventDefault();
+		}
 
 		if ( chip ) {
 			var field = document.getElementById( chip.getAttribute( 'data-target' ) );
@@ -119,10 +124,46 @@
 		renderChips();
 	}
 
+	function initTabs( form ) {
+		var panels = form.querySelectorAll( '[data-agentready-panel]' );
+		var tabs = document.querySelectorAll( '[data-agentready-tab]' );
+		var referer = form.querySelector( 'input[name="_wp_http_referer"]' );
+
+		function show() {
+			var slug = window.location.hash.replace( '#', '' );
+
+			if ( ! form.querySelector( '[data-agentready-panel="' + slug + '"]' ) ) {
+				slug = 'content';
+			}
+
+			form.classList.add( 'is-tabbed' );
+
+			panels.forEach( function ( panel ) {
+				panel.classList.toggle( 'is-active', panel.getAttribute( 'data-agentready-panel' ) === slug );
+			} );
+
+			tabs.forEach( function ( tab ) {
+				tab.classList.toggle( 'nav-tab-active', tab.getAttribute( 'data-agentready-tab' ) === slug );
+			} );
+
+			if ( referer ) {
+				referer.value = referer.value.split( '#' )[ 0 ] + '#' + slug;
+			}
+		}
+
+		window.addEventListener( 'hashchange', show );
+		show();
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
+		var tabbed = document.querySelector( '[data-agentready-tabs]' );
 		var toggle = document.getElementById( 'agentready-http-auth' );
 		var fields = document.getElementById( 'agentready-http-auth-fields' );
 		var terms = document.querySelector( '[data-agentready-terms]' );
+
+		if ( tabbed ) {
+			initTabs( tabbed );
+		}
 
 		if ( terms ) {
 			initTerms( terms );

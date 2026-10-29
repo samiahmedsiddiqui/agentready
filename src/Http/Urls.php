@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace AgentReady\Http;
 
+use AgentReady\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -17,6 +18,12 @@ final class Urls {
 
 	public const ROUTE_LLMS = 'llms';
 	public const ROUTE_PAGE = 'page';
+
+	public const HOME_LONG    = 'index.html.md';
+	public const HOME_SHORT   = 'index.md';
+	public const HOME_DEFAULT = self::HOME_SHORT;
+
+	public function __construct( private ?Options $options = null ) {}
 
 	public static function has_pretty_permalinks(): bool {
 		return '' !== (string) get_option( 'permalink_structure' );
@@ -64,6 +71,30 @@ final class Urls {
 		);
 	}
 
+	/**
+	 * @param string $setting   The saved homepage URL choice.
+	 * @param bool   $collision Whether a real page already uses the slug "index".
+	 */
+	public static function home_file_name( string $setting, bool $collision ): string {
+		return self::HOME_LONG === $setting || $collision ? self::HOME_LONG : self::HOME_SHORT;
+	}
+
+	public function home_file(): string {
+		$setting = null === $this->options ? self::HOME_DEFAULT : (string) $this->options->get( 'home_markdown_url', self::HOME_DEFAULT );
+
+		return self::home_file_name( $setting, self::HOME_LONG !== $setting && $this->index_collision() );
+	}
+
+	/**
+	 * Whether a page other than the homepage has the slug "index", which would make /index.md ambiguous.
+	 */
+	public function index_collision(): bool {
+		$post  = $this->post_from_path( 'index', true );
+		$front = $this->front_page();
+
+		return $post instanceof WP_Post && ( ! $front instanceof WP_Post || $post->ID !== $front->ID );
+	}
+
 	public function permalink( WP_Post $post ): ?string {
 		if ( ! self::has_pretty_permalinks() ) {
 			return null;
@@ -88,7 +119,7 @@ final class Urls {
 		$front_page = $this->front_page();
 
 		if ( $front_page instanceof WP_Post && $front_page->ID === $post->ID ) {
-			return home_url( '/index.html.md' );
+			return home_url( '/' . $this->home_file() );
 		}
 
 		return untrailingslashit( $url ) . '.md';

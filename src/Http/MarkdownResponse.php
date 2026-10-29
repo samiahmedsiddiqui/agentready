@@ -16,7 +16,10 @@ final class MarkdownResponse {
 	public const MARKDOWN = 'text/markdown; charset=utf-8';
 	public const TEXT     = 'text/plain; charset=utf-8';
 
-	public function send( string $body, string $content_type, string $canonical = '', int $modified = 0 ): void {
+	/**
+	 * @param array<string, string> $extra Additional headers.
+	 */
+	public function send( string $body, string $content_type, string $canonical = '', int $modified = 0, array $extra = array() ): void {
 		$etag    = '"' . md5( $body ) . '"';
 		$headers = array(
 			'Content-Type'           => $content_type,
@@ -24,7 +27,7 @@ final class MarkdownResponse {
 			'X-Robots-Tag'           => 'noindex',
 			'Cache-Control'          => 'public, max-age=300',
 			'ETag'                   => $etag,
-		);
+		) + $extra;
 
 		if ( '' !== $canonical ) {
 			$headers['Link'] = '<' . esc_url_raw( $canonical ) . '>; rel="canonical"';
@@ -47,6 +50,22 @@ final class MarkdownResponse {
 
 		if ( 'HEAD' !== $this->method() ) {
 			echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Served as text, never HTML.
+		}
+	}
+
+	public function unavailable(): void {
+		status_header( 503 );
+		$this->send_headers(
+			array(
+				'Content-Type'  => self::TEXT,
+				'Retry-After'   => '10',
+				'Cache-Control' => 'no-store',
+				'X-Robots-Tag'  => 'noindex',
+			)
+		);
+
+		if ( 'HEAD' !== $this->method() ) {
+			echo esc_html__( 'The Markdown for this page is being generated. Try again in a few seconds.', 'agentready' ) . "\n";
 		}
 	}
 
