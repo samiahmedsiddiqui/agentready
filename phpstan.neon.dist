@@ -1,0 +1,16 @@
+parameters:
+	level: 5
+	treatPhpDocTypesAsCertain: false
+	phpVersion:
+		min: 80000
+		max: 80599
+	paths:
+		- agentready.php
+		- uninstall.php
+		- src
+	bootstrapFiles:
+		- .phpstan/bootstrap.php
+	ignoreErrors:
+		# Temporary: the stub classes accept dependencies they do not use yet.
+		- identifier: property.onlyWritten
+		- identifier: return.unusedType

@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: source
+          persist-credentials: false
           show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
       # Check what ships: the repository without the export-ignored files.

@@ -5,6 +5,8 @@
 	<exclude-pattern>/tests/*</exclude-pattern>
 
 	<arg name="extensions" value="php"/>
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
 	<arg value="ps"/>
 
 	<config name="testVersion" value="8.0-"/>

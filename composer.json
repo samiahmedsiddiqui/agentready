@@ -9,30 +9,44 @@
 			"name": "Sami Ahmed Siddiqui"
 		}
 	],
+	"support": {
+		"issues": "https://github.com/samiahmedsiddiqui/agentready/issues",
+		"source": "https://github.com/samiahmedsiddiqui/agentready"
+	},
 	"require": {
 		"php": ">=8.0",
 		"composer/installers": "^2.0"
 	},
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-		"wp-coding-standards/wpcs": "^3.0",
-		"phpcompatibility/phpcompatibility-wp": "^2.1"
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpstan/extension-installer": "^1.4",
+		"phpstan/phpstan": "^2.1",
+		"szepeviktor/phpstan-wordpress": "^2.0",
+		"wp-coding-standards/wpcs": "^3.0"
 	},
 	"autoload": {
 		"psr-4": {
 			"AgentReady\\": "src/"
 		}
 	},
+	"prefer-stable": true,
 	"config": {
 		"optimize-autoloader": true,
 		"sort-packages": true,
+		"platform": {
+			"php": "8.0.30"
+		},
 		"allow-plugins": {
 			"composer/installers": true,
-			"dealerdirect/phpcodesniffer-composer-installer": true
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
 		}
 	},
 	"scripts": {
+		"format": "phpcbf",
 		"lint": "phpcs",
-		"fix": "phpcbf"
+		"lint:errors": "phpcs -n",
+		"analyse": "phpstan analyse --memory-limit=1G"
 	}
 }
