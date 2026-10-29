@@ -64,6 +64,10 @@ No. Pages that use `?p=123` style URLs are never converted. Choose another struc
 
 It only runs on production by default. Open Settings > AgentReady > Environment and tick your environment, or define `WP_ENVIRONMENT_TYPE` as `production`. To limit it to certain domains, set "Allowed URLs", or define `AGENTREADY_ALLOWED_URLS` in `wp-config.php`. `define( 'AGENTREADY_ENABLED', false );` switches it off completely.
 
+= I changed a page but the .md or llms.txt still shows the old text. =
+
+Your host, a CDN or the browser may be keeping the file for a few minutes. AgentReady allows 5 minutes. Add a query string to the address, for example `/about.md?t=123` or `/llms.txt?t=123`, to skip that cache. Also check that the page was saved: it is refreshed in the background a few seconds after saving.
+
 = How do I refresh the stored Markdown? =
 
 Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.

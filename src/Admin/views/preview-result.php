@@ -23,4 +23,7 @@ $found = $vars['post'];
 			<dd><a href="<?php echo esc_url( $vars['md_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $vars['md_url'] ); ?></a></dd>
 		<?php endif; ?>
 	</dl>
+	<?php if ( $vars['served'] ) : ?>
+		<p class="description"><?php esc_html_e( 'Servers and CDNs may keep .md and llms.txt for a few minutes (AgentReady allows 5). If a change does not show yet, add a query string to the URL, such as ?t=123, to skip that cache.', 'agentready' ); ?></p>
+	<?php endif; ?>
 </section>

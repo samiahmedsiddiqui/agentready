@@ -81,6 +81,7 @@ Generated Markdown is stored in a `{prefix}agentready_pages` table. There is no 
 - An out-of-date copy is still served while a new one is built. Copies built by an older plugin version are rebuilt on the next request.
 - Changing the content selector, the excluded elements or the HTTP Basic credentials marks every copy out of date and rebuilds them in the background.
 - Responses carry `X-AgentReady-Cache: HIT`, `STALE` or `MISS`.
+- Hosts, CDNs and browsers can keep `.md` and `llms.txt` for a few minutes (the plugin allows 5, with `Cache-Control: max-age=300`). If a change does not show yet, add a query string such as `/about.md?t=123`. Query strings are ignored when the page is found.
 - If the page could not be fetched and the post content was used, the copy is retried about 5 minutes later.
 
 Refresh by hand from the **Status** column (**Regenerate all**, **Clear cache**), the AgentReady box on the edit screen (**Regenerate now**, **Clear**), the **Regenerate Markdown** row action and bulk action in the post lists, or WP-CLI:

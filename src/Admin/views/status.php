@@ -60,6 +60,7 @@ $cache = $vars['cache'];
 	<?php if ( $vars['cron_disabled'] ) : ?>
 		<p class="description"><?php esc_html_e( 'WP-Cron is disabled on this site, so background refreshes only run if a real cron job calls wp-cron.php. Pages are still generated when they are first requested.', 'agentready' ); ?></p>
 	<?php endif; ?>
+	<p class="description"><?php esc_html_e( 'Servers and CDNs may keep .md and llms.txt for a few minutes (AgentReady allows 5). If a change does not show yet, add a query string to the URL, such as ?t=123, to skip that cache.', 'agentready' ); ?></p>
 	<p class="agentready-actions">
 		<button type="submit" form="agentready-cache-form" name="cache_action" value="regenerate_all" class="button" data-agentready-confirm="<?php esc_attr_e( 'Mark every page as out of date and rebuild them in the background? Current copies keep being served meanwhile.', 'agentready' ); ?>" <?php disabled( null !== $vars['inactive'] ); ?>><?php esc_html_e( 'Regenerate all', 'agentready' ); ?></button>
 		<button type="submit" form="agentready-cache-form" name="cache_action" value="clear" class="button" data-agentready-confirm="<?php esc_attr_e( 'Delete every stored copy? Pages are rebuilt in the background and when first requested.', 'agentready' ); ?>"><?php esc_html_e( 'Clear cache', 'agentready' ); ?></button>
