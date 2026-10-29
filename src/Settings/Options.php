@@ -22,15 +22,18 @@ final class Options {
 	 */
 	public static function defaults(): array {
 		return array(
-			'excluded_post_types' => array(),
-			'excluded_posts'      => '',
-			'excluded_terms'      => array(),
-			'content_selector'    => '',
-			'strip_selectors'     => '',
-			'show_meta_box'       => true,
-			'http_auth_enabled'   => false,
-			'http_auth_user'      => '',
-			'http_auth_password'  => '',
+			'excluded_post_types'  => array(),
+			'excluded_posts'       => '',
+			'excluded_terms'       => array(),
+			'content_selector'     => '',
+			'strip_selectors'      => '',
+			'show_meta_box'        => true,
+			'http_auth_enabled'    => false,
+			'http_auth_user'       => '',
+			'http_auth_password'   => '',
+			'allowed_environments' => array(),
+			'allowed_urls'         => '',
+			'delete_data'          => false,
 		);
 	}
 

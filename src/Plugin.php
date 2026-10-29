@@ -9,17 +9,27 @@ declare(strict_types=1);
 
 namespace AgentReady;
 
+use AgentReady\Admin\CacheActions;
 use AgentReady\Admin\MetaBox;
 use AgentReady\Admin\PreviewTool;
 use AgentReady\Admin\SettingsPage;
+use AgentReady\Admin\TermList;
+use AgentReady\Cache\Batch;
+use AgentReady\Cache\Candidates;
+use AgentReady\Cache\Coverage;
 use AgentReady\Cache\Invalidator;
-use AgentReady\Cache\Store;
+use AgentReady\Cache\Lock;
+use AgentReady\Cache\PageCache;
+use AgentReady\Cache\PageStatus;
+use AgentReady\Cache\Schema;
+use AgentReady\Cache\WpdbStore;
 use AgentReady\Cli\Command;
 use AgentReady\Content\Description;
 use AgentReady\Content\Eligibility;
 use AgentReady\Content\Exclusions;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
+use AgentReady\Environment\Environment;
 use AgentReady\Http\DiscoveryTags;
 use AgentReady\Http\MarkdownResponse;
 use AgentReady\Http\Router;
@@ -36,6 +46,7 @@ use AgentReady\Rendering\Generator;
 use AgentReady\Rendering\Renderer;
 use AgentReady\Rendering\Selector;
 use AgentReady\Rendering\Summary;
+use AgentReady\Rest\PagesController;
 use AgentReady\Robots\RobotsTxt;
 use AgentReady\Settings\Options;
 use AgentReady\Settings\Sanitizer;
@@ -63,11 +74,13 @@ final class Plugin {
 		}
 
 		$options     = new Options();
+		$environment = new Environment( $options );
 		$post_types  = new PostTypes( $options );
 		$urls        = new Urls();
 		$eligibility = new Eligibility( $post_types, new Exclusions( $options ), $urls );
 		$description = new Description();
-		$store       = new Store();
+		$store       = new WpdbStore();
+		$candidates  = new Candidates();
 		$generator   = new Generator(
 			$options,
 			$urls,
@@ -84,11 +97,19 @@ final class Plugin {
 			$description,
 			new Summary()
 		);
+		$pages       = new PageCache( $store, $generator, new Lock(), $eligibility, $environment );
+		$batch       = new Batch( $store, $pages, $post_types, $eligibility, $environment, $candidates );
+		$status      = new PageStatus( $store, $eligibility, $environment );
+		$coverage    = new Coverage( $store, $candidates, $post_types, $eligibility );
 
 		$this->components = array(
-			new Router( $urls, $eligibility, $generator, new LlmsTxt( $post_types, $eligibility, $urls, $description ), new MarkdownResponse() ),
-			new DiscoveryTags( $eligibility, $urls ),
-			new Invalidator( $store ),
+			new Schema(),
+			$pages,
+			$batch,
+			new Invalidator( $store, $pages, $batch, $post_types ),
+			new Router( $urls, $eligibility, $pages, $environment, new LlmsTxt( $post_types, $eligibility, $urls, $description ), new MarkdownResponse() ),
+			new DiscoveryTags( $eligibility, $urls, $environment ),
+			new PagesController( $store, $pages, $status, $eligibility, $environment ),
 			new RobotsTxt( $options ),
 			new Seo(),
 			new Elementor(),
@@ -101,13 +122,18 @@ final class Plugin {
 				$options,
 				$post_types,
 				new Sanitizer( $post_types, $options ),
-				new PreviewTool( $urls, $eligibility, $generator )
+				new PreviewTool( $urls, $eligibility, $generator ),
+				$environment,
+				$coverage,
+				$batch,
+				new TermList()
 			);
-			$this->components[] = new MetaBox( $post_types, $options );
+			$this->components[] = new MetaBox( $post_types, $options, $status );
+			$this->components[] = new CacheActions( $store, $pages, $batch, $post_types, $eligibility, $environment );
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			$this->components[] = new Command( $store );
+			$this->components[] = new Command( $store, $pages, $post_types, $eligibility, $environment, $candidates, $coverage );
 		}
 
 		foreach ( $this->components as $component ) {

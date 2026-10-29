@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace AgentReady\Settings;
 
 use AgentReady\Content\PostTypes;
+use AgentReady\Environment\Environment;
 use AgentReady\Rendering\Selector;
 
 defined( 'ABSPATH' ) || exit;
@@ -48,18 +49,34 @@ final class Sanitizer {
 
 		$this->last = array_merge(
 			array(
-				'excluded_post_types' => $post_types,
-				'excluded_posts'      => isset( $input['excluded_posts'] ) ? sanitize_textarea_field( $input['excluded_posts'] ) : '',
-				'excluded_terms'      => $terms,
-				'content_selector'    => implode( ', ', $content['valid'] ),
-				'strip_selectors'     => implode( "\n", $strip['valid'] ),
-				'show_meta_box'       => ! empty( $input['show_meta_box'] ),
-				'http_auth_enabled'   => ! empty( $input['http_auth_enabled'] ),
+				'excluded_post_types'  => $post_types,
+				'excluded_posts'       => isset( $input['excluded_posts'] ) ? sanitize_textarea_field( $input['excluded_posts'] ) : '',
+				'excluded_terms'       => $terms,
+				'content_selector'     => implode( ', ', $content['valid'] ),
+				'strip_selectors'      => implode( "\n", $strip['valid'] ),
+				'show_meta_box'        => ! empty( $input['show_meta_box'] ),
+				'http_auth_enabled'    => ! empty( $input['http_auth_enabled'] ),
+				'allowed_environments' => isset( $input['allowed_environments'] ) && is_array( $input['allowed_environments'] )
+					? array_values( array_intersect( Environment::OPTIONAL, array_map( 'sanitize_key', $input['allowed_environments'] ) ) )
+					: array(),
+				'allowed_urls'         => $this->allowed_urls( $input ),
+				'delete_data'          => ! empty( $input['delete_data'] ),
 			),
 			$this->http_auth( $input )
 		);
 
 		return $this->last;
+	}
+
+	/**
+	 * @param array<string, mixed> $input Raw submitted values.
+	 */
+	private function allowed_urls( array $input ): string {
+		if ( defined( 'AGENTREADY_ALLOWED_URLS' ) ) {
+			return (string) $this->options->get( 'allowed_urls', '' );
+		}
+
+		return implode( "\n", Environment::parse_urls( isset( $input['allowed_urls'] ) ? sanitize_textarea_field( $input['allowed_urls'] ) : '' ) );
 	}
 
 	/**
