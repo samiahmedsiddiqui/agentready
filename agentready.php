@@ -29,7 +29,4 @@ if ( is_readable( AGENTREADY_PATH . 'vendor/autoload.php' ) ) {
 	AgentReady\Autoloader::register( 'AgentReady\\', AGENTREADY_PATH . 'src/' );
 }
 
-register_activation_hook( __FILE__, array( AgentReady\Activator::class, 'activate' ) );
-register_deactivation_hook( __FILE__, array( AgentReady\Deactivator::class, 'deactivate' ) );
-
 add_action( 'plugins_loaded', array( AgentReady\Plugin::class, 'boot' ) );

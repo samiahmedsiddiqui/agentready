@@ -15,12 +15,16 @@ use AgentReady\Admin\SettingsPage;
 use AgentReady\Cache\Invalidator;
 use AgentReady\Cache\Store;
 use AgentReady\Cli\Command;
+use AgentReady\Content\Description;
 use AgentReady\Content\Eligibility;
 use AgentReady\Content\Exclusions;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Http\DiscoveryTags;
+use AgentReady\Http\MarkdownResponse;
 use AgentReady\Http\Router;
+use AgentReady\Http\Urls;
+use AgentReady\Index\LlmsTxt;
 use AgentReady\Integrations\Acf;
 use AgentReady\Integrations\Elementor;
 use AgentReady\Integrations\Seo;
@@ -29,8 +33,10 @@ use AgentReady\Rendering\Extractor;
 use AgentReady\Rendering\FrontMatter;
 use AgentReady\Rendering\Generator;
 use AgentReady\Rendering\Renderer;
+use AgentReady\Rendering\Selector;
 use AgentReady\Robots\RobotsTxt;
 use AgentReady\Settings\Options;
+use AgentReady\Settings\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -49,15 +55,30 @@ final class Plugin {
 	}
 
 	private function init(): void {
+		if ( ! class_exists( 'DOMDocument' ) ) {
+			add_action( 'admin_notices', array( $this, 'missing_dom_notice' ) );
+			return;
+		}
+
 		$options     = new Options();
 		$post_types  = new PostTypes( $options );
-		$eligibility = new Eligibility( $post_types, new Exclusions( $options ) );
+		$urls        = new Urls();
+		$eligibility = new Eligibility( $post_types, new Exclusions( $options ), $urls );
+		$description = new Description();
 		$store       = new Store();
-		$generator   = new Generator( $options, new Renderer(), new Extractor(), new Converter(), new FrontMatter() );
+		$generator   = new Generator(
+			$options,
+			$urls,
+			new Renderer( $options, $urls ),
+			new Extractor( new Selector(), (array) apply_filters( 'agentready_strip_selectors', Extractor::DEFAULT_STRIP ) ),
+			new Converter(),
+			new FrontMatter(),
+			$description
+		);
 
 		$this->components = array(
-			new Router( $eligibility ),
-			new DiscoveryTags( $eligibility ),
+			new Router( $urls, $eligibility, $generator, new LlmsTxt( $post_types, $eligibility, $urls, $description ), new MarkdownResponse() ),
+			new DiscoveryTags( $eligibility, $urls ),
 			new Invalidator( $store ),
 			new RobotsTxt( $options ),
 			new Seo(),
@@ -66,9 +87,13 @@ final class Plugin {
 		);
 
 		if ( is_admin() ) {
-			$this->components[] = new SettingsPage( $options, $post_types );
+			$this->components[] = new SettingsPage(
+				$options,
+				$post_types,
+				new Sanitizer( $post_types, $options ),
+				new PreviewTool( $urls, $eligibility, $generator )
+			);
 			$this->components[] = new MetaBox( $post_types );
-			$this->components[] = new PreviewTool( $eligibility, $generator );
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -77,6 +102,12 @@ final class Plugin {
 
 		foreach ( $this->components as $component ) {
 			$component->register();
+		}
+	}
+
+	public function missing_dom_notice(): void {
+		if ( current_user_can( 'manage_options' ) ) {
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'AgentReady needs the PHP DOM extension, which is not available on this server. The plugin is inactive.', 'agentready' ) . '</p></div>';
 		}
 	}
 }

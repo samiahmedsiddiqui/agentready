@@ -22,7 +22,7 @@ final class Description {
 			return $override;
 		}
 
-		$fallback = wp_strip_all_tags( get_the_excerpt( $post ) );
+		$fallback = wp_trim_words( wp_strip_all_tags( get_the_excerpt( $post ) ), 30 );
 
 		return (string) apply_filters( 'agentready_description', $fallback, $post );
 	}

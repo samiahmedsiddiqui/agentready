@@ -11,12 +11,36 @@ namespace AgentReady\Http;
 
 use AgentReady\Content\Eligibility;
 use AgentReady\Contracts\Hookable;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
 final class DiscoveryTags implements Hookable {
 
-	public function __construct( private Eligibility $eligibility ) {}
+	public function __construct(
+		private Eligibility $eligibility,
+		private Urls $urls
+	) {}
 
-	public function register(): void {}
+	public function register(): void {
+		add_action( 'wp_head', array( $this, 'render' ), 2 );
+	}
+
+	public function render(): void {
+		if ( ! is_singular() ) {
+			return;
+		}
+
+		$post = get_queried_object();
+
+		if ( ! $post instanceof WP_Post || ! $this->eligibility->is_eligible( $post ) ) {
+			return;
+		}
+
+		$url = $this->urls->markdown_url( $post );
+
+		if ( null !== $url ) {
+			printf( '<link rel="alternate" type="text/markdown" href="%s" />' . "\n", esc_url( $url ) );
+		}
+	}
 }

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace AgentReady\Content;
 
+use AgentReady\Http\Urls;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -17,7 +18,8 @@ final class Eligibility {
 
 	public function __construct(
 		private PostTypes $post_types,
-		private Exclusions $exclusions
+		private Exclusions $exclusions,
+		private Urls $urls
 	) {}
 
 	public function is_eligible( WP_Post $post ): bool {
@@ -40,6 +42,10 @@ final class Eligibility {
 			return 'excluded_post_type';
 		}
 
+		if ( null === $this->urls->permalink( $post ) ) {
+			return 'plain_permalink';
+		}
+
 		$excluded = $this->exclusions->matched( $post );
 
 		if ( null !== $excluded ) {
@@ -47,5 +53,20 @@ final class Eligibility {
 		}
 
 		return apply_filters( 'agentready_is_eligible', true, $post ) ? null : 'filtered';
+	}
+
+	public function describe( string $reason ): string {
+		$labels = array(
+			'not_published'      => __( 'The page is not published.', 'agentready' ),
+			'password_protected' => __( 'The page is password protected.', 'agentready' ),
+			'excluded_post_type' => __( 'Its post type is excluded in the settings.', 'agentready' ),
+			'plain_permalink'    => __( 'It has no pretty permalink. Plain permalinks are not supported.', 'agentready' ),
+			'excluded_page'      => __( 'The page is hidden from AgentReady in the editor.', 'agentready' ),
+			'excluded_pattern'   => __( 'It matches an ID or URL pattern in the exclusion list.', 'agentready' ),
+			'excluded_term'      => __( 'It belongs to an excluded taxonomy term.', 'agentready' ),
+			'filtered'           => __( 'A filter excluded it.', 'agentready' ),
+		);
+
+		return $labels[ $reason ] ?? $reason;
 	}
 }
