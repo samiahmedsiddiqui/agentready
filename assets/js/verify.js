@@ -23,13 +23,12 @@
 	}
 
 	function inline( parent, text ) {
+		var pattern = new RegExp( INLINE.source, 'g' );
 		var match;
 		var last = 0;
 		var node;
 
-		INLINE.lastIndex = 0;
-
-		while ( ( match = INLINE.exec( text ) ) !== null ) {
+		while ( ( match = pattern.exec( text ) ) !== null ) {
 			if ( match.index > last ) {
 				parent.appendChild( document.createTextNode( text.slice( last, match.index ) ) );
 			}
@@ -56,7 +55,7 @@
 				parent.appendChild( document.createTextNode( match[ 9 ] ) );
 			}
 
-			last = INLINE.lastIndex;
+			last = pattern.lastIndex;
 		}
 
 		if ( last < text.length ) {
