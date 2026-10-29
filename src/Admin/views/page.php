@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
 
-$on_preview = 'preview' === $vars['tab'];
+$on_preview = false;
 ?>
 <div class="wrap agentready">
 	<h1 class="agentready-title">
@@ -20,11 +20,15 @@ $on_preview = 'preview' === $vars['tab'];
 	</h1>
 	<p class="agentready-tagline"><?php esc_html_e( 'Serve an llms.txt index and a Markdown version of every page, so AI agents can read your content.', 'agentready' ); ?></p>
 	<?php View::render( 'notices', $vars['notices'] ); ?>
+	<?php
+	if ( ! empty( $vars['after_notices'] ) ) {
+		$vars['after_notices']();
+	}
+	?>
 	<nav class="nav-tab-wrapper">
 		<?php foreach ( $vars['tabs'] as $slug => $label ) : ?>
-			<a class="nav-tab <?php echo ! $on_preview && 'content' === $slug ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $vars['settings_url'] . '#' . $slug ); ?>" data-agentready-tab="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $label ); ?></a>
+			<a class="nav-tab <?php echo 'content' === $slug ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $vars['settings_url'] . '#' . $slug ); ?>" data-agentready-tab="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $label ); ?></a>
 		<?php endforeach; ?>
-		<a class="nav-tab <?php echo $on_preview ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $vars['preview_url'] ); ?>"><?php esc_html_e( 'Preview', 'agentready' ); ?></a>
 	</nav>
 	<?php $vars['content'](); ?>
 </div>

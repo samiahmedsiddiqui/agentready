@@ -23,6 +23,9 @@ $state  = $vars['status'];
 		<button type="button" class="button" data-agentready-action="clear" <?php disabled( ! $state['can_clear'] ); ?>><?php esc_html_e( 'Clear', 'agentready' ); ?></button>
 	</p>
 	<p class="description"><?php esc_html_e( 'Save or update the page first. Regeneration reads the saved page.', 'agentready' ); ?></p>
+	<?php if ( '' !== $vars['verify_url'] && 'unavailable' !== $state['state'] ) : ?>
+		<p><a href="<?php echo esc_url( $vars['verify_url'] ); ?>"><?php esc_html_e( 'Check against the page', 'agentready' ); ?></a></p>
+	<?php endif; ?>
 </div>
 <hr />
 <p>

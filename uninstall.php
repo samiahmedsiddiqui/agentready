@@ -21,9 +21,11 @@ function agentready_uninstall_site(): void {
 
 	delete_option( 'agentready_db_version' );
 	delete_option( 'agentready_batch' );
+	delete_option( 'agentready_scan' );
 	wp_unschedule_hook( 'agentready_generate_post' );
 	wp_unschedule_hook( 'agentready_regenerate_batch' );
 	wp_unschedule_hook( 'agentready_prune' );
+	wp_unschedule_hook( 'agentready_scan_batch' );
 
 	if ( $delete ) {
 		delete_option( 'agentready_settings' );

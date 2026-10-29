@@ -68,7 +68,7 @@ final class CacheActions implements Hookable {
 			}
 		}
 
-		wp_safe_redirect( add_query_arg( 'agentready_notice', $notice, admin_url( 'options-general.php?page=' . SettingsPage::SLUG ) ) );
+		wp_safe_redirect( add_query_arg( 'agentready_notice', $notice, admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
 		exit;
 	}
 
@@ -93,7 +93,12 @@ final class CacheActions implements Hookable {
 			$notice = 'busy';
 		}
 
-		$back = wp_get_referer();
+		$back   = wp_get_referer();
+		$return = isset( $_GET['agentready_return'] ) ? wp_validate_redirect( esc_url_raw( wp_unslash( $_GET['agentready_return'] ) ), '' ) : '';
+
+		if ( '' !== $return ) {
+			$back = $return;
+		}
 
 		wp_safe_redirect( add_query_arg( 'agentready_notice', $notice, false === $back ? admin_url( 'edit.php' ) : remove_query_arg( array( 'agentready_notice', 'agentready_count' ), $back ) ) );
 		exit;
@@ -189,6 +194,9 @@ final class CacheActions implements Hookable {
 			'regenerating'       => array( 'success', __( 'Every page is marked out of date and is being rebuilt in the background. Current copies keep being served meanwhile.', 'agentready' ) ),
 			'cleared_rebuilding' => array( 'success', __( 'The stored Markdown was deleted. Pages are being rebuilt in the background.', 'agentready' ) ),
 			'cleared'            => array( 'success', __( 'The stored Markdown was deleted.', 'agentready' ) ),
+			'scan_started'       => array( 'success', __( 'The scan started. It runs in the background and this page updates by itself.', 'agentready' ) ),
+			'scan_stopped'       => array( 'success', __( 'The scan was stopped.', 'agentready' ) ),
+			'missing_started'    => array( 'success', __( 'Pages without a stored copy are being generated in the background.', 'agentready' ) ),
 			'busy'               => array( 'warning', __( 'This page is being generated right now. Try again in a few seconds.', 'agentready' ) ),
 			'inactive'           => array( 'warning', __( 'AgentReady is inactive on this site, so nothing was regenerated.', 'agentready' ) ),
 			'not_served'         => array( 'warning', __( 'This page is not served as Markdown, so nothing was regenerated.', 'agentready' ) ),
