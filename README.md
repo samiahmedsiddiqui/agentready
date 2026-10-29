@@ -25,7 +25,7 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 | Homepage (static front page) | `/index.html.md` |
 | Site index | `/llms.txt` |
 
-`/about/index.html.md`, `/about/index.md` and `/index.md` are accepted as aliases. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
+`/about/index.html.md`, `/about/index.md` and `/index.md` are accepted as aliases. The homepage URL defaults to `/index.html.md`; choose `/index.md` instead under Settings > AgentReady > Content > Homepage. Both keep working, and the chosen one is the one listed in `llms.txt` and the page head. If a real page has the slug `index`, `/index.html.md` is used. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
 
 ## Custom Permalinks
 
@@ -45,7 +45,7 @@ Works with default WordPress permalinks and with the [Custom Permalinks](https:/
 
 ## Settings
 
-Settings > AgentReady has four tabs. **Content**: post types, exclusions and the editor box. **Rendering**: the content selector, extra elements to exclude (CSS selectors, added to the built-in list) and HTTP Basic authentication. **Environment**: where the plugin runs, and whether uninstalling removes your settings. **Preview**: shows the Markdown for any URL, and can try a different content selector or extra excludes without saving them. The Status column shows system info and how many pages are stored.
+Settings > AgentReady has four tabs. **Content**: post types, exclusions, the homepage Markdown URL and the editor box. **Rendering**: the content selector, extra elements to exclude (CSS selectors, added to the built-in list) and HTTP Basic authentication. **Environment**: where the plugin runs, and whether uninstalling removes your settings. **Preview**: shows the Markdown for any URL, and can try a different content selector or extra excludes without saving them. The Status column shows system info and how many pages are stored.
 
 HTTP Basic credentials are stored encrypted with a key derived from the site's auth salt. To keep them out of the database, define them in `wp-config.php`:
 

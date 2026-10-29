@@ -86,4 +86,24 @@ final class UrlsTest extends TestCase {
 			'empty'             => array( '', '' ),
 		);
 	}
+
+	/**
+	 * @dataProvider home_files
+	 */
+	public function test_picks_the_homepage_file( string $setting, bool $collision, string $expected ): void {
+		$this->assertSame( $expected, Urls::home_file_name( $setting, $collision ) );
+	}
+
+	/**
+	 * @return array<string, array{string, bool, string}>
+	 */
+	public function home_files(): array {
+		return array(
+			'default'                   => array( 'index.html.md', false, 'index.html.md' ),
+			'short chosen'              => array( 'index.md', false, 'index.md' ),
+			'short chosen but a page is called index' => array( 'index.md', true, 'index.html.md' ),
+			'junk value'                => array( 'other', false, 'index.html.md' ),
+			'empty'                     => array( '', false, 'index.html.md' ),
+		);
+	}
 }

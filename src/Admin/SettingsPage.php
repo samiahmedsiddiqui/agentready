@@ -40,7 +40,8 @@ final class SettingsPage implements Hookable {
 		private Environment $environment,
 		private Coverage $coverage,
 		private Batch $batch,
-		private TermList $terms
+		private TermList $terms,
+		private Urls $urls
 	) {}
 
 	public function register(): void {
@@ -169,6 +170,11 @@ final class SettingsPage implements Hookable {
 				'types'           => $this->types( true ),
 				'term_groups'     => $this->terms->groups(),
 				'term_limit'      => TermList::LIMIT,
+				'home_urls'       => array(
+					Urls::HOME_DEFAULT => home_url( '/' . Urls::HOME_DEFAULT ),
+					Urls::HOME_SHORT   => home_url( '/' . Urls::HOME_SHORT ),
+				),
+				'home_collision'  => $this->urls->index_collision(),
 				'excluded_terms'  => array_map( 'absint', (array) $this->options->get( 'excluded_terms', array() ) ),
 				'common_content'  => self::COMMON_CONTENT,
 				'common_excludes' => self::COMMON_EXCLUDES,

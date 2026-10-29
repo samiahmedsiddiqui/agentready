@@ -40,6 +40,25 @@ $options = $vars['options'];
 </section>
 
 <section class="agentready-card">
+	<h2><?php esc_html_e( 'Homepage', 'agentready' ); ?></h2>
+	<p class="agentready-intro"><?php esc_html_e( 'Choose the Markdown URL of the homepage when a static page is set as the front page. Both URLs keep working. The one chosen here is listed in llms.txt and in the page head.', 'agentready' ); ?></p>
+	<div class="agentready-field">
+		<?php foreach ( $vars['home_urls'] as $file => $home_url ) : ?>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $name ); ?>[home_markdown_url]" value="<?php echo esc_attr( $file ); ?>" <?php checked( $file, (string) $options->get( 'home_markdown_url', 'index.html.md' ) ); ?> />
+				<code><?php echo esc_html( $home_url ); ?></code>
+				<?php if ( 'index.html.md' === $file ) : ?>
+					<span class="description"><?php esc_html_e( '(default)', 'agentready' ); ?></span>
+				<?php endif; ?>
+			</label><br />
+		<?php endforeach; ?>
+		<?php if ( $vars['home_collision'] ) : ?>
+			<p class="description"><strong><?php esc_html_e( 'A page with the slug "index" exists, so /index.md would be ambiguous. /index.html.md is used until that page is renamed.', 'agentready' ); ?></strong></p>
+		<?php endif; ?>
+	</div>
+</section>
+
+<section class="agentready-card">
 	<h2><?php esc_html_e( 'Editor', 'agentready' ); ?></h2>
 	<p class="agentready-intro"><?php esc_html_e( 'Choose whether editors see AgentReady on the edit screen.', 'agentready' ); ?></p>
 	<div class="agentready-field">

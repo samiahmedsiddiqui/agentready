@@ -76,7 +76,7 @@ final class Plugin {
 		$options     = new Options();
 		$environment = new Environment( $options );
 		$post_types  = new PostTypes( $options );
-		$urls        = new Urls();
+		$urls        = new Urls( $options );
 		$eligibility = new Eligibility( $post_types, new Exclusions( $options ), $urls );
 		$description = new Description();
 		$store       = new WpdbStore();
@@ -126,7 +126,8 @@ final class Plugin {
 				$environment,
 				$coverage,
 				$batch,
-				new TermList()
+				new TermList(),
+				$urls
 			);
 			$this->components[] = new MetaBox( $post_types, $options, $status );
 			$this->components[] = new CacheActions( $store, $pages, $batch, $post_types, $eligibility, $environment );
