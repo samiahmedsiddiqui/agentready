@@ -51,8 +51,6 @@ final class Plugin {
 	}
 
 	private function init(): void {
-		load_plugin_textdomain( 'agentready', false, dirname( plugin_basename( AGENTREADY_FILE ) ) . '/languages' );
-
 		$options     = new Options();
 		$post_types  = new PostTypes( $options );
 		$eligibility = new Eligibility( $post_types, new Exclusions( $options ) );
