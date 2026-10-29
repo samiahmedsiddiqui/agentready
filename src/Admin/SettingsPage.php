@@ -112,8 +112,17 @@ final class SettingsPage implements Hookable {
 			return;
 		}
 
-		wp_enqueue_style( 'agentready-admin', AGENTREADY_URL . 'assets/css/admin.css', array(), AGENTREADY_VERSION );
-		wp_enqueue_script( 'agentready-admin', AGENTREADY_URL . 'assets/js/admin.js', array(), AGENTREADY_VERSION, true );
+		wp_enqueue_style( 'agentready-admin', AGENTREADY_URL . 'assets/css/admin.css', array(), $this->asset_version( 'assets/css/admin.css' ) );
+		wp_enqueue_script( 'agentready-admin', AGENTREADY_URL . 'assets/js/admin.js', array(), $this->asset_version( 'assets/js/admin.js' ), true );
+	}
+
+	/**
+	 * The plugin version plus the file's modification time, so a changed file is never served from a stale browser cache.
+	 */
+	private function asset_version( string $file ): string {
+		$path = AGENTREADY_PATH . $file;
+
+		return AGENTREADY_VERSION . '.' . ( file_exists( $path ) ? (int) filemtime( $path ) : 0 );
 	}
 
 	/**
