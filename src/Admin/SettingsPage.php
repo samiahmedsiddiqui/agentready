@@ -24,6 +24,8 @@ final class SettingsPage implements Hookable {
 
 	private const GROUP = 'agentready_group';
 
+	private const AUTHOR_URL = 'https://www.linkedin.com/in/sami-ahmed-siddiqui/';
+
 	private const COMMON_CONTENT = array( 'main', '[role="main"]', 'article', '#content', '#main', '#primary', '.site-content', '.entry-content', '.post-content', '.page-content' );
 
 	private const COMMON_EXCLUDES = array( '.breadcrumb', '.breadcrumbs', '.cookie-notice', '.related-posts', '.post-navigation', '.author-box', '.share-buttons', '.newsletter-signup' );
@@ -40,6 +42,8 @@ final class SettingsPage implements Hookable {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( AGENTREADY_FILE ), array( $this, 'action_links' ) );
+		add_filter( 'admin_footer_text', array( $this, 'footer_text' ), 11 );
+		add_filter( 'update_footer', array( $this, 'footer_version' ), 11 );
 	}
 
 	public function add_page(): void {
@@ -50,6 +54,42 @@ final class SettingsPage implements Hookable {
 			self::SLUG,
 			array( $this, 'render' )
 		);
+	}
+
+	public function footer_text( mixed $text ): mixed {
+		if ( ! $this->is_settings_screen() ) {
+			return $text;
+		}
+
+		return wp_kses(
+			sprintf(
+				/* translators: %s: author name, linked to their profile. */
+				__( 'Thank you for using AgentReady. Built by %s.', 'agentready' ),
+				'<a href="' . esc_url( self::AUTHOR_URL ) . '" target="_blank" rel="noopener noreferrer">Sami Ahmed Siddiqui</a>'
+			),
+			array(
+				'a' => array(
+					'href'   => array(),
+					'target' => array(),
+					'rel'    => array(),
+				),
+			)
+		);
+	}
+
+	public function footer_version( mixed $text ): mixed {
+		if ( ! $this->is_settings_screen() ) {
+			return $text;
+		}
+
+		/* translators: %s: plugin version. */
+		return esc_html( sprintf( __( 'AgentReady %s', 'agentready' ), AGENTREADY_VERSION ) );
+	}
+
+	private function is_settings_screen(): bool {
+		$screen = get_current_screen();
+
+		return $screen instanceof \WP_Screen && 'settings_page_' . self::SLUG === $screen->id;
 	}
 
 	public function register_settings(): void {

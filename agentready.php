@@ -6,6 +6,7 @@
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Sami Ahmed Siddiqui
+ * Author URI:        https://www.linkedin.com/in/sami-ahmed-siddiqui/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       agentready
