@@ -94,12 +94,15 @@ final class Urls {
 		return untrailingslashit( $url ) . '.md';
 	}
 
-	public function resolve( string $path, bool $home_alias = false ): ?WP_Post {
+	/**
+	 * @param bool $strict Require the post's own permalink to match the path exactly.
+	 */
+	public function resolve( string $path, bool $home_alias = false, bool $strict = true ): ?WP_Post {
 		if ( '' === $path ) {
 			return $this->front_page();
 		}
 
-		$post = $this->post_from_path( $path );
+		$post = $this->post_from_path( $path, $strict );
 
 		if ( null === $post && $home_alias ) {
 			return $this->front_page();
@@ -120,10 +123,10 @@ final class Urls {
 		$route = $this->parse_route( $path );
 
 		if ( null !== $route ) {
-			return self::ROUTE_PAGE === $route['type'] ? $this->resolve( $route['path'], $route['home_alias'] ) : null;
+			return self::ROUTE_PAGE === $route['type'] ? $this->resolve( $route['path'], $route['home_alias'], false ) : null;
 		}
 
-		return $this->resolve( $path );
+		return $this->resolve( $path, false, false );
 	}
 
 	private function front_page(): ?WP_Post {
@@ -136,9 +139,14 @@ final class Urls {
 		return $id > 0 ? get_post( $id ) : null;
 	}
 
-	private function post_from_path( string $path ): ?WP_Post {
+	private function post_from_path( string $path, bool $strict ): ?WP_Post {
 		$post = null;
-		$id   = url_to_postid( home_url( '/' . $path . '/' ) );
+		// Plugins such as Custom Permalinks only understand a path here, so try that before the full URL.
+		$id = url_to_postid( $path . '/' );
+
+		if ( $id <= 0 ) {
+			$id = url_to_postid( home_url( '/' . $path . '/' ) );
+		}
 
 		if ( $id > 0 ) {
 			$post = get_post( $id );
@@ -156,11 +164,24 @@ final class Urls {
 
 		$permalink = $this->permalink( $post );
 
-		if ( null === $permalink || trim( $path, '/' ) !== $this->relative_path( (string) wp_parse_url( $permalink, PHP_URL_PATH ) ) ) {
+		if ( null === $permalink ) {
+			return null;
+		}
+
+		if ( $strict && trim( $path, '/' ) !== $this->relative_path( (string) wp_parse_url( $permalink, PHP_URL_PATH ) ) ) {
 			return null;
 		}
 
 		return $post;
+	}
+
+	/**
+	 * @return string|null The Markdown URL path relative to the site, for example company/about-us.md.
+	 */
+	public function markdown_path( WP_Post $post ): ?string {
+		$url = $this->markdown_url( $post );
+
+		return null === $url ? null : $this->relative_path( (string) wp_parse_url( $url, PHP_URL_PATH ) );
 	}
 
 	private function relative_path( string $path ): string {

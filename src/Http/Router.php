@@ -49,7 +49,12 @@ final class Router implements Hookable {
 
 		$post = $this->urls->resolve( $route['path'], $route['home_alias'] );
 
-		if ( null === $post || ! $this->eligibility->is_eligible( $post ) ) {
+		if ( null === $post ) {
+			$this->redirect_to_canonical( $route, trim( (string) $wp->request, '/' ) );
+			return;
+		}
+
+		if ( ! $this->eligibility->is_eligible( $post ) ) {
 			return;
 		}
 
@@ -62,6 +67,29 @@ final class Router implements Hookable {
 			(int) strtotime( $post->post_modified_gmt . ' UTC' )
 		);
 
+		$this->terminate();
+	}
+
+	/**
+	 * Sends a request for a valid page under the wrong path (such as its original permalink) to the real Markdown URL.
+	 *
+	 * @param array{type: string, path: string, home_alias: bool} $route   The parsed route.
+	 * @param string                                              $request The requested path.
+	 */
+	private function redirect_to_canonical( array $route, string $request ): void {
+		$post = $this->urls->resolve( $route['path'], $route['home_alias'], false );
+
+		if ( null === $post || ! $this->eligibility->is_eligible( $post ) ) {
+			return;
+		}
+
+		$target = $this->urls->markdown_url( $post );
+
+		if ( null === $target || $this->urls->markdown_path( $post ) === $request ) {
+			return;
+		}
+
+		wp_safe_redirect( $target, 301 );
 		$this->terminate();
 	}
 
