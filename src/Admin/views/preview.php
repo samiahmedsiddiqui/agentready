@@ -14,11 +14,11 @@ $strip    = $vars['strip'];
 ?>
 <section class="agentready-card" style="margin-top:20px">
 	<h2><?php esc_html_e( 'Check a page', 'agentready' ); ?></h2>
-	<p class="agentready-intro"><?php esc_html_e( 'Enter the URL or path of a page on this site, for example /about/, to see whether it is served and what the Markdown looks like.', 'agentready' ); ?></p>
+	<p class="agentready-intro"><?php esc_html_e( 'Enter the URL or path of a page on this site to see whether it is served and what the Markdown looks like. The field starts with your homepage address.', 'agentready' ); ?></p>
 	<form method="post" action="<?php echo esc_url( $vars['action'] ); ?>">
 		<?php wp_nonce_field( $vars['nonce'] ); ?>
 		<p>
-			<input type="text" class="large-text code" name="agentready_preview_url" value="<?php echo esc_attr( $vars['url'] ); ?>" placeholder="<?php esc_attr_e( '/about/', 'agentready' ); ?>" />
+			<input type="text" class="large-text code" name="agentready_preview_url" value="<?php echo esc_attr( $vars['url'] ); ?>" placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>" />
 		</p>
 		<details class="agentready-details"<?php echo '' !== $selector || '' !== $strip ? ' open' : ''; ?>>
 			<summary><?php esc_html_e( 'Try different selectors without saving', 'agentready' ); ?></summary>
