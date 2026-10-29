@@ -40,9 +40,93 @@
 		}
 	} );
 
+	function initTerms( root ) {
+		var chosen = root.querySelector( '[data-agentready-chosen]' );
+		var search = root.querySelector( '[data-agentready-term-search]' );
+
+		function renderChips() {
+			var checked = root.querySelectorAll( 'input[type="checkbox"]:checked' );
+
+			chosen.textContent = '';
+			chosen.hidden = checked.length === 0;
+
+			if ( ! checked.length ) {
+				return;
+			}
+
+			var label = document.createElement( 'span' );
+			label.className = 'agentready-chips-label';
+			label.textContent = chosen.getAttribute( 'data-label' ) || '';
+			chosen.appendChild( label );
+
+			checked.forEach( function ( box ) {
+				var chip = document.createElement( 'button' );
+				var name = box.getAttribute( 'data-name' ) + ' (' + box.getAttribute( 'data-group' ) + ')';
+
+				chip.type = 'button';
+				chip.className = 'agentready-chip';
+				chip.setAttribute( 'data-term', box.value );
+				chip.setAttribute( 'aria-label', name );
+				chip.textContent = name + ' ×';
+				chosen.appendChild( chip );
+			} );
+		}
+
+		root.addEventListener( 'change', renderChips );
+
+		root.addEventListener( 'click', function ( event ) {
+			var chip = event.target.closest( '.agentready-chip' );
+
+			if ( ! chip ) {
+				return;
+			}
+
+			var box = root.querySelector( 'input[type="checkbox"][value="' + chip.getAttribute( 'data-term' ) + '"]' );
+
+			if ( box ) {
+				box.checked = false;
+				renderChips();
+			}
+		} );
+
+		search.addEventListener( 'keydown', function ( event ) {
+			if ( event.key === 'Enter' ) {
+				event.preventDefault();
+			}
+		} );
+
+		search.addEventListener( 'input', function () {
+			var query = search.value.trim().toLowerCase();
+
+			root.querySelectorAll( '.agentready-term-group' ).forEach( function ( group ) {
+				var visible = 0;
+
+				group.querySelectorAll( 'li' ).forEach( function ( item ) {
+					var show = ! query || item.getAttribute( 'data-name' ).indexOf( query ) !== -1;
+
+					item.hidden = ! show;
+					visible += show ? 1 : 0;
+				} );
+
+				group.hidden = visible === 0;
+
+				if ( query && visible ) {
+					group.open = true;
+				}
+			} );
+		} );
+
+		renderChips();
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		var toggle = document.getElementById( 'agentready-http-auth' );
 		var fields = document.getElementById( 'agentready-http-auth-fields' );
+		var terms = document.querySelector( '[data-agentready-terms]' );
+
+		if ( terms ) {
+			initTerms( terms );
+		}
 
 		if ( ! toggle || ! fields ) {
 			return;

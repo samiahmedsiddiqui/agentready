@@ -15,6 +15,7 @@ use AgentReady\Http\Urls;
 use AgentReady\Rendering\Extractor;
 use AgentReady\Settings\Options;
 use AgentReady\Settings\Sanitizer;
+use WP_Term;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -23,6 +24,8 @@ final class SettingsPage implements Hookable {
 	public const SLUG = 'agentready';
 
 	private const GROUP = 'agentready_group';
+
+	private const TERM_LIMIT = 200;
 
 	private const AUTHOR_URL = 'https://www.linkedin.com/in/sami-ahmed-siddiqui/';
 
@@ -227,31 +230,7 @@ final class SettingsPage implements Hookable {
 							<textarea id="agentready-excluded-posts" name="<?php echo esc_attr( $name ); ?>[excluded_posts]" rows="4" class="large-text code" placeholder="42&#10;checkout/*&#10;privacy"><?php echo esc_textarea( (string) $this->options->get( 'excluded_posts', '' ) ); ?></textarea>
 							<p class="description"><?php esc_html_e( 'One per line. A number is a post ID. Anything else is a path where * matches anything.', 'agentready' ); ?></p>
 						</div>
-						<div class="agentready-field">
-							<label for="agentready-excluded-terms"><?php esc_html_e( 'Taxonomy terms', 'agentready' ); ?></label>
-							<select id="agentready-excluded-terms" name="<?php echo esc_attr( $name ); ?>[excluded_terms][]" multiple size="6" class="large-text">
-								<?php foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $taxonomy ) : ?>
-									<?php
-									$terms = get_terms(
-										array(
-											'taxonomy'   => $taxonomy->name,
-											'hide_empty' => false,
-											'number'     => 200,
-										)
-									);
-									?>
-									<?php if ( is_wp_error( $terms ) || empty( $terms ) ) : ?>
-										<?php continue; ?>
-									<?php endif; ?>
-									<optgroup label="<?php echo esc_attr( $taxonomy->labels->name ); ?>">
-										<?php foreach ( $terms as $term ) : ?>
-											<option value="<?php echo esc_attr( (string) $term->term_id ); ?>" <?php selected( in_array( $term->term_id, $excluded, true ) ); ?>><?php echo esc_html( $term->name ); ?></option>
-										<?php endforeach; ?>
-									</optgroup>
-								<?php endforeach; ?>
-							</select>
-							<p class="description"><?php esc_html_e( 'Posts in any selected term are left out. Hold Ctrl or Cmd to select several.', 'agentready' ); ?></p>
-						</div>
+						<?php $this->render_terms( $excluded ); ?>
 					</section>
 
 					<section class="agentready-card">
@@ -354,6 +333,129 @@ final class SettingsPage implements Hookable {
 			<p><a class="button" href="<?php echo esc_url( admin_url( 'options-general.php?page=' . self::SLUG . '&tab=preview' ) ); ?>"><?php esc_html_e( 'Try the preview', 'agentready' ); ?></a></p>
 		</section>
 		<?php
+	}
+
+	/**
+	 * @param int[] $excluded Term IDs that are currently excluded.
+	 */
+	private function render_terms( array $excluded ): void {
+		$groups = array();
+
+		foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $taxonomy ) {
+			$terms = get_terms(
+				array(
+					'taxonomy'   => $taxonomy->name,
+					'hide_empty' => false,
+					'number'     => self::TERM_LIMIT,
+					'orderby'    => 'name',
+				)
+			);
+
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				continue;
+			}
+
+			$total = wp_count_terms(
+				array(
+					'taxonomy'   => $taxonomy->name,
+					'hide_empty' => false,
+				)
+			);
+
+			$groups[] = array(
+				'taxonomy' => $taxonomy,
+				'terms'    => $this->ordered_terms( array_filter( $terms, static fn( $term ): bool => $term instanceof WP_Term ), (bool) $taxonomy->hierarchical ),
+				'total'    => is_wp_error( $total ) ? 0 : (int) $total,
+			);
+		}
+		?>
+		<div class="agentready-field">
+			<span class="agentready-label"><?php esc_html_e( 'Taxonomy terms', 'agentready' ); ?></span>
+			<?php if ( empty( $groups ) ) : ?>
+				<p class="description"><?php esc_html_e( 'There are no categories, tags or other terms yet.', 'agentready' ); ?></p>
+			<?php else : ?>
+				<div class="agentready-terms" data-agentready-terms>
+					<div class="agentready-chosen" data-agentready-chosen data-label="<?php esc_attr_e( 'Excluded:', 'agentready' ); ?>" aria-live="polite" hidden></div>
+					<input type="search" class="agentready-term-search" data-agentready-term-search placeholder="<?php esc_attr_e( 'Search terms', 'agentready' ); ?>" aria-label="<?php esc_attr_e( 'Search terms', 'agentready' ); ?>" />
+					<?php foreach ( $groups as $index => $group ) : ?>
+						<?php
+						$ids      = array_map(
+							static fn( array $item ): int => (int) $item['term']->term_id,
+							$group['terms']
+						);
+						$selected = array_intersect( $ids, $excluded );
+						?>
+						<details class="agentready-term-group" <?php echo 0 === $index || ! empty( $selected ) ? 'open' : ''; ?>>
+							<summary><?php echo esc_html( $group['taxonomy']->labels->name ); ?></summary>
+							<ul class="agentready-term-list">
+								<?php foreach ( $group['terms'] as $item ) : ?>
+									<li data-name="<?php echo esc_attr( strtolower( $item['term']->name ) ); ?>" style="--depth:<?php echo (int) $item['depth']; ?>">
+										<label>
+											<input type="checkbox" name="<?php echo esc_attr( Options::KEY ); ?>[excluded_terms][]" value="<?php echo esc_attr( (string) $item['term']->term_id ); ?>" data-name="<?php echo esc_attr( $item['term']->name ); ?>" data-group="<?php echo esc_attr( $group['taxonomy']->labels->singular_name ); ?>" <?php checked( in_array( (int) $item['term']->term_id, $excluded, true ) ); ?> />
+											<?php echo esc_html( $item['term']->name ); ?>
+											<span class="agentready-term-count"><?php echo esc_html( number_format_i18n( (int) $item['term']->count ) ); ?></span>
+										</label>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+							<?php if ( $group['total'] > self::TERM_LIMIT ) : ?>
+								<p class="description" style="padding:0 10px 8px">
+									<?php
+									/* translators: %s: number of terms listed. */
+									echo esc_html( sprintf( __( 'Only the first %s terms are listed.', 'agentready' ), number_format_i18n( self::TERM_LIMIT ) ) );
+									?>
+								</p>
+							<?php endif; ?>
+						</details>
+					<?php endforeach; ?>
+				</div>
+				<p class="description"><?php esc_html_e( 'Posts in any ticked term are left out. The number is how many posts use the term.', 'agentready' ); ?></p>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * @param WP_Term[] $terms        Terms to order.
+	 * @param bool      $hierarchical Whether children are shown under their parents.
+	 * @return array<int, array{term: WP_Term, depth: int}>
+	 */
+	private function ordered_terms( array $terms, bool $hierarchical ): array {
+		if ( ! $hierarchical ) {
+			return array_map(
+				static fn( WP_Term $term ): array => array(
+					'term'  => $term,
+					'depth' => 0,
+				),
+				array_values( $terms )
+			);
+		}
+
+		$listed    = array();
+		$by_parent = array();
+
+		foreach ( $terms as $term ) {
+			$listed[ $term->term_id ] = true;
+		}
+
+		foreach ( $terms as $term ) {
+			$by_parent[ isset( $listed[ $term->parent ] ) ? (int) $term->parent : 0 ][] = $term;
+		}
+
+		$ordered = array();
+		$walk    = static function ( int $parent, int $depth ) use ( &$walk, &$ordered, $by_parent ): void {
+			foreach ( $by_parent[ $parent ] ?? array() as $term ) {
+				$ordered[] = array(
+					'term'  => $term,
+					'depth' => $depth,
+				);
+				$walk( (int) $term->term_id, $depth + 1 );
+			}
+		};
+
+		$walk( 0, 0 );
+
+		return $ordered;
 	}
 
 	/**
