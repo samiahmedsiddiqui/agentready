@@ -62,6 +62,10 @@ AgentReady falls back to the post content. That output is thinner, because field
 
 Yes. Set the content selector in Settings > AgentReady. The default tries `main`, `[role="main"]`, `#content`, `#main`, `.site-content` and `article`, then the whole body.
 
+= Can I remove parts of a page from the Markdown? =
+
+Yes. Add CSS selectors, one per line, under "Elements to exclude". They are removed in addition to the built-in list (navigation, sidebars, forms, scripts, hidden elements, and any site-level header or footer). Headers and footers inside an article are kept. The Preview tab lets you try selectors without saving them.
+
 == Changelog ==
 
 = 0.1.0 =

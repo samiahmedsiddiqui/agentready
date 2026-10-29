@@ -35,11 +35,11 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 1. A request for `/about.md` is caught early (on `parse_request`), so no rewrite rules are added and nothing needs flushing.
 2. The post is resolved from the path and checked for eligibility: published, not password protected, post type enabled, not excluded.
 3. The page is fetched from its own public URL as a logged-out visitor, so theme templates, ACF output and page builders are included. If that fails, the post content is used instead.
-4. The main content is selected (`main`, `[role="main"]`, `#content`, `#main`, `.site-content`, `article`, then `body`), navigation, scripts and forms are removed, and the result is converted to Markdown with a metadata header.
+4. The main content is selected (`main`, `[role="main"]`, `#content`, `#main`, `.site-content`, `article`, then `body`). Navigation, sidebars, forms, scripts, hidden elements and site-level headers and footers are removed. Headers and footers inside an `article`, `main` or `section` are kept. The result is converted to Markdown with a metadata header.
 
 ## Settings
 
-Settings > AgentReady has post types, exclusions, the content selector, HTTP Basic authentication, and a Preview tab.
+Settings > AgentReady has post types, exclusions, the content selector, extra elements to exclude (CSS selectors, added to the built-in list), HTTP Basic authentication, and a Preview tab. The Preview tab can try a different content selector or extra excludes without saving them.
 
 HTTP Basic credentials are stored encrypted with a key derived from the site's auth salt. To keep them out of the database, define them in `wp-config.php`:
 
