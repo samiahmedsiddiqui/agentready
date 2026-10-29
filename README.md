@@ -25,6 +25,10 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 
 `/about/index.html.md`, `/about/index.md` and `/index.md` are accepted as aliases. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
 
+## Custom Permalinks
+
+Works with default WordPress permalinks and with the [Custom Permalinks](https://wordpress.org/plugins/custom-permalinks/) plugin. A page with a custom URL gets its Markdown at that URL plus `.md` (`/company/about-us.md`), `llms.txt` and the discovery tag use it, and `.md` requests for the original WordPress URL (`/about.md`) are redirected to it. URL patterns in the exclusion list match the custom path.
+
 ## Requirements
 
 - PHP 8.0+ with the DOM extension, WordPress 6.0+.

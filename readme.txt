@@ -46,6 +46,10 @@ Add `.md` to the page URL without the trailing slash: `/about/` becomes `/about.
 
 The page is not published, is password protected, belongs to an excluded post type, is hidden in the editor, matches an exclusion rule, or has no pretty permalink. The Preview tab tells you which.
 
+= Does it work with Custom Permalinks? =
+
+Yes. Pages, posts and custom post types that have a custom URL set by the Custom Permalinks plugin get their `.md` version at that URL plus `.md`, for example `/company/about-us.md`. A request for the original WordPress URL plus `.md`, for example `/about.md`, is redirected to it. Pages with default WordPress permalinks work as usual.
+
 = Does it work with plain permalinks? =
 
 No. Pages that use `?p=123` style URLs are never converted. Choose another structure in Settings > Permalinks.
