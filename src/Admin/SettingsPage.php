@@ -151,10 +151,7 @@ final class SettingsPage implements Hookable {
 				<span class="agentready-version">v<?php echo esc_html( AGENTREADY_VERSION ); ?></span>
 			</h1>
 			<p class="agentready-tagline"><?php esc_html_e( 'Serve an llms.txt index and a Markdown version of every page, so AI agents can read your content.', 'agentready' ); ?></p>
-			<?php
-			settings_errors();
-			$this->notices();
-			?>
+			<?php $this->notices(); ?>
 			<nav class="nav-tab-wrapper">
 				<a class="nav-tab <?php echo 'general' === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( 'options-general.php?page=' . self::SLUG ) ); ?>"><?php esc_html_e( 'Settings', 'agentready' ); ?></a>
 				<a class="nav-tab <?php echo 'preview' === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( 'options-general.php?page=' . self::SLUG . '&tab=preview' ) ); ?>"><?php esc_html_e( 'Preview', 'agentready' ); ?></a>
@@ -188,19 +185,22 @@ final class SettingsPage implements Hookable {
 			);
 		}
 
-		if ( file_exists( get_home_path() . 'llms.txt' ) ) {
-			printf(
-				'<div class="notice notice-warning"><p>%s</p></div>',
-				esc_html__( 'A physical llms.txt file exists in the site root. The web server serves it before WordPress runs, so AgentReady cannot replace it. Delete or rename the file to use the generated one.', 'agentready' )
-			);
-		}
-
-		$yoast = get_option( 'wpseo' );
+		$file_exists = file_exists( get_home_path() . 'llms.txt' );
+		$yoast       = get_option( 'wpseo' );
 
 		if ( is_array( $yoast ) && ! empty( $yoast['enable_llms_txt'] ) ) {
 			printf(
-				'<div class="notice notice-info"><p>%s</p></div>',
-				esc_html__( 'Yoast SEO also generates an llms.txt. While AgentReady is active, it answers /llms.txt first. Turn off one of the two to avoid confusion.', 'agentready' )
+				'<div class="notice notice-warning"><p>%s</p></div>',
+				esc_html(
+					$file_exists
+						? __( 'Yoast SEO\'s llms.txt feature is on. Yoast saves a physical llms.txt file, which the web server serves before WordPress runs, so AgentReady\'s llms.txt is not used while that file exists. Turn the feature off in the Yoast SEO settings to use AgentReady\'s.', 'agentready' )
+						: __( 'Yoast SEO\'s llms.txt feature is on, but its file does not exist yet, so AgentReady answers /llms.txt for now. When Yoast creates the file, it takes over. Turn the feature off in the Yoast SEO settings to keep using AgentReady\'s.', 'agentready' )
+				)
+			);
+		} elseif ( $file_exists ) {
+			printf(
+				'<div class="notice notice-warning"><p>%s</p></div>',
+				esc_html__( 'A physical llms.txt file exists in the site root. The web server serves it before WordPress runs, so AgentReady cannot replace it. Delete or rename the file to use the generated one.', 'agentready' )
 			);
 		}
 	}

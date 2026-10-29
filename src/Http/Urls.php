@@ -115,7 +115,14 @@ final class Urls {
 		$parts = wp_parse_url( $url );
 		$home  = wp_parse_url( home_url() );
 
-		if ( ! is_array( $parts ) || ! is_array( $home ) || ( $parts['host'] ?? '' ) !== ( $home['host'] ?? '' ) ) {
+		if ( ! is_array( $parts ) || ! is_array( $home ) ) {
+			return null;
+		}
+
+		// A path such as /about/ has no host and means this site.
+		$home_host = $home['host'] ?? '';
+
+		if ( isset( $parts['host'] ) && $home_host !== $parts['host'] ) {
 			return null;
 		}
 

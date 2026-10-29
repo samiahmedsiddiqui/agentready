@@ -35,7 +35,7 @@ final class PreviewTool {
 
 		if ( isset( $_POST['agentready_preview_url'] ) ) {
 			check_admin_referer( self::NONCE );
-			$url      = esc_url_raw( wp_unslash( $_POST['agentready_preview_url'] ) );
+			$url      = trim( sanitize_text_field( wp_unslash( $_POST['agentready_preview_url'] ) ) );
 			$selector = isset( $_POST['agentready_preview_selector'] ) ? sanitize_text_field( wp_unslash( $_POST['agentready_preview_selector'] ) ) : '';
 			$strip    = isset( $_POST['agentready_preview_strip'] ) ? sanitize_textarea_field( wp_unslash( $_POST['agentready_preview_strip'] ) ) : '';
 		}
@@ -50,11 +50,11 @@ final class PreviewTool {
 		?>
 		<section class="agentready-card" style="margin-top:20px">
 			<h2><?php esc_html_e( 'Check a page', 'agentready' ); ?></h2>
-			<p class="agentready-intro"><?php esc_html_e( 'Enter the URL of a page on this site to see whether it is served and what the Markdown looks like.', 'agentready' ); ?></p>
+			<p class="agentready-intro"><?php esc_html_e( 'Enter the URL or path of a page on this site, for example /about/, to see whether it is served and what the Markdown looks like.', 'agentready' ); ?></p>
 			<form method="post" action="<?php echo esc_url( $action ); ?>">
 				<?php wp_nonce_field( self::NONCE ); ?>
 				<p>
-					<input type="text" class="large-text code" name="agentready_preview_url" value="<?php echo esc_attr( $url ); ?>" placeholder="<?php echo esc_attr( home_url( '/about/' ) ); ?>" />
+					<input type="text" class="large-text code" name="agentready_preview_url" value="<?php echo esc_attr( $url ); ?>" placeholder="<?php esc_attr_e( '/about/', 'agentready' ); ?>" />
 				</p>
 				<details class="agentready-details"<?php echo '' !== $selector || '' !== $strip ? ' open' : ''; ?>>
 					<summary><?php esc_html_e( 'Try different selectors without saving', 'agentready' ); ?></summary>
