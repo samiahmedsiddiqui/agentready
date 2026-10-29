@@ -15,7 +15,7 @@ Serves an llms.txt index and a clean Markdown version of every page, so AI agent
 AgentReady builds a Markdown version of each page from its rendered output, so ACF fields, Gutenberg blocks, Elementor layouts and classic editor content are all included, whatever theme you use.
 
 * `/llms.txt`, a Markdown index of your pages.
-* A `.md` version of every page, for example `/about.md`. The homepage is `/index.html.md`.
+* A `.md` version of every page, for example `/about.md`. The homepage is `/index.md`.
 * All public post types are served by default, with a setting to exclude any of them.
 * Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
 * Per-page description override for `llms.txt`.
@@ -46,7 +46,7 @@ The generated Markdown is stored in its own database table and refreshed in the 
 
 = What are the Markdown URLs? =
 
-Add `.md` to the page URL without the trailing slash: `/about/` becomes `/about.md` and `/services/web/` becomes `/services/web.md`. The homepage is `/index.html.md`. `/about/index.html.md`, `/about/index.md` and `/index.md` also work. You can choose `/index.md` as the homepage URL under Settings > AgentReady > Content > Homepage; the chosen one is listed in llms.txt.
+Add `.md` to the page URL without the trailing slash: `/about/` becomes `/about.md` and `/services/web/` becomes `/services/web.md`. The homepage is `/index.md`. `/about/index.html.md`, `/about/index.md` and `/index.html.md` also work. You can choose `/index.html.md` as the homepage URL under Settings > AgentReady > Content > Homepage; the chosen one is listed in llms.txt.
 
 = Why do I get a 404 for a page? =
 
@@ -102,7 +102,7 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 * Stored Markdown with background refresh, on-demand generation and manual regenerate and clear controls.
 * Environment control: production by default, optional staging, development and local, allowed URLs, and the `AGENTREADY_ENABLED` and `AGENTREADY_ALLOWED_URLS` constants.
 * Settings split into tabs, with system info.
-* Setting to use `/index.md` instead of `/index.html.md` for the homepage.
+* The homepage Markdown URL is now `/index.md`, with a setting to use `/index.html.md` instead. Both keep working.
 * "Delete all data on uninstall" option.
 * WP-CLI commands `wp agentready cache clear|regenerate|status`.
 

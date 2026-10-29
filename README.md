@@ -22,10 +22,10 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 | --- | --- |
 | `/about/` | `/about.md` |
 | `/services/web/` | `/services/web.md` |
-| Homepage (static front page) | `/index.html.md` |
+| Homepage (static front page) | `/index.md` |
 | Site index | `/llms.txt` |
 
-`/about/index.html.md`, `/about/index.md` and `/index.md` are accepted as aliases. The homepage URL defaults to `/index.html.md`; choose `/index.md` instead under Settings > AgentReady > Content > Homepage. Both keep working, and the chosen one is the one listed in `llms.txt` and the page head. If a real page has the slug `index`, `/index.html.md` is used. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
+`/about/index.html.md`, `/about/index.md` and `/index.html.md` are accepted as aliases. The homepage URL defaults to `/index.md`; choose `/index.html.md` instead under Settings > AgentReady > Content > Homepage. Both keep working, and the chosen one is the one listed in `llms.txt` and the page head. If a real page has the slug `index`, `/index.html.md` is used. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
 
 ## Custom Permalinks
 

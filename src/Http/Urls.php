@@ -19,8 +19,9 @@ final class Urls {
 	public const ROUTE_LLMS = 'llms';
 	public const ROUTE_PAGE = 'page';
 
-	public const HOME_DEFAULT = 'index.html.md';
+	public const HOME_LONG    = 'index.html.md';
 	public const HOME_SHORT   = 'index.md';
+	public const HOME_DEFAULT = self::HOME_SHORT;
 
 	public function __construct( private ?Options $options = null ) {}
 
@@ -75,13 +76,13 @@ final class Urls {
 	 * @param bool   $collision Whether a real page already uses the slug "index".
 	 */
 	public static function home_file_name( string $setting, bool $collision ): string {
-		return self::HOME_SHORT === $setting && ! $collision ? self::HOME_SHORT : self::HOME_DEFAULT;
+		return self::HOME_LONG === $setting || $collision ? self::HOME_LONG : self::HOME_SHORT;
 	}
 
 	public function home_file(): string {
 		$setting = null === $this->options ? self::HOME_DEFAULT : (string) $this->options->get( 'home_markdown_url', self::HOME_DEFAULT );
 
-		return self::home_file_name( $setting, self::HOME_SHORT === $setting && $this->index_collision() );
+		return self::home_file_name( $setting, self::HOME_LONG !== $setting && $this->index_collision() );
 	}
 
 	/**

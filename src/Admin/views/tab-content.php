@@ -45,9 +45,9 @@ $options = $vars['options'];
 	<div class="agentready-field">
 		<?php foreach ( $vars['home_urls'] as $file => $home_url ) : ?>
 			<label>
-				<input type="radio" name="<?php echo esc_attr( $name ); ?>[home_markdown_url]" value="<?php echo esc_attr( $file ); ?>" <?php checked( $file, (string) $options->get( 'home_markdown_url', 'index.html.md' ) ); ?> />
+				<input type="radio" name="<?php echo esc_attr( $name ); ?>[home_markdown_url]" value="<?php echo esc_attr( $file ); ?>" <?php checked( $file, (string) $options->get( 'home_markdown_url', 'index.md' ) ); ?> />
 				<code><?php echo esc_html( $home_url ); ?></code>
-				<?php if ( 'index.html.md' === $file ) : ?>
+				<?php if ( 'index.md' === $file ) : ?>
 					<span class="description"><?php esc_html_e( '(default)', 'agentready' ); ?></span>
 				<?php endif; ?>
 			</label><br />

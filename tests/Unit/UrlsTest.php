@@ -99,11 +99,12 @@ final class UrlsTest extends TestCase {
 	 */
 	public function home_files(): array {
 		return array(
-			'default'                   => array( 'index.html.md', false, 'index.html.md' ),
-			'short chosen'              => array( 'index.md', false, 'index.md' ),
+			'default'                   => array( 'index.md', false, 'index.md' ),
+			'long chosen'               => array( 'index.html.md', false, 'index.html.md' ),
+			'long chosen with a page called index' => array( 'index.html.md', true, 'index.html.md' ),
 			'short chosen but a page is called index' => array( 'index.md', true, 'index.html.md' ),
-			'junk value'                => array( 'other', false, 'index.html.md' ),
-			'empty'                     => array( '', false, 'index.html.md' ),
+			'junk value'                => array( 'other', false, 'index.md' ),
+			'empty'                     => array( '', false, 'index.md' ),
 		);
 	}
 }

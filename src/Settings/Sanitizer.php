@@ -60,7 +60,7 @@ final class Sanitizer {
 				'allowed_environments' => isset( $input['allowed_environments'] ) && is_array( $input['allowed_environments'] )
 					? array_values( array_intersect( Environment::OPTIONAL, array_map( 'sanitize_key', $input['allowed_environments'] ) ) )
 					: array(),
-				'home_markdown_url'    => isset( $input['home_markdown_url'] ) && Urls::HOME_SHORT === $input['home_markdown_url'] ? Urls::HOME_SHORT : Urls::HOME_DEFAULT,
+				'home_markdown_url'    => isset( $input['home_markdown_url'] ) && Urls::HOME_LONG === $input['home_markdown_url'] ? Urls::HOME_LONG : Urls::HOME_SHORT,
 				'allowed_urls'         => $this->allowed_urls( $input ),
 				'delete_data'          => ! empty( $input['delete_data'] ),
 			),

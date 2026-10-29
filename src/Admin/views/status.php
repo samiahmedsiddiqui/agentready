@@ -79,7 +79,7 @@ $cache = $vars['cache'];
 <section class="agentready-card">
 	<h2><?php esc_html_e( 'How it works', 'agentready' ); ?></h2>
 	<ol class="agentready-steps">
-		<li><?php esc_html_e( 'Add .md to a page URL, for example /about.md. The homepage is /index.html.md.', 'agentready' ); ?></li>
+		<li><?php echo esc_html( sprintf( /* translators: %s: homepage Markdown path. */ __( 'Add .md to a page URL, for example /about.md. The homepage is /%s.', 'agentready' ), $vars['home_file'] ) ); ?></li>
 		<li><?php esc_html_e( 'The page is read like a visitor sees it, so theme, ACF and builder output is included.', 'agentready' ); ?></li>
 		<li><?php esc_html_e( 'Navigation, scripts and forms are removed, and the rest becomes Markdown.', 'agentready' ); ?></li>
 		<li><?php esc_html_e( 'The result is stored and refreshed when you save the page.', 'agentready' ); ?></li>

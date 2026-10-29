@@ -171,8 +171,8 @@ final class SettingsPage implements Hookable {
 				'term_groups'     => $this->terms->groups(),
 				'term_limit'      => TermList::LIMIT,
 				'home_urls'       => array(
-					Urls::HOME_DEFAULT => home_url( '/' . Urls::HOME_DEFAULT ),
-					Urls::HOME_SHORT   => home_url( '/' . Urls::HOME_SHORT ),
+					Urls::HOME_SHORT => home_url( '/' . Urls::HOME_SHORT ),
+					Urls::HOME_LONG  => home_url( '/' . Urls::HOME_LONG ),
 				),
 				'home_collision'  => $this->urls->index_collision(),
 				'excluded_terms'  => array_map( 'absint', (array) $this->options->get( 'excluded_terms', array() ) ),
@@ -215,6 +215,7 @@ final class SettingsPage implements Hookable {
 			'running'       => $this->batch->is_running(),
 			'cron_disabled' => defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON,
 			'preview_url'   => $this->url() . '&tab=preview',
+			'home_file'     => $this->urls->home_file(),
 			'system'        => array(
 				__( 'WordPress', 'agentready' )   => (string) $wp_version,
 				__( 'PHP', 'agentready' )         => PHP_VERSION,
