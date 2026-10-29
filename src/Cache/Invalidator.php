@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace AgentReady\Cache;
 
+use AgentReady\Content\PostMeta;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Settings\Options;
@@ -31,6 +32,10 @@ final class Invalidator implements Hookable {
 	public function register(): void {
 		add_action( 'save_post', array( $this, 'on_save' ), 99, 2 );
 		add_action( 'set_object_terms', array( $this, 'on_terms' ) );
+		foreach ( array( 'added_post_meta', 'updated_post_meta', 'deleted_post_meta' ) as $hook ) {
+			add_action( $hook, array( $this, 'on_meta' ), 10, 3 );
+		}
+
 		add_action( 'transition_post_status', array( $this, 'on_transition' ), 10, 3 );
 		add_action( 'deleted_post', array( $this->store, 'delete' ) );
 		add_action( 'update_option_' . Options::KEY, array( $this, 'on_settings_updated' ), 10, 2 );
@@ -39,6 +44,18 @@ final class Invalidator implements Hookable {
 
 	public function on_save( int $post_id, WP_Post $post ): void {
 		$this->touch( $post );
+	}
+
+	public function on_meta( mixed $meta_id, mixed $object_id, mixed $meta_key ): void {
+		if ( ! in_array( $meta_key, array( PostMeta::EXCLUDE, PostMeta::DESCRIPTION ), true ) ) {
+			return;
+		}
+
+		$post = get_post( (int) $object_id );
+
+		if ( $post instanceof WP_Post ) {
+			$this->touch( $post );
+		}
 	}
 
 	public function on_terms( int $object_id ): void {
