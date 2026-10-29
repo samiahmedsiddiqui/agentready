@@ -2,7 +2,7 @@
 Contributors: samiahmedsiddiqui
 Tags: llms-txt, markdown, ai, llm, seo
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 8.0
 Stable tag: 0.1.0
 License: GPLv2 or later
