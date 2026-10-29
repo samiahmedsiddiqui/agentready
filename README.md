@@ -93,7 +93,7 @@ wp agentready cache regenerate 42 57
 wp agentready cache regenerate --all
 ```
 
-Uninstalling always drops the table. Your settings and the per-page choices are removed too only if "Delete all data on uninstall" is ticked.
+Uninstalling always drops the table and clears any saved HTTP Basic credentials. Your other settings and the per-page choices are removed too only if "Delete all data on uninstall" is ticked.
 
 ## Hooks
 

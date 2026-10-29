@@ -8,7 +8,7 @@
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 /**
- * Removes the stored Markdown, and the settings and per-page choices when the user asked for it.
+ * Removes the stored Markdown and saved credentials, and the settings and per-page choices when the user asked for it.
  */
 function agentready_uninstall_site(): void {
 	global $wpdb;
@@ -29,6 +29,13 @@ function agentready_uninstall_site(): void {
 		delete_option( 'agentready_settings' );
 		delete_post_meta_by_key( '_agentready_exclude' );
 		delete_post_meta_by_key( '_agentready_description' );
+	} elseif ( is_array( $settings ) ) {
+		// Saved HTTP Basic credentials are secrets, so they never outlive the plugin.
+		$settings['http_auth_enabled']  = false;
+		$settings['http_auth_user']     = '';
+		$settings['http_auth_password'] = '';
+
+		update_option( 'agentready_settings', $settings );
 	}
 }
 

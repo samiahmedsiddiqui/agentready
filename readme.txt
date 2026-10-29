@@ -74,7 +74,7 @@ Pages refresh in the background when you save them. To refresh by hand use "Rege
 
 = What is removed when I delete the plugin? =
 
-The stored Markdown table is always removed. Your settings and the choices saved on pages are removed only if you tick "Delete all data on uninstall" on the Environment tab.
+The stored Markdown table is always removed, and so are any saved HTTP Basic credentials. Your other settings and the choices saved on pages are removed only if you tick "Delete all data on uninstall" on the Environment tab.
 
 = My site asks for a username and password. =
 
@@ -103,6 +103,9 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 == Changelog ==
 
 = Unreleased =
+* The Markdown front matter description follows the same order as llms.txt and is left out when none is set, instead of using a summary of the page body.
+* Post types, pages and taxonomy terms share one Exclusions card.
+* Saved HTTP Basic credentials are always removed when the plugin is deleted.
 * `llms.txt` descriptions come from the per-page description, then the SEO meta description, then the excerpt. They no longer fall back to text taken from the page content.
 * Stored Markdown with background refresh, on-demand generation and manual regenerate and clear controls.
 * Environment control: production by default, optional staging, development and local, allowed URLs, and the `AGENTREADY_ENABLED` and `AGENTREADY_ALLOWED_URLS` constants.

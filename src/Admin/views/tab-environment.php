@@ -48,7 +48,7 @@ $ticked      = $environment->allowed_types();
 
 <section class="agentready-card">
 	<h2><?php esc_html_e( 'Data', 'agentready' ); ?></h2>
-	<p class="agentready-intro"><?php esc_html_e( 'The stored Markdown is always removed when the plugin is deleted.', 'agentready' ); ?></p>
+	<p class="agentready-intro"><?php esc_html_e( 'The stored Markdown and any saved HTTP Basic credentials are always removed when the plugin is deleted.', 'agentready' ); ?></p>
 	<div class="agentready-field">
 		<label>
 			<input type="checkbox" name="<?php echo esc_attr( $name ); ?>[delete_data]" value="1" <?php checked( (bool) $options->get( 'delete_data', false ) ); ?> />

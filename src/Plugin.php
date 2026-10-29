@@ -47,7 +47,6 @@ use AgentReady\Rendering\FrontMatter;
 use AgentReady\Rendering\Generator;
 use AgentReady\Rendering\Renderer;
 use AgentReady\Rendering\Selector;
-use AgentReady\Rendering\Summary;
 use AgentReady\Rest\PagesController;
 use AgentReady\Robots\RobotsTxt;
 use AgentReady\Settings\Options;
@@ -94,8 +93,7 @@ final class Plugin {
 			),
 			new Converter(),
 			new FrontMatter(),
-			$description,
-			new Summary()
+			$description
 		);
 		$pages       = new PageCache( $store, $generator, new Lock(), $eligibility, $environment );
 		$batch       = new Batch( $store, $pages, $post_types, $eligibility, $environment, $candidates );
