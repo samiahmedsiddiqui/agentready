@@ -66,6 +66,7 @@ final class ConverterTest extends TestCase {
 			'wrapped site header'   => array( '<div id="page"><header><p>Brand</p></header><p>Body</p></div>', "Body\n" ),
 			'article header kept'   => array( '<article><header><h1>Title</h1></header><p>Text</p><footer><p>By Ann</p></footer></article>', "# Title\n\nText\n\nBy Ann\n" ),
 			'logo repeats link text' => array( '<a href="/c/">Claude <img src="/c.svg" alt="Claude"></a>', "[Claude](https://example.com/c/)\n" ),
+			'logo in nested wrappers' => array( '<a href="/c/"><div class="top"><div class="name">Claude</div><div class="image"><img src="/c.svg" alt="Claude"></div></div></a>', "[Claude](https://example.com/c/)\n" ),
 			'image-only link kept'  => array( '<a href="/x/"><img src="/x.svg" alt="Logo"></a>', "[![Logo](https://example.com/x.svg)](https://example.com/x/)\n" ),
 			'label then logo'       => array( '<div>AgentCore</div><div><img src="/a.svg" alt="AgentCore"></div>', "AgentCore\n" ),
 			'logo then caption'     => array( '<div><img src="/d.svg" alt="Diagram one"></div><p>Diagram one</p>', "Diagram one\n" ),

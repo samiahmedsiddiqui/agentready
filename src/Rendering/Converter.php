@@ -376,16 +376,31 @@ final class Converter {
 		return '![' . $alt . '](' . $this->destination( $src ) . ')';
 	}
 
+	/**
+	 * Whether the nearest ancestor that has text, within a few levels, is a short label that already says the alt text.
+	 */
 	private function repeats_parent_text( DOMElement $image, string $alt ): bool {
-		$parent = $image->parentNode;
-
-		if ( '' === $alt || ! $parent instanceof DOMElement || 'figure' === strtolower( $parent->nodeName ) ) {
+		if ( '' === $alt ) {
 			return false;
 		}
 
-		$text = $this->plain( $parent->textContent );
+		$ancestor = $image->parentNode;
 
-		return strlen( $text ) <= 80 && str_contains( $text, $this->plain( $alt ) );
+		for ( $level = 0; $level < 4 && $ancestor instanceof DOMElement; $level++ ) {
+			if ( in_array( strtolower( $ancestor->nodeName ), array( 'figure', 'body', 'main', 'article', 'section' ), true ) ) {
+				return false;
+			}
+
+			$text = $this->plain( $ancestor->textContent );
+
+			if ( '' !== $text ) {
+				return strlen( $text ) <= 80 && str_contains( $text, $this->plain( $alt ) );
+			}
+
+			$ancestor = $ancestor->parentNode;
+		}
+
+		return false;
 	}
 
 	private function embed( DOMElement $element, string $label ): string {

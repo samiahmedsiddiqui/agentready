@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class Summary {
 
-	private const MIN_LENGTH = 40;
+	private const MIN_LENGTH = 30;
 
 	public function from_markdown( string $markdown, int $words = 30 ): string {
 		foreach ( (array) preg_split( '/\n{2,}/', $markdown ) as $block ) {
