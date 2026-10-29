@@ -22,7 +22,6 @@
 	<rule ref="PHPCompatibilityWP"/>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-		<exclude-pattern>/src/Admin/views/*</exclude-pattern>
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="agentready"/>

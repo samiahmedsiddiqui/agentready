@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
+
 if ( null !== $vars['inactive'] ) :
 	?>
 	<div class="notice notice-warning">

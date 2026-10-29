@@ -6,6 +6,8 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
 ?>
 <div class="agentready-chips">
 	<span class="agentready-chips-label"><?php esc_html_e( 'Common:', 'agentready' ); ?></span>

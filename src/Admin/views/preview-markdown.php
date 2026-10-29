@@ -9,6 +9,8 @@ use AgentReady\Rendering\RenderResult;
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
+
 $result = $vars['page'];
 ?>
 <section class="agentready-card">

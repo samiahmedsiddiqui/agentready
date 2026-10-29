@@ -21,6 +21,8 @@ AgentReady builds a Markdown version of each page from its rendered output, so A
 * Per-page description override for `llms.txt`.
 * A preview tool to test the generated Markdown for any URL.
 * Works on sites protected with HTTP Basic authentication.
+* Generated Markdown is stored and refreshed when a page is saved.
+* Runs on production by default. Staging, development and local sites are opt-in.
 * Drafts, private and password-protected content are never exposed.
 
 **Pretty permalinks are required.** Plain permalinks such as `?p=123` are not supported: no Markdown pages or `llms.txt` are served, and the settings page shows a notice.
@@ -28,6 +30,10 @@ AgentReady builds a Markdown version of each page from its rendered output, so A
 = How it works =
 
 When an agent requests `/about.md`, AgentReady reads the public page `/about/` the same way a visitor would, keeps the main content, removes navigation, scripts and forms, and converts the result to Markdown with a short metadata header. Each Markdown response carries a canonical link to the HTML page and a `noindex` header, so search engines do not treat it as duplicate content.
+
+= Stored Markdown =
+
+The generated Markdown is stored in its own database table and refreshed in the background when you save a page. You can regenerate or clear it from the settings page, the edit screen, the post lists and WP-CLI.
 
 == Installation ==
 
@@ -54,6 +60,18 @@ Yes. Pages, posts and custom post types that have a custom URL set by the Custom
 
 No. Pages that use `?p=123` style URLs are never converted. Choose another structure in Settings > Permalinks.
 
+= Why does AgentReady do nothing on my staging site? =
+
+It only runs on production by default. Open Settings > AgentReady > Environment and tick your environment, or define `WP_ENVIRONMENT_TYPE` as `production`. To limit it to certain domains, set "Allowed URLs", or define `AGENTREADY_ALLOWED_URLS` in `wp-config.php`. `define( 'AGENTREADY_ENABLED', false );` switches it off completely.
+
+= How do I refresh the stored Markdown? =
+
+Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.
+
+= What is removed when I delete the plugin? =
+
+The stored Markdown table is always removed. Your settings and the choices saved on pages are removed only if you tick "Delete all data on uninstall" on the Environment tab.
+
 = My site asks for a username and password. =
 
 Tick "This site is protected with HTTP Basic authentication" in Settings > AgentReady and enter the credentials. They are stored encrypted and only sent to your own site. You can also define `AGENTREADY_HTTP_AUTH_USER` and `AGENTREADY_HTTP_AUTH_PASSWORD` in `wp-config.php`.
@@ -79,6 +97,13 @@ Yes. Set the content selector in Settings > AgentReady. The default tries `main`
 Yes. Add CSS selectors, one per line, under "Elements to exclude". They are removed in addition to the built-in list (navigation, sidebars, forms, scripts, hidden elements, and any site-level header or footer). Headers and footers inside an article are kept. The Preview tab lets you try selectors without saving them.
 
 == Changelog ==
+
+= Unreleased =
+* Stored Markdown with background refresh, on-demand generation and manual regenerate and clear controls.
+* Environment control: production by default, optional staging, development and local, allowed URLs, and the `AGENTREADY_ENABLED` and `AGENTREADY_ALLOWED_URLS` constants.
+* Settings split into tabs, with system info.
+* "Delete all data on uninstall" option.
+* WP-CLI commands `wp agentready cache clear|regenerate|status`.
 
 = 0.1.0 =
 * Initial release.

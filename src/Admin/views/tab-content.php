@@ -9,6 +9,8 @@ use AgentReady\Admin\View;
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
+
 $name    = $vars['name'];
 $options = $vars['options'];
 ?>

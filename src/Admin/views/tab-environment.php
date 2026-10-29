@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
+
 $name        = $vars['name'];
 $options     = $vars['options'];
 $environment = $vars['environment'];

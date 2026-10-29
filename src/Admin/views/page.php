@@ -9,6 +9,8 @@ use AgentReady\Admin\View;
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
+
 $on_preview = 'preview' === $vars['tab'];
 ?>
 <div class="wrap agentready">

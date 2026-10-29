@@ -10,6 +10,8 @@ use AgentReady\Rendering\Extractor;
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
+
 $name     = $vars['name'];
 $options  = $vars['options'];
 $locked   = $options->http_auth_from_constants();

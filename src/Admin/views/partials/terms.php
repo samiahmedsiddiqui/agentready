@@ -9,6 +9,8 @@ use AgentReady\Settings\Options;
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
+
 $groups   = $vars['term_groups'];
 $excluded = $vars['excluded_terms'];
 $limit    = $vars['term_limit'];

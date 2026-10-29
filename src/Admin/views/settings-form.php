@@ -8,6 +8,8 @@
 use AgentReady\Admin\View;
 
 defined( 'ABSPATH' ) || exit;
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
 ?>
 <form method="post" action="options.php" class="agentready-tabs" data-agentready-tabs>
 	<?php settings_fields( $vars['group'] ); ?>

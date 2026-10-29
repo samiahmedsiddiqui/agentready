@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace AgentReady;
 
+defined( 'ABSPATH' ) || exit;
+
 use AgentReady\Admin\CacheActions;
 use AgentReady\Admin\MetaBox;
 use AgentReady\Admin\PreviewTool;
@@ -50,8 +52,6 @@ use AgentReady\Rest\PagesController;
 use AgentReady\Robots\RobotsTxt;
 use AgentReady\Settings\Options;
 use AgentReady\Settings\Sanitizer;
-
-defined( 'ABSPATH' ) || exit;
 
 final class Plugin {
 
