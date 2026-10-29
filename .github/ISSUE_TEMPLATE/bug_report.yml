@@ -1,0 +1,74 @@
+name: Bug report
+description: Report something in AgentReady that doesn't work as expected.
+labels: [ bug ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. For security vulnerabilities, please follow [SECURITY.md](https://github.com/samiahmedsiddiqui/agentready/blob/main/SECURITY.md) instead of opening an issue.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What went wrong, and what did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The page URL and what its Markdown version looks like help a lot.
+      placeholder: |
+        1. Open `https://example.com/about/`.
+        2. Open `https://example.com/about.md`.
+        3. See that the ACF fields are missing.
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: AgentReady version
+      placeholder: '0.1.0'
+    validations:
+      required: true
+  - type: input
+    id: wordpress-version
+    attributes:
+      label: WordPress version
+      placeholder: '6.9'
+    validations:
+      required: true
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: '8.3'
+    validations:
+      required: true
+  - type: dropdown
+    id: builder
+    attributes:
+      label: How is the page built?
+      options:
+        - Block editor (Gutenberg)
+        - Classic editor
+        - Elementor
+        - ACF fields in the theme template
+        - A mix of these
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Other plugins and theme
+      description: SEO, caching, multilingual and page builder plugins are the most useful to list.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked the problem still happens with the latest version of AgentReady.
+          required: true
+        - label: This isn't a security vulnerability. Those are reported privately; see SECURITY.md.
+          required: true
