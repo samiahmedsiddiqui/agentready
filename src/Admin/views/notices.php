@@ -15,7 +15,7 @@ if ( null !== $vars['inactive'] ) :
 		<p>
 			<strong><?php esc_html_e( 'AgentReady is inactive on this site.', 'agentready' ); ?></strong>
 			<?php echo esc_html( $vars['inactive'] ); ?>
-			<?php esc_html_e( 'Markdown pages and llms.txt return the normal 404 page, and no discovery tag is added. The Preview tab still works.', 'agentready' ); ?>
+			<?php esc_html_e( 'Markdown pages and llms.txt return the normal 404 page, and no discovery tag is added. Verify & Preview still works.', 'agentready' ); ?>
 		</p>
 	</div>
 <?php endif; ?>

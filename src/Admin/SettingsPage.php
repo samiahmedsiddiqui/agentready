@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings screen under Settings > AgentReady.
+ * Settings page of the AgentReady menu.
  *
  * @package AgentReady
  */

@@ -11,7 +11,8 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 - All public post types enabled by default, with a setting to exclude any of them.
 - Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
 - Per-page description for `llms.txt`. When empty it uses the meta description from Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework, then the excerpt. The page content is never used, so a page without any of these is listed without a description.
-- Preview tool to test the generated Markdown for any URL.
+- Verify & Preview: checks that the stored Markdown matches the page, shows a rendered preview and the changes, and updates it in one click.
+- Check all pages: a background scan that lists every stored page that has drifted from its live page.
 - Works behind HTTP Basic authentication.
 - Generated Markdown is stored and refreshed when a page is saved, so agents get a fast answer.
 - Runs on production by default. Staging, development and local are opt-in, and a URL allow-list and a `wp-config.php` kill switch keep copied sites quiet.
@@ -25,7 +26,7 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 | Homepage (static front page) | `/index.md` |
 | Site index | `/llms.txt` |
 
-`/about/index.html.md`, `/about/index.md` and `/index.html.md` are accepted as aliases. The homepage URL defaults to `/index.md`; choose `/index.html.md` instead under Settings > AgentReady > Content > Homepage. Both keep working, and the chosen one is the one listed in `llms.txt` and the page head. If a real page has the slug `index`, `/index.html.md` is used. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
+`/about/index.html.md`, `/about/index.md` and `/index.html.md` are accepted as aliases. The homepage URL defaults to `/index.md`; choose `/index.html.md` instead under AgentReady > Settings > Content > Homepage. Both keep working, and the chosen one is the one listed in `llms.txt` and the page head. If a real page has the slug `index`, `/index.html.md` is used. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
 
 ## Custom Permalinks
 
@@ -45,7 +46,7 @@ Works with default WordPress permalinks and with the [Custom Permalinks](https:/
 
 ## Settings
 
-Settings > AgentReady has four tabs. **Content**: post types, exclusions, the homepage Markdown URL and the editor box. **Rendering**: the content selector, extra elements to exclude (CSS selectors, added to the built-in list) and HTTP Basic authentication. **Environment**: where the plugin runs, and whether uninstalling removes your settings. **Preview**: shows the Markdown for any URL, and can try a different content selector or extra excludes without saving them. The Status column shows system info and how many pages are stored.
+The **AgentReady** menu has two pages. **Settings** has three tabs. **Content**: exclusions (post types, pages by ID or URL pattern, taxonomy terms), the homepage Markdown URL and the editor box. **Rendering**: the content selector, extra elements to exclude (CSS selectors, added to the built-in list) and HTTP Basic authentication. **Environment**: where the plugin runs, and whether uninstalling removes your settings. The Status column shows system info and how many pages are stored. **Verify & Preview** is described below.
 
 HTTP Basic credentials are stored encrypted with a key derived from the site's auth salt. To keep them out of the database, define them in `wp-config.php`:
 
@@ -54,11 +55,27 @@ define( 'AGENTREADY_HTTP_AUTH_USER', 'user' );
 define( 'AGENTREADY_HTTP_AUTH_PASSWORD', 'password' );
 ```
 
+## Verify & Preview
+
+AgentReady > Verify & Preview has two tabs.
+
+**One page.** Enter a page URL (the field starts with your homepage address). AgentReady reads the page now, builds fresh Markdown with your saved settings, and shows:
+
+- a verdict: **In sync**, **Out of date** (with the number of lines that differ), **Not stored yet**, or **Not served** with the reason;
+- a rendered **Preview** (an approximation, made without any library and without HTML from the page), the **Raw Markdown** with a copy button, the **Changes** between the stored copy and the fresh Markdown, and **Page text**, which checks that the text blocks of the content area are in the Markdown and lists any that were lost, and the text your exclusions removed on purpose;
+- an **Update stored copy** (or **Create stored copy**) button when the copy is out of date or missing.
+
+You can also try a different content selector or extra exclusions without saving them; the comparison then shows what would change if you saved them. The edit screen's AgentReady box has a **Check against the page** link for administrators.
+
+Pages with content that changes on every load, such as the time, can look out of date each time. Use the `agentready_compare_ignore` filter, which returns regular expressions for text to leave out of the comparison.
+
+**All pages.** Start a scan and AgentReady checks every stored page in the background, a few at a time, and reports how many are in sync and which differ, with a Compare link for each. The scan changes nothing. **Update outdated** then queues a refresh for the pages that differ, and **Generate missing** builds the pages that have no stored copy yet.
+
 ## Environments
 
 AgentReady is active on production, and when the environment type is not set (WordPress treats that as production). Tick staging, development or local on the Environment tab to run there too. Set the type with `WP_ENVIRONMENT_TYPE`; many hosts do it for you.
 
-When the plugin is inactive, `.md` and `/llms.txt` return the normal 404 page, no discovery tag is added, and nothing is scheduled. The settings page says why, and the Preview tab still works.
+When the plugin is inactive, `.md` and `/llms.txt` return the normal 404 page, no discovery tag is added, and nothing is scheduled. The settings page says why, and Verify & Preview still works.
 
 Two constants in `wp-config.php` take priority over the settings:
 
@@ -109,6 +126,7 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | `agentready_markdown` | Final Markdown for a page. |
 | `agentready_description` | The description used in the metadata and `llms.txt`. |
 | `agentready_meta_description_keys` | Post meta keys read as the SEO meta description, in order. |
+| `agentready_compare_ignore` | Regular expressions for text that Verify & Preview and the scan leave out when comparing. |
 | `agentready_llms_txt` | Final `llms.txt` content. |
 | `agentready_llms_max_items` | Entries per post type in `llms.txt` (default 500). |
 | `agentready_content_type` | Content type of the Markdown response. |
