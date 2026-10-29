@@ -1,5 +1,5 @@
 === AgentReady – llms.txt & Markdown for AI Agents ===
-Contributors: samiahmedsiddiqui
+Contributors: sasiddiqui
 Tags: llms-txt, markdown, ai, llm, seo
 Requires at least: 6.0
 Tested up to: 7.1

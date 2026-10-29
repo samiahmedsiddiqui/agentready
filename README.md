@@ -32,10 +32,15 @@ Or copy the plugin folder to `wp-content/plugins/agentready` and activate it.
 
 ```bash
 composer install
-composer lint
 ```
 
-Requires PHP 8.0+ and WordPress 6.0+.
+| Command | What it does |
+| --- | --- |
+| `composer lint` | Runs PHP_CodeSniffer with the WordPress Coding Standards and PHP 8.0+ compatibility checks. |
+| `composer format` | Fixes the violations PHP_CodeSniffer can fix automatically. |
+| `composer analyse` | Runs PHPStan. |
+
+Requires PHP 8.0+ and WordPress 6.0+. Every pull request runs these checks plus [Plugin Check](https://github.com/WordPress/plugin-check).
 
 ## License
 

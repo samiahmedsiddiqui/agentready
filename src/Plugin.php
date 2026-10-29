@@ -41,13 +41,11 @@ final class Plugin {
 	/** @var Hookable[] */
 	private array $components = array();
 
-	public static function boot(): self {
+	public static function boot(): void {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
 			self::$instance->init();
 		}
-
-		return self::$instance;
 	}
 
 	private function init(): void {
