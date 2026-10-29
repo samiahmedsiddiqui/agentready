@@ -26,6 +26,7 @@ use AgentReady\Http\Router;
 use AgentReady\Http\Urls;
 use AgentReady\Index\LlmsTxt;
 use AgentReady\Integrations\Acf;
+use AgentReady\Integrations\CustomPermalinks;
 use AgentReady\Integrations\Elementor;
 use AgentReady\Integrations\Seo;
 use AgentReady\Rendering\Converter;
@@ -92,6 +93,7 @@ final class Plugin {
 			new Seo(),
 			new Elementor(),
 			new Acf(),
+			new CustomPermalinks( $urls ),
 		);
 
 		if ( is_admin() ) {
