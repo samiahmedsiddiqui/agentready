@@ -74,9 +74,26 @@
 	}
 
 	function cells( line ) {
-		return line.trim().replace( /^\|/, '' ).replace( /\|$/, '' ).split( /(?<!\\)\|/ ).map( function ( cell ) {
-			return cell.trim().replace( /\\\|/g, '|' );
-		} );
+		var text = line.trim().replace( /^\|/, '' ).replace( /\|$/, '' );
+		var out = [];
+		var current = '';
+		var i;
+
+		for ( i = 0; i < text.length; i++ ) {
+			if ( text.charAt( i ) === '\\' && text.charAt( i + 1 ) === '|' ) {
+				current += '|';
+				i++;
+			} else if ( text.charAt( i ) === '|' ) {
+				out.push( current.trim() );
+				current = '';
+			} else {
+				current += text.charAt( i );
+			}
+		}
+
+		out.push( current.trim() );
+
+		return out;
 	}
 
 	function list( lines, i, parent ) {
