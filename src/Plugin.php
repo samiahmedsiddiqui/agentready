@@ -34,6 +34,7 @@ use AgentReady\Content\Exclusions;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Environment\Environment;
+use AgentReady\Http\CronAuth;
 use AgentReady\Http\DiscoveryTags;
 use AgentReady\Http\MarkdownResponse;
 use AgentReady\Http\Router;
@@ -115,6 +116,7 @@ final class Plugin {
 			new Invalidator( $store, $pages, $batch, $post_types ),
 			new Router( $urls, $eligibility, $pages, $environment, new LlmsTxt( $post_types, $eligibility, $urls, $description ), new MarkdownResponse() ),
 			new DiscoveryTags( $eligibility, $urls, $environment ),
+			new CronAuth( $options ),
 			new PagesController( $store, $pages, $status, $eligibility, $environment ),
 			$scan,
 			new ScanController( $scan ),

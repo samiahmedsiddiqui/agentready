@@ -84,6 +84,10 @@ The stored Markdown table is always removed, and so are any saved HTTP Basic cre
 
 Tick "This site is protected with HTTP Basic authentication" in AgentReady > Settings and enter the credentials. They are stored encrypted and only sent to your own site. You can also define `AGENTREADY_HTTP_AUTH_USER` and `AGENTREADY_HTTP_AUTH_PASSWORD` in `wp-config.php`.
 
+= My staging site asks for a username and password and background refreshes never run. =
+
+Save the credentials in AgentReady > Settings > Rendering > Site access. AgentReady then sends them with the page request and with WordPress's own background request, so scheduled refreshes run. Without them, WP-Cron cannot reach the site.
+
 = What happens if the page cannot be fetched? =
 
 AgentReady falls back to the post content. That output is thinner, because fields printed by your theme are missing. Verify & Preview shows when this happens and why.

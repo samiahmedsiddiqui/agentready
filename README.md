@@ -48,6 +48,8 @@ Works with default WordPress permalinks and with the [Custom Permalinks](https:/
 
 The **AgentReady** menu has two pages. **Settings** has three tabs. **Content**: exclusions (post types, pages by ID or URL pattern, taxonomy terms), the homepage Markdown URL and the editor box. **Rendering**: the content selector, extra elements to exclude (CSS selectors, added to the built-in list) and HTTP Basic authentication. **Environment**: where the plugin runs, and whether uninstalling removes your settings. The Status column shows system info and how many pages are stored. **Verify & Preview** is described below.
 
+When HTTP Basic credentials are saved, AgentReady also sends them with WordPress's own background request to `wp-cron.php` (and only to this site), so scheduled refreshes keep running on a protected site. Without credentials, WP-Cron cannot reach a site that asks for them, and background work waits until something else calls `wp-cron.php`.
+
 HTTP Basic credentials are stored encrypted with a key derived from the site's auth salt. To keep them out of the database, define them in `wp-config.php`:
 
 ```php
