@@ -11,7 +11,7 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 - Optional comment lines in `robots.txt` that point to these files.
 - A `.md` version of every page, for example `/about.md`.
 - All public post types enabled by default, with a setting to exclude any of them.
-- Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
+- Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term. Pages set to noindex by an SEO plugin are left out by default.
 - Per-page description for `llms.txt`. When empty it uses the meta description from Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework, then the excerpt. The page content is never used, so a page without any of these is listed without a description.
 - Verify & Preview: checks that the stored Markdown matches the page, shows a rendered preview and the changes, and updates it in one click.
 - Check all pages: a background scan that lists every stored page that has drifted from its live page.
@@ -46,6 +46,10 @@ Works with default WordPress permalinks and with the [Custom Permalinks](https:/
 2. The post is resolved from the path and checked for eligibility: published, not password protected, post type enabled, not excluded.
 3. The page is fetched from its own public URL as a logged-out visitor, so theme templates, ACF output and page builders are included. If that fails, the post content is used instead.
 4. The main content is selected (`main`, `[role="main"]`, `#content`, `#main`, `.site-content`, `article`, then `body`). Navigation, sidebars, forms, scripts, hidden elements and site-level headers and footers are removed. Headers and footers inside an `article`, `main` or `section` are kept. The result is converted to Markdown with a metadata header.
+
+## noindex pages
+
+By default, pages that Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework mark as noindex are left out of `llms.txt`, `llms-full.txt` and the `.md` files (the `.md` URL then gives the normal 404 page), and their stored copy is removed. Only the page's own setting counts, not the rules of a whole post type, and only the plugins that are active are read, so a value left behind by a removed plugin is ignored. Untick **Leave out pages set to noindex** under AgentReady > Settings > Content > Exclusions to include them again. The editor box and Verify & Preview say when this is the reason a page is not served.
 
 ## Settings
 
@@ -112,6 +116,9 @@ Generated Markdown is stored in a `{prefix}agentready_pages` table. There is no 
 - A page with no copy is generated while the request waits. If another request is already generating it, the request waits up to 5 seconds and then answers `503` with `Retry-After: 10`.
 - An out-of-date copy is still served while a new one is built. Copies built by an older plugin version are rebuilt on the next request.
 - Changing the content selector, the excluded elements or the HTTP Basic credentials marks every copy out of date and rebuilds them in the background.
+- Saving an ACF options page marks every copy out of date and rebuilds them in the background. Saving a page in Elementor refreshes that page, and saving an Elementor saved template refreshes every page.
+- Changing the SEO meta description of a page (Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework) refreshes that page, because it feeds `llms.txt` and the metadata block.
+- Switching the theme, updating the active theme or saving the Customizer marks every copy out of date and rebuilds them in the background, and a notice on the AgentReady pages says so. Activating, deactivating or updating other plugins only shows a notice that points to Check all pages, because plugin updates are frequent. Dismiss a notice with its link. Nothing is recorded while the plugin is inactive.
 - Responses carry `X-AgentReady-Cache: HIT`, `STALE` or `MISS`.
 - Hosts, CDNs and browsers can keep `.md` and `llms.txt` for a few minutes (the plugin allows 5, with `Cache-Control: max-age=300`). If a change does not show yet, add a query string such as `/about.md?t=123`. Query strings are ignored when the page is found.
 - If the page could not be fetched and the post content was used, the copy is retried about 5 minutes later.
@@ -132,6 +139,8 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | Filter | Purpose |
 | --- | --- |
 | `agentready_is_eligible` | Exclude a post programmatically. Receives `$eligible` and the `WP_Post`. |
+| `agentready_is_noindex` | Whether a page counts as noindex. Receives the result and the `WP_Post`. |
+| `agentready_noindex_sources` | Which SEO plugins' noindex settings are read, as meta key => active. |
 | `agentready_excluded_post_types` | Add or remove excluded post types in code. |
 | `agentready_show_meta_box` | Show or hide the editor box. Receives the setting and the post type. |
 | `agentready_resolve_post` | Map a request path to a post. |
