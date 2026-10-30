@@ -16,7 +16,11 @@ defined( 'ABSPATH' ) || exit;
 
 final class Exclusions {
 
-	public function __construct( private Options $options ) {}
+	private Noindex $noindex;
+
+	public function __construct( private Options $options, ?Noindex $noindex = null ) {
+		$this->noindex = $noindex ?? new Noindex();
+	}
 
 	/**
 	 * @return string|null Reason code, or null when nothing excludes the post.
@@ -32,6 +36,10 @@ final class Exclusions {
 
 		if ( $this->matches_term( $post ) ) {
 			return 'excluded_term';
+		}
+
+		if ( $this->options->get( 'exclude_noindex', true ) && $this->noindex->is_noindex( $post ) ) {
+			return 'noindex';
 		}
 
 		return null;

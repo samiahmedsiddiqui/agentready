@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace AgentReady\Admin;
 
 use AgentReady\Cache\Batch;
+use AgentReady\Cache\Changes;
 use AgentReady\Cache\PageCache;
 use AgentReady\Cache\Store;
 use AgentReady\Content\Eligibility;
@@ -31,13 +32,15 @@ final class CacheActions implements Hookable {
 		private Batch $batch,
 		private PostTypes $post_types,
 		private Eligibility $eligibility,
-		private Environment $environment
+		private Environment $environment,
+		private Changes $changes
 	) {}
 
 	public function register(): void {
 		add_action( 'admin_post_agentready_cache', array( $this, 'handle_settings' ) );
 		add_action( 'admin_post_agentready_regenerate_post', array( $this, 'handle_row' ) );
 		add_action( 'admin_post_agentready_resume', array( $this, 'handle_resume' ) );
+		add_action( 'admin_post_agentready_dismiss', array( $this, 'handle_dismiss' ) );
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
 		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'register_bulk' ) );
@@ -84,6 +87,25 @@ final class CacheActions implements Hookable {
 		SiteAddress::remember();
 
 		wp_safe_redirect( add_query_arg( 'agentready_notice', 'resumed', admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
+		exit;
+	}
+
+	public function handle_dismiss(): void {
+		check_admin_referer( 'agentready_dismiss' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
+		}
+
+		$key = isset( $_GET['key'] ) ? sanitize_key( wp_unslash( $_GET['key'] ) ) : '';
+
+		if ( in_array( $key, array( Changes::REFRESH, Changes::PLUGINS ), true ) ) {
+			$this->changes->dismiss( $key );
+		}
+
+		$back = wp_get_referer();
+
+		wp_safe_redirect( false === $back ? admin_url( 'admin.php?page=' . SettingsPage::SLUG ) : $back );
 		exit;
 	}
 

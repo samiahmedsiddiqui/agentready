@@ -53,6 +53,7 @@ final class Sanitizer {
 				'excluded_post_types'  => $post_types,
 				'excluded_posts'       => isset( $input['excluded_posts'] ) ? sanitize_textarea_field( $input['excluded_posts'] ) : '',
 				'excluded_terms'       => $terms,
+				'exclude_noindex'      => ! empty( $input['exclude_noindex'] ),
 				'content_selector'     => implode( ', ', $content['valid'] ),
 				'strip_selectors'      => implode( "\n", $strip['valid'] ),
 				'show_meta_box'        => ! empty( $input['show_meta_box'] ),

@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class Description {
 
-	private const SEO_META_KEYS = array( '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc', '_genesis_description' );
+	public const SEO_META_KEYS = array( '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc', '_genesis_description' );
 
 	/**
 	 * Whether the text still holds template tags such as %%sitename%%, %title% or #site_title.

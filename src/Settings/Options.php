@@ -25,6 +25,7 @@ final class Options {
 			'excluded_post_types'  => array(),
 			'excluded_posts'       => '',
 			'excluded_terms'       => array(),
+			'exclude_noindex'      => true,
 			'content_selector'     => '',
 			'strip_selectors'      => '',
 			'show_meta_box'        => true,

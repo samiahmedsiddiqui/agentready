@@ -25,6 +25,17 @@ if ( null !== $vars['inactive'] ) :
 		<?php endif; ?>
 	</div>
 <?php endif; ?>
+<?php foreach ( $vars['changes'] as $change ) : ?>
+	<div class="notice notice-info">
+		<p>
+			<?php echo esc_html( $change['message'] ); ?>
+			<?php if ( '' !== $change['check_url'] ) : ?>
+				<a href="<?php echo esc_url( $change['check_url'] ); ?>"><?php esc_html_e( 'Check all pages', 'agentready' ); ?></a>
+			<?php endif; ?>
+			<a href="<?php echo esc_url( $change['dismiss_url'] ); ?>"><?php esc_html_e( 'Dismiss', 'agentready' ); ?></a>
+		</p>
+	</div>
+<?php endforeach; ?>
 <?php if ( ! $vars['pretty'] ) : ?>
 	<div class="notice notice-warning"><p>
 		<?php

@@ -42,6 +42,10 @@ final class Invalidator implements Hookable {
 		add_action( 'add_option_' . Options::KEY, array( $this, 'on_settings_added' ), 10, 2 );
 	}
 
+	public function refresh( WP_Post $post ): void {
+		$this->touch( $post );
+	}
+
 	public function on_save( int $post_id, WP_Post $post ): void {
 		$this->touch( $post );
 	}
@@ -112,6 +116,14 @@ final class Invalidator implements Hookable {
 
 		if ( $this->changed( $previous, $current, self::SCOPE_KEYS ) ) {
 			$this->batch->schedule_prune();
+		}
+
+		if ( $this->changed( $previous, $current, array( 'exclude_noindex' ) ) ) {
+			if ( $current['exclude_noindex'] ) {
+				$this->batch->schedule_prune();
+			} else {
+				$this->batch->start( false );
+			}
 		}
 	}
 
