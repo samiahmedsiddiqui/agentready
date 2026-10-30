@@ -354,3 +354,130 @@
 	gap: 8px;
 	margin: 10px 0 6px;
 }
+
+.agentready .agentready-pane-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 14px;
+}
+
+.agentready .agentready-pane[hidden] {
+	display: none;
+}
+
+.agentready .agentready-verdict {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin: 0 0 12px;
+}
+
+.agentready .agentready-verdict .agentready-dot {
+	flex: none;
+	width: 10px;
+	height: 10px;
+	margin-top: 6px;
+	border-radius: 50%;
+	background: #8c8f94;
+}
+
+.agentready [data-agentready-verdict="in_sync"] .agentready-dot {
+	background: #00a32a;
+}
+
+.agentready [data-agentready-verdict="differs"] .agentready-dot {
+	background: #dba617;
+}
+
+.agentready [data-agentready-verdict="not_served"] .agentready-dot {
+	background: #d63638;
+}
+
+.agentready .agentready-rendered {
+	max-height: 640px;
+	overflow: auto;
+	padding: 4px 16px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	line-height: 1.6;
+}
+
+.agentready .agentready-rendered h1,
+.agentready .agentready-rendered h2,
+.agentready .agentready-rendered h3,
+.agentready .agentready-rendered h4 {
+	margin: 1.2em 0 0.5em;
+}
+
+.agentready .agentready-rendered pre {
+	overflow: auto;
+	padding: 10px 12px;
+	background: #f6f7f7;
+}
+
+.agentready .agentready-rendered blockquote {
+	margin: 1em 0;
+	padding-left: 12px;
+	border-left: 3px solid #c3c4c7;
+	color: #50575e;
+}
+
+.agentready .agentready-rendered table {
+	border-collapse: collapse;
+	margin: 1em 0;
+}
+
+.agentready .agentready-rendered th,
+.agentready .agentready-rendered td {
+	padding: 4px 10px;
+	border: 1px solid #dcdcde;
+	text-align: left;
+}
+
+.agentready .agentready-rendered .agentready-img {
+	color: #646970;
+	font-style: italic;
+}
+
+.agentready .agentready-diff {
+	max-height: 640px;
+	overflow: auto;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	font-size: 13px;
+}
+
+.agentready .agentready-diff > div {
+	display: flex;
+	gap: 8px;
+	padding: 1px 10px;
+}
+
+.agentready .agentready-diff code {
+	flex: 1;
+	background: transparent;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.agentready .agentready-diff-add {
+	background: #e6f6e9;
+}
+
+.agentready .agentready-diff-del {
+	background: #fbe9e9;
+}
+
+.agentready .agentready-diff-gap {
+	justify-content: center;
+	color: #646970;
+	background: #f6f7f7;
+}
+
+.agentready .agentready-blocks {
+	margin: 8px 0 16px 18px;
+	list-style: disc;
+}

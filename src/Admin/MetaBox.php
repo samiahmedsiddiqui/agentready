@@ -70,6 +70,7 @@ final class MetaBox implements Hookable {
 				'excluded'    => (bool) get_post_meta( $post->ID, PostMeta::EXCLUDE, true ),
 				'description' => (string) get_post_meta( $post->ID, PostMeta::DESCRIPTION, true ),
 				'status'      => $this->status->for_post( $post ),
+				'verify_url'  => current_user_can( 'manage_options' ) ? VerifyPage::url( array( 'url' => (string) get_permalink( $post ) ) ) : '',
 			)
 		);
 	}

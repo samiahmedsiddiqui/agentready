@@ -15,8 +15,14 @@ if ( null !== $vars['inactive'] ) :
 		<p>
 			<strong><?php esc_html_e( 'AgentReady is inactive on this site.', 'agentready' ); ?></strong>
 			<?php echo esc_html( $vars['inactive'] ); ?>
-			<?php esc_html_e( 'Markdown pages and llms.txt return the normal 404 page, and no discovery tag is added. The Preview tab still works.', 'agentready' ); ?>
+			<?php esc_html_e( 'Markdown pages and llms.txt return the normal 404 page, and no discovery tag is added. Verify & Preview still works.', 'agentready' ); ?>
 		</p>
+		<?php if ( '' !== $vars['resume_url'] ) : ?>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( $vars['resume_url'] ); ?>"><?php esc_html_e( 'Resume on this address', 'agentready' ); ?></a>
+				<span class="description"><?php esc_html_e( 'Press this if the address change is intended, for example after moving the site to a new domain.', 'agentready' ); ?></span>
+			</p>
+		<?php endif; ?>
 	</div>
 <?php endif; ?>
 <?php if ( ! $vars['pretty'] ) : ?>

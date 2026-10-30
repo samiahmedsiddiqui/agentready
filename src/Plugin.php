@@ -12,10 +12,12 @@ namespace AgentReady;
 defined( 'ABSPATH' ) || exit;
 
 use AgentReady\Admin\CacheActions;
+use AgentReady\Admin\Menu;
 use AgentReady\Admin\MetaBox;
-use AgentReady\Admin\PreviewTool;
+use AgentReady\Admin\Notices;
 use AgentReady\Admin\SettingsPage;
 use AgentReady\Admin\TermList;
+use AgentReady\Admin\VerifyPage;
 use AgentReady\Cache\Batch;
 use AgentReady\Cache\Candidates;
 use AgentReady\Cache\Coverage;
@@ -32,6 +34,7 @@ use AgentReady\Content\Exclusions;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Environment\Environment;
+use AgentReady\Http\CronAuth;
 use AgentReady\Http\DiscoveryTags;
 use AgentReady\Http\MarkdownResponse;
 use AgentReady\Http\Router;
@@ -48,9 +51,12 @@ use AgentReady\Rendering\Generator;
 use AgentReady\Rendering\Renderer;
 use AgentReady\Rendering\Selector;
 use AgentReady\Rest\PagesController;
+use AgentReady\Rest\ScanController;
 use AgentReady\Robots\RobotsTxt;
 use AgentReady\Settings\Options;
 use AgentReady\Settings\Sanitizer;
+use AgentReady\Verify\Scan;
+use AgentReady\Verify\Verifier;
 
 final class Plugin {
 
@@ -80,10 +86,11 @@ final class Plugin {
 		$description = new Description();
 		$store       = new WpdbStore();
 		$candidates  = new Candidates();
+		$renderer    = new Renderer( $options, $urls );
 		$generator   = new Generator(
 			$options,
 			$urls,
-			new Renderer( $options, $urls ),
+			$renderer,
 			new Extractor(
 				new Selector(),
 				(array) apply_filters(
@@ -95,10 +102,13 @@ final class Plugin {
 			new FrontMatter(),
 			$description
 		);
-		$pages       = new PageCache( $store, $generator, new Lock(), $eligibility, $environment );
+		$lock        = new Lock();
+		$pages       = new PageCache( $store, $generator, $lock, $eligibility, $environment );
 		$batch       = new Batch( $store, $pages, $post_types, $eligibility, $environment, $candidates );
 		$status      = new PageStatus( $store, $eligibility, $environment );
 		$coverage    = new Coverage( $store, $candidates, $post_types, $eligibility );
+		$verifier    = new Verifier( $store, $generator, $renderer, $eligibility );
+		$scan        = new Scan( $store, $verifier, $environment, $coverage, $lock );
 
 		$this->components = array(
 			new Schema(),
@@ -107,7 +117,10 @@ final class Plugin {
 			new Invalidator( $store, $pages, $batch, $post_types ),
 			new Router( $urls, $eligibility, $pages, $environment, new LlmsTxt( $post_types, $eligibility, $urls, $description ), new MarkdownResponse() ),
 			new DiscoveryTags( $eligibility, $urls, $environment ),
+			new CronAuth( $options ),
 			new PagesController( $store, $pages, $status, $eligibility, $environment ),
+			$scan,
+			new ScanController( $scan, $environment ),
 			new RobotsTxt( $options ),
 			new Seo(),
 			new Elementor(),
@@ -116,17 +129,23 @@ final class Plugin {
 		);
 
 		if ( is_admin() ) {
-			$this->components[] = new SettingsPage(
+			$notices  = new Notices( $environment );
+			$settings = new SettingsPage(
 				$options,
 				$post_types,
 				new Sanitizer( $post_types, $options ),
-				new PreviewTool( $urls, $eligibility, $generator ),
 				$environment,
 				$coverage,
 				$batch,
 				new TermList(),
-				$urls
+				$urls,
+				$notices
 			);
+			$verify   = new VerifyPage( $urls, $verifier, $notices, $scan, $batch, $pages, $environment );
+
+			$this->components[] = $settings;
+			$this->components[] = $verify;
+			$this->components[] = new Menu( $settings, $verify );
 			$this->components[] = new MetaBox( $post_types, $options, $status );
 			$this->components[] = new CacheActions( $store, $pages, $batch, $post_types, $eligibility, $environment );
 		}
