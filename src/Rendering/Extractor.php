@@ -52,6 +52,10 @@ final class Extractor {
 		'.//footer[not(ancestor::article or ancestor::main or ancestor::section)]',
 	);
 
+	private const SKIP_TAGS = array( 'script', 'style', 'noscript', 'template', 'svg', 'canvas', 'iframe', 'select', 'option', 'button', 'input', 'textarea', 'head' );
+
+	private const INLINE_TAGS = array( 'a', 'abbr', 'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'del', 'dfn', 'em', 'font', 'i', 'img', 'ins', 'kbd', 'label', 'mark', 'q', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'u', 'var', 'wbr', 'br' );
+
 	private const LAZY_ATTRIBUTES = array( 'data-src', 'data-lazy-src', 'data-original' );
 
 	/**
@@ -88,6 +92,122 @@ final class Extractor {
 		$this->absolutize( $xpath, $node, $base_url );
 
 		return $node;
+	}
+
+	/**
+	 * Text blocks of the content area, split into those kept and those removed by the exclusions.
+	 *
+	 * @return array{kept: string[], excluded: string[]}
+	 */
+	public function text_blocks( string $html, string $selector ): array {
+		$dom = $this->load( $html );
+
+		if ( null === $dom ) {
+			return array(
+				'kept'     => array(),
+				'excluded' => array(),
+			);
+		}
+
+		$xpath = new DOMXPath( $dom );
+		$node  = $this->find( $xpath, $selector );
+
+		if ( null === $node ) {
+			return array(
+				'kept'     => array(),
+				'excluded' => array(),
+			);
+		}
+
+		$all = array();
+		$this->collect( $node, $all );
+		$this->strip( $xpath, $node );
+
+		$kept = array();
+		$this->collect( $node, $kept );
+
+		$left = array_count_values( $kept );
+		$gone = array();
+
+		foreach ( $all as $block ) {
+			if ( ! empty( $left[ $block ] ) ) {
+				--$left[ $block ];
+			} else {
+				$gone[] = $block;
+			}
+		}
+
+		return array(
+			'kept'     => $kept,
+			'excluded' => $gone,
+		);
+	}
+
+	/**
+	 * @param string[] $blocks Collected text blocks.
+	 */
+	private function collect( DOMNode $node, array &$blocks ): void {
+		$text = '';
+
+		foreach ( $node->childNodes as $child ) {
+			if ( XML_TEXT_NODE === $child->nodeType || XML_CDATA_SECTION_NODE === $child->nodeType ) {
+				$text .= $child->nodeValue;
+				continue;
+			}
+
+			if ( ! $child instanceof DOMElement ) {
+				continue;
+			}
+
+			$tag = strtolower( $child->nodeName );
+
+			if ( in_array( $tag, self::SKIP_TAGS, true ) || $this->is_hidden( $child ) ) {
+				continue;
+			}
+
+			if ( 'br' === $tag ) {
+				$text .= ' ';
+				continue;
+			}
+
+			if ( in_array( $tag, self::INLINE_TAGS, true ) && $this->is_inline_only( $child ) ) {
+				$text .= ' ' . $child->textContent . ' ';
+				continue;
+			}
+
+			$this->add_block( $text, $blocks );
+			$text = '';
+			$this->collect( $child, $blocks );
+		}
+
+		$this->add_block( $text, $blocks );
+	}
+
+	/**
+	 * @param string[] $blocks Collected text blocks.
+	 */
+	private function add_block( string $text, array &$blocks ): void {
+		$text = trim( (string) preg_replace( '/\s+/u', ' ', str_replace( "\xc2\xa0", ' ', $text ) ) );
+
+		if ( 1 === preg_match( '/[\p{L}\p{N}]{2}/u', $text ) ) {
+			$blocks[] = $text;
+		}
+	}
+
+	private function is_inline_only( DOMElement $element ): bool {
+		foreach ( $element->getElementsByTagName( '*' ) as $descendant ) {
+			if ( ! in_array( strtolower( $descendant->nodeName ), self::INLINE_TAGS, true ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private function is_hidden( DOMElement $element ): bool {
+		return $element->hasAttribute( 'hidden' )
+			|| 'true' === strtolower( $element->getAttribute( 'aria-hidden' ) )
+			|| 1 === preg_match( '/display\s*:\s*none|visibility\s*:\s*hidden/i', $element->getAttribute( 'style' ) );
 	}
 
 	private function load( string $html ): ?DOMDocument {

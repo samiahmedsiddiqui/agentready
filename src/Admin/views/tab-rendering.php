@@ -19,7 +19,7 @@ $has_pass = '' !== (string) $options->get( 'http_auth_password', '' );
 ?>
 <section class="agentready-card">
 	<h2><?php esc_html_e( 'Page content', 'agentready' ); ?></h2>
-	<p class="agentready-intro"><?php esc_html_e( 'Choose which part of each page becomes the Markdown. Use the Preview tab to try changes before saving. Saving a change here refreshes the stored Markdown in the background.', 'agentready' ); ?></p>
+	<p class="agentready-intro"><?php esc_html_e( 'Choose which part of each page becomes the Markdown. Use Verify & Preview to try changes before saving. Saving a change here refreshes the stored Markdown in the background.', 'agentready' ); ?></p>
 	<div class="agentready-field">
 		<label for="agentready-selector"><?php esc_html_e( 'Content selector', 'agentready' ); ?></label>
 		<input type="text" id="agentready-selector" class="large-text code" name="<?php echo esc_attr( $name ); ?>[content_selector]" value="<?php echo esc_attr( $options->content_selector() ); ?>" placeholder="<?php esc_attr_e( 'Auto-detect', 'agentready' ); ?>" />

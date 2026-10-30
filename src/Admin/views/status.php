@@ -85,5 +85,5 @@ $cache = $vars['cache'];
 		<li><?php esc_html_e( 'Navigation, scripts and forms are removed, and the rest becomes Markdown.', 'agentready' ); ?></li>
 		<li><?php esc_html_e( 'The result is stored and refreshed when you save the page.', 'agentready' ); ?></li>
 	</ol>
-	<p><a class="button" href="<?php echo esc_url( $vars['preview_url'] ); ?>"><?php esc_html_e( 'Try the preview', 'agentready' ); ?></a></p>
+	<p><a class="button" href="<?php echo esc_url( $vars['verify_url'] ); ?>"><?php esc_html_e( 'Verify a page', 'agentready' ); ?></a></p>
 </section>
