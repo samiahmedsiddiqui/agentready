@@ -48,7 +48,7 @@ final class SiteAddressTest extends TestCase {
 	public function other_addresses(): array {
 		return array(
 			'another domain'          => array( 'https://example.com', 'https://staging.example.com' ),
-			'a host copy domain'      => array( 'https://example.com', 'https://example.wpenginepowered.com' ),
+			'a host copy domain'      => array( 'https://example.com', 'https://example.hostcopy.net' ),
 			'a subdirectory'          => array( 'https://example.com', 'https://example.com/blog' ),
 			'another subdirectory'    => array( 'https://example.com/blog', 'https://example.com/news' ),
 			'another port'            => array( 'http://localhost:8080', 'http://localhost:8899' ),
