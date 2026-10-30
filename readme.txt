@@ -110,6 +110,14 @@ Save the credentials in AgentReady > Settings > Rendering > Site access. AgentRe
 
 AgentReady falls back to the post content. That output is thinner, because fields printed by your theme are missing. Verify & Preview shows when this happens and why.
 
+= Why is a page I can see in the browser missing from llms.txt? =
+
+If an SEO plugin (Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework) marks the page as noindex, AgentReady leaves it out by default. The AgentReady box on the edit screen says so. To include such pages, untick "Leave out pages set to noindex" under AgentReady > Settings > Content > Exclusions.
+
+= Do the stored copies update when I change my theme, ACF options or Elementor templates? =
+
+Yes. Switching the theme, updating the active theme, saving the Customizer, saving an ACF options page or saving an Elementor saved template marks the stored Markdown out of date and rebuilds it in the background. Saving a page in Elementor refreshes that page. Activating, deactivating or updating other plugins only shows a notice, because those are frequent; use Verify & Preview > All pages to see whether anything drifted.
+
 = Can I exclude pages with code? =
 
 Yes. Use the `agentready_is_eligible` filter to leave out a single post, `agentready_excluded_post_types` to leave out post types, and `agentready_show_meta_box` to hide the box on the edit screen. Examples are in the plugin's GitHub README.
@@ -129,6 +137,10 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 == Changelog ==
 
 = Unreleased =
+* Pages that an SEO plugin marks as noindex are left out of llms.txt, llms-full.txt and the Markdown files by default. A new setting in the Exclusions card turns this off.
+* Saving an ACF options page, or an Elementor saved template, refreshes every stored page. Saving a page in Elementor refreshes that page.
+* Changing a page's SEO meta description or noindex setting refreshes that page.
+* Switching or updating the theme and saving the Customizer refresh every stored page in the background, with a notice. Plugin activations, deactivations and updates show a notice that points to Check all pages.
 * New llms.txt page: serve your own llms.txt, or your text followed by the generated list of pages. Text can be loaded from a file.
 * Optional `/llms-full.txt` with the Markdown of every page, capped at 5 MB.
 * Optional comment lines in robots.txt that point to llms.txt and llms-full.txt.
