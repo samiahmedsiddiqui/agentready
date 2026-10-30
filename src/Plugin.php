@@ -102,12 +102,13 @@ final class Plugin {
 			new FrontMatter(),
 			$description
 		);
-		$pages       = new PageCache( $store, $generator, new Lock(), $eligibility, $environment );
+		$lock        = new Lock();
+		$pages       = new PageCache( $store, $generator, $lock, $eligibility, $environment );
 		$batch       = new Batch( $store, $pages, $post_types, $eligibility, $environment, $candidates );
 		$status      = new PageStatus( $store, $eligibility, $environment );
 		$coverage    = new Coverage( $store, $candidates, $post_types, $eligibility );
 		$verifier    = new Verifier( $store, $generator, $renderer, $eligibility );
-		$scan        = new Scan( $store, $verifier, $environment, $coverage );
+		$scan        = new Scan( $store, $verifier, $environment, $coverage, $lock );
 
 		$this->components = array(
 			new Schema(),
@@ -119,7 +120,7 @@ final class Plugin {
 			new CronAuth( $options ),
 			new PagesController( $store, $pages, $status, $eligibility, $environment ),
 			$scan,
-			new ScanController( $scan ),
+			new ScanController( $scan, $environment ),
 			new RobotsTxt( $options ),
 			new Seo(),
 			new Elementor(),

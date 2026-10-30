@@ -206,6 +206,14 @@ final class CacheActions implements Hookable {
 			return;
 		}
 
+		if ( $this->environment->cron_disabled() && in_array( $code, array( 'queued', 'regenerating', 'cleared_rebuilding', 'missing_started', 'scan_started' ), true ) ) {
+			$map[ $code ][1] .= ' ' . __( 'WP-Cron is disabled on this site, so this waits for a real cron job that calls wp-cron.php.', 'agentready' );
+
+			if ( 'scan_started' === $code ) {
+				$map[ $code ][1] = __( 'The scan started. WP-Cron is disabled on this site, so this page runs it while it stays open.', 'agentready' );
+			}
+		}
+
 		printf( '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>', esc_attr( $map[ $code ][0] ), esc_html( $map[ $code ][1] ) );
 	}
 }

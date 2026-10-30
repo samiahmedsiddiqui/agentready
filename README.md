@@ -71,7 +71,7 @@ You can also try a different content selector or extra exclusions without saving
 
 Pages with content that changes on every load, such as the time, can look out of date each time. Use the `agentready_compare_ignore` filter, which returns regular expressions for text to leave out of the comparison.
 
-**All pages.** Start a scan and AgentReady checks every stored page in the background, a few at a time, and reports how many are in sync and which differ, with a Compare link for each. The scan changes nothing. **Update outdated** then queues a refresh for the pages that differ, and **Generate missing** builds the pages that have no stored copy yet.
+**All pages.** Start a scan and AgentReady checks every stored page in the background, a few at a time, and reports how many are in sync and which differ, with a Compare link for each. The scan changes nothing. On a site that disables WP-Cron, the open All pages tab runs the scan itself, a few pages at a time, and it pauses when you close the tab. **Update outdated** then queues a refresh for the pages that differ, and **Generate missing** builds the pages that have no stored copy yet.
 
 ## Environments
 

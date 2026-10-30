@@ -142,7 +142,7 @@ final class SettingsPage implements Hookable {
 			'types'         => $this->types( false ),
 			'cache'         => $this->coverage->summary(),
 			'running'       => $this->batch->is_running(),
-			'cron_disabled' => defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON,
+			'cron_disabled' => $this->environment->cron_disabled(),
 			'verify_url'    => VerifyPage::url(),
 			'home_file'     => $this->urls->home_file(),
 			'system'        => array(

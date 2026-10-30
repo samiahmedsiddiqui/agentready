@@ -16,6 +16,9 @@ $ran     = $scan['started'] > 0;
 <section class="agentready-card" style="margin-top:20px" data-agentready-scan data-running="<?php echo $running ? '1' : '0'; ?>" data-path="/agentready/v1/scan">
 	<h2><?php esc_html_e( 'Check all pages', 'agentready' ); ?></h2>
 	<p class="agentready-intro"><?php esc_html_e( 'Reads every page that has a stored copy, builds fresh Markdown, and lists the pages that differ. The scan runs in the background and changes nothing until you press Update outdated.', 'agentready' ); ?></p>
+	<?php if ( $vars['cron_disabled'] ) : ?>
+		<p class="description"><strong><?php esc_html_e( 'WP-Cron is disabled on this site.', 'agentready' ); ?></strong> <?php esc_html_e( 'While this page stays open it runs the scan itself, a few pages at a time. If you close it, the scan pauses until you come back or a real cron job calls wp-cron.php.', 'agentready' ); ?></p>
+	<?php endif; ?>
 	<form method="post" action="<?php echo esc_url( $vars['action'] ); ?>" class="agentready-actions">
 		<input type="hidden" name="action" value="agentready_scan" />
 		<?php wp_nonce_field( $vars['nonce'] ); ?>
@@ -58,6 +61,9 @@ $ran     = $scan['started'] > 0;
 				<button type="submit" name="scan_action" value="generate_missing" class="button" <?php disabled( $vars['inactive'] ); ?>><?php esc_html_e( 'Generate missing', 'agentready' ); ?></button>
 			<?php endif; ?>
 		</form>
+		<?php if ( $vars['cron_disabled'] ) : ?>
+			<p class="description"><?php esc_html_e( 'Update outdated and Generate missing queue background work. With WP-Cron disabled it only runs when a real cron job calls wp-cron.php. To refresh a page right away, use Update stored copy on its Compare page, or Regenerate now in its editor box.', 'agentready' ); ?></p>
+		<?php endif; ?>
 	<?php endif; ?>
 </section>
 <?php if ( ! $running && ! empty( $vars['rows'] ) ) : ?>

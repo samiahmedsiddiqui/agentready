@@ -269,8 +269,15 @@
 			}
 		}
 
+		var busy = false;
 		var timer = window.setInterval( function () {
+			if ( busy ) {
+				return;
+			}
+
+			busy = true;
 			window.wp.apiFetch( { path: path } ).then( function ( status ) {
+				busy = false;
 				count( 'checked', status.checked );
 				count( 'in_sync', status.in_sync );
 				count( 'differs', status.differs );
@@ -279,7 +286,9 @@
 					window.clearInterval( timer );
 					window.location.reload();
 				}
-			} ).catch( function () {} );
+			} ).catch( function () {
+				busy = false;
+			} );
 		}, 5000 );
 	}
 

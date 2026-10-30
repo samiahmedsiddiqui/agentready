@@ -66,7 +66,7 @@ It only runs on production by default. Open AgentReady > Settings > Environment 
 
 = How do I know the stored Markdown matches my page? =
 
-Open AgentReady > Verify & Preview, enter the page address and press Check page. It builds fresh Markdown from the live page and tells you whether the stored copy is in sync, shows a preview and the changes, and checks that the text on the page is in the Markdown. If the copy is out of date, press Update stored copy. The All pages tab does the same check for every stored page in the background and lists the ones that differ.
+Open AgentReady > Verify & Preview, enter the page address and press Check page. It builds fresh Markdown from the live page and tells you whether the stored copy is in sync, shows a preview and the changes, and checks that the text on the page is in the Markdown. If the copy is out of date, press Update stored copy. The All pages tab does the same check for every stored page in the background and lists the ones that differ. If your site disables WP-Cron, that tab runs the scan itself while it stays open.
 
 = I changed a page but the .md or llms.txt still shows the old text. =
 

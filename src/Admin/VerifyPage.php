@@ -130,13 +130,14 @@ final class VerifyPage implements Hookable {
 		View::render(
 			'scan',
 			array(
-				'status'   => $status,
-				'rows'     => $rows,
-				'inactive' => null !== $this->environment->reason(),
-				'action'   => admin_url( 'admin-post.php' ),
-				'nonce'    => self::SCAN_NONCE,
-				'started'  => $status['started'] > 0 ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $status['started'] ) : '',
-				'finished' => $status['finished'] > 0 ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $status['finished'] ) : '',
+				'status'        => $status,
+				'rows'          => $rows,
+				'inactive'      => null !== $this->environment->reason(),
+				'cron_disabled' => $this->environment->cron_disabled(),
+				'action'        => admin_url( 'admin-post.php' ),
+				'nonce'         => self::SCAN_NONCE,
+				'started'       => $status['started'] > 0 ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $status['started'] ) : '',
+				'finished'      => $status['finished'] > 0 ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $status['finished'] ) : '',
 			)
 		);
 	}

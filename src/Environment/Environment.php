@@ -24,6 +24,10 @@ final class Environment {
 
 	public function __construct( private Options $options ) {}
 
+	public function cron_disabled(): bool {
+		return defined( 'DISABLE_WP_CRON' ) && (bool) constant( 'DISABLE_WP_CRON' );
+	}
+
 	public function type(): string {
 		return wp_get_environment_type();
 	}

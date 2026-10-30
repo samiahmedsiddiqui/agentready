@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace AgentReady\Rest;
 
 use AgentReady\Contracts\Hookable;
+use AgentReady\Environment\Environment;
 use AgentReady\Verify\Scan;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -18,7 +19,10 @@ defined( 'ABSPATH' ) || exit;
 
 final class ScanController implements Hookable {
 
-	public function __construct( private Scan $scan ) {}
+	public function __construct(
+		private Scan $scan,
+		private Environment $environment
+	) {}
 
 	public function register(): void {
 		add_action( 'rest_api_init', array( $this, 'routes' ) );
@@ -37,6 +41,11 @@ final class ScanController implements Hookable {
 	}
 
 	public function show(): WP_REST_Response {
+		// Without WP-Cron, the open page drives the scan: each poll runs one small batch.
+		if ( $this->environment->cron_disabled() && $this->scan->status()['running'] ) {
+			$this->scan->run();
+		}
+
 		$status = $this->scan->status();
 
 		return new WP_REST_Response(

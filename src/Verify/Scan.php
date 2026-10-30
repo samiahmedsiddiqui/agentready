@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace AgentReady\Verify;
 
 use AgentReady\Cache\Coverage;
+use AgentReady\Cache\Lock;
 use AgentReady\Cache\Store;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Environment\Environment;
@@ -26,11 +27,15 @@ final class Scan implements Hookable {
 	private const BUDGET = 20;
 	private const LIMIT  = 500;
 
+	// A post ID never used, so the scan has its own lock.
+	private const LOCK_ID = 0;
+
 	public function __construct(
 		private Store $store,
 		private Verifier $verifier,
 		private Environment $environment,
-		private Coverage $coverage
+		private Coverage $coverage,
+		private Lock $lock
 	) {}
 
 	public function register(): void {
@@ -84,6 +89,18 @@ final class Scan implements Hookable {
 	}
 
 	public function run(): void {
+		if ( ! $this->lock->acquire( self::LOCK_ID ) ) {
+			return;
+		}
+
+		try {
+			$this->step();
+		} finally {
+			$this->lock->release( self::LOCK_ID );
+		}
+	}
+
+	private function step(): void {
 		$state = $this->status();
 
 		if ( ! $state['running'] ) {
