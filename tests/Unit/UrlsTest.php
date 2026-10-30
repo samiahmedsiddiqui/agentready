@@ -56,7 +56,14 @@ final class UrlsTest extends TestCase {
 			'plain page'           => array( 'about', null ),
 			'bare extension'       => array( '.md', null ),
 			'other file'           => array( 'readme.txt', null ),
-			'not built yet'        => array( 'llms-full.txt', null ),
+			'llms-full.txt'        => array(
+				'llms-full.txt',
+				array(
+					'type'       => Urls::ROUTE_LLMS_FULL,
+					'path'       => '',
+					'home_alias' => false,
+				),
+			),
 		);
 	}
 

@@ -124,6 +124,59 @@
 		renderChips();
 	}
 
+	function initLlms( form ) {
+		var area = document.getElementById( 'agentready-llms-custom' );
+		var custom = form.querySelector( '[data-agentready-custom]' );
+		var load = form.querySelector( '[data-agentready-load]' );
+		var file = form.querySelector( '[data-agentready-file]' );
+		var count = form.querySelector( '[data-agentready-count]' );
+		var encoder = window.TextEncoder ? new window.TextEncoder() : null;
+
+		function update() {
+			var used = encoder ? encoder.encode( area.value ).length : area.value.length;
+
+			count.textContent = count.getAttribute( 'data-template' )
+				.replace( '{used}', used.toLocaleString() )
+				.replace( '{max}', Number( count.getAttribute( 'data-max' ) ).toLocaleString() );
+		}
+
+		form.addEventListener( 'change', function ( event ) {
+			if ( event.target.hasAttribute( 'data-agentready-mode' ) ) {
+				custom.hidden = event.target.value === 'automatic';
+			}
+		} );
+
+		load.addEventListener( 'click', function () {
+			file.click();
+		} );
+
+		file.addEventListener( 'change', function () {
+			var chosen = file.files[ 0 ];
+			var reader;
+
+			if ( ! chosen ) {
+				return;
+			}
+
+			if ( chosen.size > Number( load.getAttribute( 'data-max' ) ) ) {
+				window.alert( load.getAttribute( 'data-too-big' ) );
+				file.value = '';
+				return;
+			}
+
+			reader = new window.FileReader();
+			reader.onload = function () {
+				area.value = String( reader.result );
+				file.value = '';
+				update();
+			};
+			reader.readAsText( chosen );
+		} );
+
+		area.addEventListener( 'input', update );
+		update();
+	}
+
 	function initTabs( form ) {
 		var panels = form.querySelectorAll( '[data-agentready-panel]' );
 		var tabs = document.querySelectorAll( '[data-agentready-tab]' );
@@ -160,6 +213,11 @@
 		var toggle = document.getElementById( 'agentready-http-auth' );
 		var fields = document.getElementById( 'agentready-http-auth-fields' );
 		var terms = document.querySelector( '[data-agentready-terms]' );
+		var llms = document.querySelector( '.agentready-llms' );
+
+		if ( llms ) {
+			initLlms( llms );
+		}
 
 		if ( tabbed ) {
 			initTabs( tabbed );

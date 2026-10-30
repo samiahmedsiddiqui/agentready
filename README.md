@@ -6,7 +6,9 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 
 ## Features
 
-- `/llms.txt`, a Markdown index of your pages.
+- `/llms.txt`, a Markdown index of your pages. Write your own text instead, or put it above the generated list.
+- Optional `/llms-full.txt`, the Markdown of every page in one file.
+- Optional comment lines in `robots.txt` that point to these files.
 - A `.md` version of every page, for example `/about.md`.
 - All public post types enabled by default, with a setting to exclude any of them.
 - Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
@@ -25,6 +27,7 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 | `/services/web/` | `/services/web.md` |
 | Homepage (static front page) | `/index.md` |
 | Site index | `/llms.txt` |
+| All pages in one file (opt-in) | `/llms-full.txt` |
 
 `/about/index.html.md`, `/about/index.md` and `/index.html.md` are accepted as aliases. The homepage URL defaults to `/index.md`; choose `/index.html.md` instead under AgentReady > Settings > Content > Homepage. Both keep working, and the chosen one is the one listed in `llms.txt` and the page head. If a real page has the slug `index`, `/index.html.md` is used. Markdown responses send `Content-Type: text/markdown`, a canonical `Link` header to the HTML page, `X-Robots-Tag: noindex`, and support `ETag` and `If-Modified-Since`. Each page also gets `<link rel="alternate" type="text/markdown">` in its head.
 
@@ -46,7 +49,7 @@ Works with default WordPress permalinks and with the [Custom Permalinks](https:/
 
 ## Settings
 
-The **AgentReady** menu has two pages. **Settings** has three tabs. **Content**: exclusions (post types, pages by ID or URL pattern, taxonomy terms), the homepage Markdown URL and the editor box. **Rendering**: the content selector, extra elements to exclude (CSS selectors, added to the built-in list) and HTTP Basic authentication. **Environment**: where the plugin runs, and whether uninstalling removes your settings. The Status column shows system info and how many pages are stored. **Verify & Preview** is described below.
+The **AgentReady** menu has three pages. **Settings** has three tabs. **Content**: exclusions (post types, pages by ID or URL pattern, taxonomy terms), the homepage Markdown URL and the editor box. **Rendering**: the content selector, extra elements to exclude (CSS selectors, added to the built-in list) and HTTP Basic authentication. **Environment**: where the plugin runs, and whether uninstalling removes your settings. The Status column shows system info and how many pages are stored. **llms.txt** and **Verify & Preview** are described below.
 
 When HTTP Basic credentials are saved, AgentReady also sends them with WordPress's own background request to `wp-cron.php` (and only to this site), so scheduled refreshes keep running on a protected site. Without credentials, WP-Cron cannot reach a site that asks for them, and background work waits until something else calls `wp-cron.php`.
 
@@ -56,6 +59,14 @@ HTTP Basic credentials are stored encrypted with a key derived from the site's a
 define( 'AGENTREADY_HTTP_AUTH_USER', 'user' );
 define( 'AGENTREADY_HTTP_AUTH_PASSWORD', 'password' );
 ```
+
+## llms.txt
+
+AgentReady > llms.txt has three cards. These settings are saved apart from the main settings and are removed on uninstall when "Delete all data on uninstall" is ticked.
+
+- **The llms.txt file.** Choose a mode. *Automatic* lists your pages, as before. *Custom* serves exactly the text you write. *Hybrid* serves your text first, then the generated list of pages (leave the list out of your text). You can type the text or load it from a `.txt` or `.md` file on your computer. The file is read in the browser and nothing is uploaded. Notes appear when the text has no title line, links to other sites or is very large, but they never block saving. A custom text is capped at 200,000 bytes. An empty text serves the generated file. A collapsed preview shows what the file contains now.
+- **llms-full.txt.** Off by default. When on, `/llms-full.txt` joins the stored Markdown of every eligible page: a title, a `Source:` line with the page URL, then the body, without the metadata block. It reads only stored copies, so pages without one are left out until you generate them (Verify & Preview > All pages > Generate missing). The file stops at 5 MB (change it with `agentready_llms_full_max_bytes`), includes only whole pages, and ends with a note saying how many were left out. When the option is off, the address returns the normal 404 page.
+- **robots.txt.** Off by default. When on, WordPress's generated robots.txt gets comment lines such as `# llms.txt: https://example.com/llms.txt`. They add no allow or disallow rules, so crawler access does not change. They are skipped when the site asks search engines not to index it, and when a real `robots.txt` file exists on the server, because WordPress then does not generate one.
 
 ## Verify & Preview
 
@@ -133,6 +144,8 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | `agentready_check_site_address` | Return `false` to turn off the automatic pause when the site address changes. |
 | `agentready_compare_ignore` | Regular expressions for text that Verify & Preview and the scan leave out when comparing. |
 | `agentready_llms_txt` | Final `llms.txt` content. |
+| `agentready_llms_full_txt` | Final `llms-full.txt` content. |
+| `agentready_llms_full_max_bytes` | Size limit of `llms-full.txt` (default 5,000,000 bytes). |
 | `agentready_llms_max_items` | Entries per post type in `llms.txt` (default 500). |
 | `agentready_content_type` | Content type of the Markdown response. |
 | `agentready_response_headers` | Response headers. |

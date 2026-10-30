@@ -13,6 +13,7 @@ use AgentReady\Content\Description;
 use AgentReady\Content\Eligibility;
 use AgentReady\Content\PostTypes;
 use AgentReady\Http\Urls;
+use AgentReady\Settings\LlmsOptions;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -23,10 +24,43 @@ final class LlmsTxt {
 		private PostTypes $post_types,
 		private Eligibility $eligibility,
 		private Urls $urls,
-		private Description $description
+		private Description $description,
+		private LlmsOptions $options
 	) {}
 
 	public function build(): string {
+		$mode   = $this->options->mode();
+		$custom = $this->options->custom();
+
+		$text = LlmsOptions::CUSTOM === $mode && '' !== $custom
+			? self::compose( $mode, $custom, array(), array() )
+			: self::compose( $mode, $custom, $this->heading(), $this->sections() );
+
+		return (string) apply_filters( 'agentready_llms_txt', $text );
+	}
+
+	/**
+	 * Joins the parts of the file for a mode. Custom text is used as written, and an empty one falls back to the generated file.
+	 *
+	 * @param string[] $heading  Generated title and tagline lines.
+	 * @param string[] $sections Generated page list lines.
+	 */
+	public static function compose( string $mode, string $custom, array $heading, array $sections ): string {
+		if ( '' !== $custom && LlmsOptions::CUSTOM === $mode ) {
+			return $custom . "\n";
+		}
+
+		if ( '' !== $custom && LlmsOptions::HYBRID === $mode ) {
+			return $custom . "\n" . ( empty( $sections ) ? '' : "\n" . implode( "\n", $sections ) . "\n" );
+		}
+
+		return implode( "\n", empty( $sections ) ? $heading : array_merge( $heading, array( '' ), $sections ) ) . "\n";
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private function heading(): array {
 		$lines   = array( '# ' . $this->clean( get_bloginfo( 'name' ) ) );
 		$tagline = $this->clean( get_bloginfo( 'description' ) );
 
@@ -35,6 +69,15 @@ final class LlmsTxt {
 			$lines[] = '> ' . $tagline;
 		}
 
+		return $lines;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private function sections(): array {
+		$lines = array();
+
 		foreach ( $this->post_types->enabled() as $type ) {
 			$entries = $this->entries( $type );
 
@@ -42,8 +85,12 @@ final class LlmsTxt {
 				continue;
 			}
 
-			$object  = get_post_type_object( $type );
-			$lines[] = '';
+			$object = get_post_type_object( $type );
+
+			if ( array() !== $lines ) {
+				$lines[] = '';
+			}
+
 			$lines[] = '## ' . ( $object ? $object->labels->name : $type );
 			$lines[] = '';
 
@@ -52,7 +99,7 @@ final class LlmsTxt {
 			}
 		}
 
-		return (string) apply_filters( 'agentready_llms_txt', implode( "\n", $lines ) . "\n" );
+		return $lines;
 	}
 
 	/**
