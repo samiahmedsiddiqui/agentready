@@ -31,6 +31,21 @@ final class LlmsFullTxtTest extends TestCase {
 		$this->assertSame( "Body\n\n---\nnot: front\n---\nEnd", LlmsFullTxt::strip_front_matter( $markdown ) );
 	}
 
+	public function test_block_puts_the_source_under_the_pages_own_heading(): void {
+		$this->assertSame(
+			"\n---\n\n# About us\n\nSource: https://example.com/about/\n\nText\n\nMore\n",
+			LlmsFullTxt::block( 'About', 'https://example.com/about/', "# About us\n\nText\n\nMore" )
+		);
+	}
+
+	public function test_block_does_not_mistake_a_subheading_for_the_title(): void {
+		$this->assertStringStartsWith( "\n---\n\n# About\n\nSource: https://example.com/about/\n\n## Part\n", LlmsFullTxt::block( 'About', 'https://example.com/about/', "## Part\nText" ) );
+	}
+
+	public function test_block_with_only_a_heading(): void {
+		$this->assertSame( "\n---\n\n# Solo\n\nSource: https://example.com/s/\n", LlmsFullTxt::block( 'Solo', 'https://example.com/s/', '# Solo' ) );
+	}
+
 	public function test_block_has_title_source_and_body(): void {
 		$this->assertSame(
 			"\n---\n\n# About\n\nSource: https://example.com/about/\n\nText\n",

@@ -84,8 +84,17 @@ final class LlmsFullTxt {
 		return trim( is_string( $stripped ) ? $stripped : $markdown );
 	}
 
+	/**
+	 * Puts the source line under the page's own top heading, or adds a heading when the body has none.
+	 */
 	public static function block( string $title, string $url, string $body ): string {
-		return "\n---\n\n# " . ( '' === $title ? $url : $title ) . "\n\nSource: " . $url . "\n\n" . $body . "\n";
+		$source = 'Source: ' . $url;
+
+		if ( 1 === preg_match( '/\A(# [^\n]+)\n*(.*)\z/s', $body, $match ) ) {
+			return "\n---\n\n" . $match[1] . "\n\n" . $source . "\n" . ( '' === $match[2] ? '' : "\n" . $match[2] . "\n" );
+		}
+
+		return "\n---\n\n# " . ( '' === $title ? $url : $title ) . "\n\n" . $source . "\n\n" . $body . "\n";
 	}
 
 	private static function line( string $text ): string {
