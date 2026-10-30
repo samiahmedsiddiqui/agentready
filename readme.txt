@@ -14,7 +14,9 @@ Serves an llms.txt index and a clean Markdown version of every page, so AI agent
 
 AgentReady builds a Markdown version of each page from its rendered output, so ACF fields, Gutenberg blocks, Elementor layouts and classic editor content are all included, whatever theme you use.
 
-* `/llms.txt`, a Markdown index of your pages.
+* `/llms.txt`, a Markdown index of your pages. Write your own text instead, or put it above the generated list.
+* Optional `/llms-full.txt`, the Markdown of every page in one file.
+* Optional comment lines in `robots.txt` that point to these files.
 * A `.md` version of every page, for example `/about.md`. The homepage is `/index.md`.
 * All public post types are served by default, with a setting to exclude any of them.
 * Hide individual pages from the editor, or exclude by ID, URL pattern or taxonomy term.
@@ -76,6 +78,18 @@ Your host, a CDN or the browser may be keeping the file for a few minutes. Agent
 
 AgentReady remembers a hash of your site address. When the address changes, as on a staging copy or after a move to a new domain, it pauses so a copy does not serve Markdown and llms.txt to AI agents. A banner on its pages has a "Resume on this address" button for administrators. If you set `AGENTREADY_ALLOWED_URLS` in `wp-config.php`, that overrides this check. Developers can turn it off with the `agentready_check_site_address` filter.
 
+= Can I write my own llms.txt? =
+
+Yes. Open AgentReady > llms.txt and choose Custom to serve exactly your text, or Hybrid to serve your text followed by the list of pages AgentReady builds. You can type the text or load it from a .txt or .md file. Automatic keeps the generated file.
+
+= What is llms-full.txt? =
+
+An optional file with the Markdown of every page in one place, for agents that prefer a single download. Turn it on under AgentReady > llms.txt. It uses the stored copies, so generate any missing pages first. It stops at 5 MB and says how many pages were left out.
+
+= What does the robots.txt option do? =
+
+It adds comment lines that point to llms.txt (and llms-full.txt when it is on). They add no allow or disallow rules. It does nothing if a real robots.txt file exists on the server or if the site asks search engines not to index it.
+
 = How do I refresh the stored Markdown? =
 
 Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.
@@ -115,6 +129,9 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 == Changelog ==
 
 = Unreleased =
+* New llms.txt page: serve your own llms.txt, or your text followed by the generated list of pages. Text can be loaded from a file.
+* Optional `/llms-full.txt` with the Markdown of every page, capped at 5 MB.
+* Optional comment lines in robots.txt that point to llms.txt and llms-full.txt.
 * AgentReady pauses itself when the site address changes (a staging copy or a move), with a Resume button, because host copies can rewrite the Allowed URLs setting.
 * New AgentReady menu with Settings and Verify & Preview pages. The settings moved from the Settings menu to AgentReady > Settings.
 * Verify & Preview checks a page against its stored Markdown, previews it, and updates it. The All pages tab scans every stored page in the background and reports which differ.

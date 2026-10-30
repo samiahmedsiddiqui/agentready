@@ -1,6 +1,6 @@
 <?php
 /**
- * Serves /llms.txt and the .md version of pages, before WordPress runs its main query.
+ * Serves /llms.txt, /llms-full.txt and the .md version of pages, before WordPress runs its main query.
  *
  * @package AgentReady
  */
@@ -13,7 +13,9 @@ use AgentReady\Cache\PageCache;
 use AgentReady\Content\Eligibility;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Environment\Environment;
+use AgentReady\Index\LlmsFullTxt;
 use AgentReady\Index\LlmsTxt;
+use AgentReady\Settings\LlmsOptions;
 use WP;
 
 defined( 'ABSPATH' ) || exit;
@@ -26,6 +28,8 @@ final class Router implements Hookable {
 		private PageCache $pages,
 		private Environment $environment,
 		private LlmsTxt $llms,
+		private LlmsFullTxt $llms_full,
+		private LlmsOptions $llms_options,
 		private MarkdownResponse $response
 	) {}
 
@@ -46,6 +50,15 @@ final class Router implements Hookable {
 
 		if ( Urls::ROUTE_LLMS === $route['type'] ) {
 			$this->response->send( $this->llms->build(), MarkdownResponse::TEXT );
+			$this->terminate();
+		}
+
+		if ( Urls::ROUTE_LLMS_FULL === $route['type'] ) {
+			if ( ! $this->llms_options->full_enabled() ) {
+				return;
+			}
+
+			$this->response->send( $this->llms_full->build(), MarkdownResponse::TEXT );
 			$this->terminate();
 		}
 

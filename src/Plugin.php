@@ -12,6 +12,7 @@ namespace AgentReady;
 defined( 'ABSPATH' ) || exit;
 
 use AgentReady\Admin\CacheActions;
+use AgentReady\Admin\LlmsPage;
 use AgentReady\Admin\Menu;
 use AgentReady\Admin\MetaBox;
 use AgentReady\Admin\Notices;
@@ -39,6 +40,7 @@ use AgentReady\Http\DiscoveryTags;
 use AgentReady\Http\MarkdownResponse;
 use AgentReady\Http\Router;
 use AgentReady\Http\Urls;
+use AgentReady\Index\LlmsFullTxt;
 use AgentReady\Index\LlmsTxt;
 use AgentReady\Integrations\Acf;
 use AgentReady\Integrations\CustomPermalinks;
@@ -53,6 +55,7 @@ use AgentReady\Rendering\Selector;
 use AgentReady\Rest\PagesController;
 use AgentReady\Rest\ScanController;
 use AgentReady\Robots\RobotsTxt;
+use AgentReady\Settings\LlmsOptions;
 use AgentReady\Settings\Options;
 use AgentReady\Settings\Sanitizer;
 use AgentReady\Verify\Scan;
@@ -110,18 +113,22 @@ final class Plugin {
 		$verifier    = new Verifier( $store, $generator, $renderer, $eligibility );
 		$scan        = new Scan( $store, $verifier, $environment, $coverage, $lock );
 
+		$llms_options = new LlmsOptions();
+		$llms         = new LlmsTxt( $post_types, $eligibility, $urls, $description, $llms_options );
+		$llms_full    = new LlmsFullTxt( $store, $eligibility, $urls );
+
 		$this->components = array(
 			new Schema(),
 			$pages,
 			$batch,
 			new Invalidator( $store, $pages, $batch, $post_types ),
-			new Router( $urls, $eligibility, $pages, $environment, new LlmsTxt( $post_types, $eligibility, $urls, $description ), new MarkdownResponse() ),
+			new Router( $urls, $eligibility, $pages, $environment, $llms, $llms_full, $llms_options, new MarkdownResponse() ),
 			new DiscoveryTags( $eligibility, $urls, $environment ),
 			new CronAuth( $options ),
 			new PagesController( $store, $pages, $status, $eligibility, $environment ),
 			$scan,
 			new ScanController( $scan, $environment ),
-			new RobotsTxt( $options ),
+			new RobotsTxt( $llms_options, $environment ),
 			new Seo(),
 			new Elementor(),
 			new Acf(),
@@ -143,9 +150,12 @@ final class Plugin {
 			);
 			$verify   = new VerifyPage( $urls, $verifier, $notices, $scan, $batch, $pages, $environment );
 
+			$llms_page = new LlmsPage( $llms_options, $llms, $coverage, $environment, $notices );
+
 			$this->components[] = $settings;
+			$this->components[] = $llms_page;
 			$this->components[] = $verify;
-			$this->components[] = new Menu( $settings, $verify );
+			$this->components[] = new Menu( $settings, $llms_page, $verify );
 			$this->components[] = new MetaBox( $post_types, $options, $status );
 			$this->components[] = new CacheActions( $store, $pages, $batch, $post_types, $eligibility, $environment );
 		}

@@ -16,8 +16,9 @@ defined( 'ABSPATH' ) || exit;
 
 final class Urls {
 
-	public const ROUTE_LLMS = 'llms';
-	public const ROUTE_PAGE = 'page';
+	public const ROUTE_LLMS      = 'llms';
+	public const ROUTE_LLMS_FULL = 'llms_full';
+	public const ROUTE_PAGE      = 'page';
 
 	public const HOME_LONG    = 'index.html.md';
 	public const HOME_SHORT   = 'index.md';
@@ -38,6 +39,14 @@ final class Urls {
 		if ( 'llms.txt' === $request ) {
 			return array(
 				'type'       => self::ROUTE_LLMS,
+				'path'       => '',
+				'home_alias' => false,
+			);
+		}
+
+		if ( 'llms-full.txt' === $request ) {
+			return array(
+				'type'       => self::ROUTE_LLMS_FULL,
 				'path'       => '',
 				'home_alias' => false,
 			);

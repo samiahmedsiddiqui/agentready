@@ -481,3 +481,19 @@
 	margin: 8px 0 16px 18px;
 	list-style: disc;
 }
+
+.agentready .agentready-llms {
+	max-width: 900px;
+}
+
+.agentready .agentready-code {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	margin: 10px 0 0;
+	max-height: 360px;
+	overflow: auto;
+	padding: 10px 12px;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
