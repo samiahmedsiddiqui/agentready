@@ -72,6 +72,10 @@ Open AgentReady > Verify & Preview, enter the page address and press Check page.
 
 Your host, a CDN or the browser may be keeping the file for a few minutes. AgentReady allows 5 minutes. Add a query string to the address, for example `/about.md?t=123` or `/llms.txt?t=123`, to skip that cache. Also check that the page was saved: it is refreshed in the background a few seconds after saving.
 
+= Why did AgentReady pause itself after I copied or moved my site? =
+
+AgentReady remembers a hash of your site address. When the address changes, as on a staging copy or after a move to a new domain, it pauses so a copy does not serve Markdown and llms.txt to AI agents. A banner on its pages has a "Resume on this address" button for administrators. If you set `AGENTREADY_ALLOWED_URLS` in `wp-config.php`, that overrides this check. Developers can turn it off with the `agentready_check_site_address` filter.
+
 = How do I refresh the stored Markdown? =
 
 Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.
@@ -111,6 +115,7 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 == Changelog ==
 
 = Unreleased =
+* AgentReady pauses itself when the site address changes (a staging copy or a move), with a Resume button, because host copies can rewrite the Allowed URLs setting.
 * New AgentReady menu with Settings and Verify & Preview pages. The settings moved from the Settings menu to AgentReady > Settings.
 * Verify & Preview checks a page against its stored Markdown, previews it, and updates it. The All pages tab scans every stored page in the background and reports which differ.
 * The Markdown front matter description follows the same order as llms.txt and is left out when none is set, instead of using a summary of the page body.
