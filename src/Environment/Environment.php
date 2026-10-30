@@ -59,6 +59,7 @@ final class Environment {
 				$this->type()
 			),
 			'url_not_allowed'         => __( 'This site\'s address does not match the allowed URLs.', 'agentready' ),
+			'site_address_changed'    => __( 'The site address changed since AgentReady was set up. This looks like a copy or a move, so AgentReady is paused.', 'agentready' ),
 		);
 
 		return $labels[ $reason ] ?? $reason;
@@ -98,6 +99,11 @@ final class Environment {
 
 		if ( array() !== $urls && ! self::host_matches( $host, $urls ) ) {
 			return 'url_not_allowed';
+		}
+
+		// An allowed-URLs constant is an explicit choice, so the automatic copy check steps aside.
+		if ( ! $this->urls_from_constant() && (bool) apply_filters( 'agentready_check_site_address', true ) && ! SiteAddress::matches() ) {
+			return 'site_address_changed';
 		}
 
 		return null;

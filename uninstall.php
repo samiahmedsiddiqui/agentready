@@ -20,6 +20,7 @@ function agentready_uninstall_site(): void {
 	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( 'agentready_lock_' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Locks are stored as options.
 
 	delete_option( 'agentready_db_version' );
+	delete_option( 'agentready_site_fingerprint' );
 	delete_option( 'agentready_batch' );
 	delete_option( 'agentready_scan' );
 	wp_unschedule_hook( 'agentready_generate_post' );

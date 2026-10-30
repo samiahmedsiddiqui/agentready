@@ -16,6 +16,7 @@ use AgentReady\Content\Eligibility;
 use AgentReady\Content\PostTypes;
 use AgentReady\Contracts\Hookable;
 use AgentReady\Environment\Environment;
+use AgentReady\Environment\SiteAddress;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -36,6 +37,7 @@ final class CacheActions implements Hookable {
 	public function register(): void {
 		add_action( 'admin_post_agentready_cache', array( $this, 'handle_settings' ) );
 		add_action( 'admin_post_agentready_regenerate_post', array( $this, 'handle_row' ) );
+		add_action( 'admin_post_agentready_resume', array( $this, 'handle_resume' ) );
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
 		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'register_bulk' ) );
@@ -69,6 +71,19 @@ final class CacheActions implements Hookable {
 		}
 
 		wp_safe_redirect( add_query_arg( 'agentready_notice', $notice, admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
+		exit;
+	}
+
+	public function handle_resume(): void {
+		check_admin_referer( 'agentready_resume' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
+		}
+
+		SiteAddress::remember();
+
+		wp_safe_redirect( add_query_arg( 'agentready_notice', 'resumed', admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
 		exit;
 	}
 
@@ -197,6 +212,7 @@ final class CacheActions implements Hookable {
 			'scan_started'       => array( 'success', __( 'The scan started. It runs in the background and this page updates by itself.', 'agentready' ) ),
 			'scan_stopped'       => array( 'success', __( 'The scan was stopped.', 'agentready' ) ),
 			'missing_started'    => array( 'success', __( 'Pages without a stored copy are being generated in the background.', 'agentready' ) ),
+			'resumed'            => array( 'success', __( 'AgentReady is resumed on this address.', 'agentready' ) ),
 			'busy'               => array( 'warning', __( 'This page is being generated right now. Try again in a few seconds.', 'agentready' ) ),
 			'inactive'           => array( 'warning', __( 'AgentReady is inactive on this site, so nothing was regenerated.', 'agentready' ) ),
 			'not_served'         => array( 'warning', __( 'This page is not served as Markdown, so nothing was regenerated.', 'agentready' ) ),

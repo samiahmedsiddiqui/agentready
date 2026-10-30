@@ -42,7 +42,7 @@ $ticked      = $environment->allowed_types();
 		<?php endif; ?>
 		<textarea id="agentready-allowed-urls" name="<?php echo esc_attr( $name ); ?>[allowed_urls]" rows="3" class="large-text code" placeholder="www.example.com&#10;*.example.com" <?php disabled( $locked ); ?>><?php echo esc_textarea( implode( "\n", $environment->allowed_urls() ) ); ?></textarea>
 		<p class="description"><?php esc_html_e( 'Optional. One host per line, where * matches anything. When set, AgentReady only runs if this site\'s host matches one of them. Leave empty to allow any host.', 'agentready' ); ?></p>
-		<p class="description"><?php esc_html_e( 'Staging copies made by some hosts replace the domain inside the database, which can change this setting. To keep it safe, define AGENTREADY_ALLOWED_URLS in wp-config.php instead. Use define( \'AGENTREADY_ENABLED\', false ); to switch the plugin off completely.', 'agentready' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Staging copies made by some hosts replace the domain inside the database, which can change this setting. To keep it safe, define AGENTREADY_ALLOWED_URLS in wp-config.php instead. Whatever you set, AgentReady also remembers the site address and pauses itself when it changes, which is what a copy or a move does. You then resume it from a banner. Use define( \'AGENTREADY_ENABLED\', false ); to switch the plugin off completely.', 'agentready' ); ?></p>
 	</div>
 </section>
 
