@@ -47,7 +47,7 @@ final class Description {
 				continue;
 			}
 
-			$text = $this->resolve( $raw, $post );
+			$text = $this->resolve( $raw, $post, (string) $key );
 
 			// A description that still has tags would print them, or leave gaps, so the next source is used.
 			if ( self::has_unresolved_tags( $text ) ) {
@@ -67,32 +67,31 @@ final class Description {
 	/**
 	 * Lets the SEO plugin that wrote the text fill in its own template tags.
 	 */
-	private function resolve( string $text, WP_Post $post ): string {
+	private function resolve( string $text, WP_Post $post, string $key ): string {
 		if ( ! self::has_unresolved_tags( $text ) ) {
 			return $text;
 		}
 
-		$resolvers = array(
-			static fn( string $value ): string => function_exists( 'wpseo_replace_vars' ) ? (string) wpseo_replace_vars( $value, $post ) : $value,
-			static function ( string $value ) use ( $post ): string {
-				$api = function_exists( 'aioseo' ) ? aioseo() : null;
+		try {
+			switch ( $key ) {
+				case '_yoast_wpseo_metadesc':
+					return function_exists( 'wpseo_replace_vars' ) ? (string) wpseo_replace_vars( $text, $post ) : $text;
 
-				return is_object( $api ) && isset( $api->tags ) && is_callable( array( $api->tags, 'replaceTags' ) ) ? (string) call_user_func( array( $api->tags, 'replaceTags' ), $value, $post->ID ) : $value;
-			},
-			static fn( string $value ): string => is_callable( array( '\RankMath\Helper', 'replace_vars' ) ) ? (string) call_user_func( array( '\RankMath\Helper', 'replace_vars' ), $value, $post ) : $value,
-			static function ( string $value ) use ( $post ): string {
-				$service = function_exists( 'seopress_get_service' ) ? seopress_get_service( 'TagsToString' ) : null;
+				case '_aioseo_description':
+					$api = function_exists( 'aioseo' ) ? aioseo() : null;
 
-				return is_object( $service ) && is_callable( array( $service, 'replace' ) ) ? (string) call_user_func( array( $service, 'replace' ), $value, array( 'post' => $post ) ) : $value;
-			},
-		);
+					return is_object( $api ) && isset( $api->tags ) && is_callable( array( $api->tags, 'replaceTags' ) ) ? (string) call_user_func( array( $api->tags, 'replaceTags' ), $text, $post->ID ) : $text;
 
-		foreach ( $resolvers as $resolver ) {
-			try {
-				$text = $resolver( $text );
-			} catch ( \Throwable $error ) {
-				continue;
+				case 'rank_math_description':
+					return is_callable( array( '\RankMath\Helper', 'replace_vars' ) ) ? (string) call_user_func( array( '\RankMath\Helper', 'replace_vars' ), $text, $post ) : $text;
+
+				case '_seopress_titles_desc':
+					$service = function_exists( 'seopress_get_service' ) ? seopress_get_service( 'TagsToString' ) : null;
+
+					return is_object( $service ) && is_callable( array( $service, 'replace' ) ) ? (string) call_user_func( array( $service, 'replace' ), $text, array( 'post' => $post ) ) : $text;
 			}
+		} catch ( \Throwable $error ) {
+			return $text;
 		}
 
 		return $text;
