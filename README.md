@@ -91,6 +91,8 @@ define( 'AGENTREADY_ALLOWED_URLS', 'www.example.com, *.example.org' );
 
 Use the constant for the allowed URLs on hosts that copy a site to staging and replace the domain inside the database, because that can rewrite the setting too.
 
+**Copies and moves pause AgentReady by themselves.** The first time it runs, AgentReady saves a hash of the site address (the host and path, ignoring `http` or `https`, `www.` and a trailing slash). Because it is a hash, a host's search-and-replace cannot find and rewrite it. When the address no longer matches, as on a staging copy or after a move, AgentReady pauses itself and shows a banner with a **Resume on this address** button for administrators. A real domain change shows the same banner and costs one click. An `AGENTREADY_ALLOWED_URLS` constant overrides this check, and `add_filter( 'agentready_check_site_address', '__return_false' );` turns it off. To resume from the command line, run `wp eval 'AgentReady\Environment\SiteAddress::remember();'`.
+
 ## Stored Markdown
 
 Generated Markdown is stored in a `{prefix}agentready_pages` table. There is no expiry: a copy stays until the page changes or you clear it.
@@ -128,6 +130,7 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | `agentready_markdown` | Final Markdown for a page. |
 | `agentready_description` | The description used in the metadata and `llms.txt`. |
 | `agentready_meta_description_keys` | Post meta keys read as the SEO meta description, in order. |
+| `agentready_check_site_address` | Return `false` to turn off the automatic pause when the site address changes. |
 | `agentready_compare_ignore` | Regular expressions for text that Verify & Preview and the scan leave out when comparing. |
 | `agentready_llms_txt` | Final `llms.txt` content. |
 | `agentready_llms_max_items` | Entries per post type in `llms.txt` (default 500). |
