@@ -17,6 +17,13 @@ final class Description {
 
 	private const SEO_META_KEYS = array( '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc', '_genesis_description' );
 
+	/**
+	 * Whether the text still holds template tags such as %%sitename%%, %title% or #site_title.
+	 */
+	public static function has_unresolved_tags( string $text ): bool {
+		return 1 === preg_match( '/%{1,2}[a-z_]+(?:\([^)]*\))?%{1,2}|#[a-z]+_[a-z_]+/i', $text );
+	}
+
 	public function get( WP_Post $post ): string {
 		$override = trim( (string) get_post_meta( $post->ID, PostMeta::DESCRIPTION, true ) );
 
@@ -34,23 +41,64 @@ final class Description {
 		$keys = (array) apply_filters( 'agentready_meta_description_keys', self::SEO_META_KEYS, $post );
 
 		foreach ( $keys as $key ) {
-			$value = $this->clean( (string) get_post_meta( $post->ID, (string) $key, true ), $post );
+			$raw = trim( (string) get_post_meta( $post->ID, (string) $key, true ) );
 
-			if ( '' !== $value ) {
-				return $value;
+			if ( '' === $raw ) {
+				continue;
+			}
+
+			$text = $this->resolve( $raw, $post );
+
+			// A description that still has tags would print them, or leave gaps, so the next source is used.
+			if ( self::has_unresolved_tags( $text ) ) {
+				continue;
+			}
+
+			$text = $this->clean( $text );
+
+			if ( '' !== $text ) {
+				return $text;
 			}
 		}
 
 		return '';
 	}
 
-	private function clean( string $text, ?WP_Post $post = null ): string {
-		if ( null !== $post && function_exists( 'wpseo_replace_vars' ) ) {
-			$text = (string) wpseo_replace_vars( $text, $post );
+	/**
+	 * Lets the SEO plugin that wrote the text fill in its own template tags.
+	 */
+	private function resolve( string $text, WP_Post $post ): string {
+		if ( ! self::has_unresolved_tags( $text ) ) {
+			return $text;
 		}
 
-		// Unresolved template variables such as %%sitename%% or %title%.
-		$text = (string) preg_replace( '/%{1,2}[a-z_]+(?:\([^)]*\))?%{1,2}/i', '', $text );
+		$resolvers = array(
+			static fn( string $value ): string => function_exists( 'wpseo_replace_vars' ) ? (string) wpseo_replace_vars( $value, $post ) : $value,
+			static function ( string $value ) use ( $post ): string {
+				$api = function_exists( 'aioseo' ) ? aioseo() : null;
+
+				return is_object( $api ) && isset( $api->tags ) && is_callable( array( $api->tags, 'replaceTags' ) ) ? (string) call_user_func( array( $api->tags, 'replaceTags' ), $value, $post->ID ) : $value;
+			},
+			static fn( string $value ): string => is_callable( array( '\RankMath\Helper', 'replace_vars' ) ) ? (string) call_user_func( array( '\RankMath\Helper', 'replace_vars' ), $value, $post ) : $value,
+			static function ( string $value ) use ( $post ): string {
+				$service = function_exists( 'seopress_get_service' ) ? seopress_get_service( 'TagsToString' ) : null;
+
+				return is_object( $service ) && is_callable( array( $service, 'replace' ) ) ? (string) call_user_func( array( $service, 'replace' ), $value, array( 'post' => $post ) ) : $value;
+			},
+		);
+
+		foreach ( $resolvers as $resolver ) {
+			try {
+				$text = $resolver( $text );
+			} catch ( \Throwable $error ) {
+				continue;
+			}
+		}
+
+		return $text;
+	}
+
+	private function clean( string $text ): string {
 		$text = wp_strip_all_tags( strip_shortcodes( $text ) );
 		$text = (string) preg_replace( '/\s+/', ' ', html_entity_decode( $text, ENT_QUOTES, 'UTF-8' ) );
 
