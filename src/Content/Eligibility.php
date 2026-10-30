@@ -64,6 +64,7 @@ final class Eligibility {
 			'excluded_page'      => __( 'The page is hidden from AgentReady in the editor.', 'agentready' ),
 			'excluded_pattern'   => __( 'It matches an ID or URL pattern in the exclusion list.', 'agentready' ),
 			'excluded_term'      => __( 'It belongs to an excluded taxonomy term.', 'agentready' ),
+			'noindex'            => __( 'An SEO plugin marks the page as noindex. Untick "Leave out pages set to noindex" in the settings to include it.', 'agentready' ),
 			'filtered'           => __( 'A filter excluded it.', 'agentready' ),
 		);
 

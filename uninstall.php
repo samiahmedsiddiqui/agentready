@@ -23,6 +23,7 @@ function agentready_uninstall_site(): void {
 	delete_option( 'agentready_site_fingerprint' );
 	delete_option( 'agentready_batch' );
 	delete_option( 'agentready_scan' );
+	delete_option( 'agentready_changes' );
 	wp_unschedule_hook( 'agentready_generate_post' );
 	wp_unschedule_hook( 'agentready_regenerate_batch' );
 	wp_unschedule_hook( 'agentready_prune' );
