@@ -81,7 +81,7 @@ final class ConverterTest extends TestCase {
 			'nested strong in a paragraph' => array( '<p><strong><strong>x</strong></strong></p>', "**x**\n" ),
 			'nested emphasis'       => array( '<p><em><em>x</em></em></p>', "*x*\n" ),
 			'bold italic kept'      => array( '<p><em><strong>x</strong></em></p>', "***x***\n" ),
-			'nested strong heading' => array( '<h2><strong><strong>Connecting Meko in AgentCore</strong></strong></h2>', "## Connecting Meko in AgentCore\n" ),
+			'nested strong heading' => array( '<h2><strong><strong>Connecting Acme in AgentCore</strong></strong></h2>', "## Connecting Acme in AgentCore\n" ),
 			'heading with bold link text' => array( '<h3><a href="/x/"><strong>Docs</strong></a></h3>', "### [**Docs**](https://example.com/x/)\n" ),
 			'partial emphasis kept' => array( '<h2>The <em>Agentic</em> way</h2>', "## The *Agentic* way\n" ),
 			'code fence untouched'  => array( "<p>a</p><pre><code>x\n\n\ny</code></pre>", "a\n\n```\nx\n\n\ny\n```\n" ),
