@@ -1,6 +1,6 @@
 <?php
 /**
- * Top-level AgentReady menu with the Settings and Verify & Preview pages.
+ * Top-level AgentReady menu with the Settings, llms.txt and Verify & Preview pages.
  *
  * @package AgentReady
  */
@@ -21,6 +21,7 @@ final class Menu implements Hookable {
 
 	public function __construct(
 		private SettingsPage $settings,
+		private LlmsPage $llms,
 		private VerifyPage $verify
 	) {}
 
@@ -42,6 +43,7 @@ final class Menu implements Hookable {
 		);
 
 		add_submenu_page( SettingsPage::SLUG, __( 'AgentReady Settings', 'agentready' ), __( 'Settings', 'agentready' ), 'manage_options', SettingsPage::SLUG, array( $this->settings, 'render' ) );
+		add_submenu_page( SettingsPage::SLUG, __( 'llms.txt', 'agentready' ), __( 'llms.txt', 'agentready' ), 'manage_options', LlmsPage::SLUG, array( $this->llms, 'render' ) );
 		add_submenu_page( SettingsPage::SLUG, __( 'Verify & Preview', 'agentready' ), __( 'Verify & Preview', 'agentready' ), 'manage_options', VerifyPage::SLUG, array( $this->verify, 'render' ) );
 	}
 
@@ -78,7 +80,7 @@ final class Menu implements Hookable {
 	private function is_plugin_screen(): bool {
 		$screen = get_current_screen();
 
-		return $screen instanceof \WP_Screen && in_array( $screen->id, array( 'toplevel_page_' . SettingsPage::SLUG, 'agentready_page_' . VerifyPage::SLUG ), true );
+		return $screen instanceof \WP_Screen && in_array( $screen->id, array( 'toplevel_page_' . SettingsPage::SLUG, 'agentready_page_' . LlmsPage::SLUG, 'agentready_page_' . VerifyPage::SLUG ), true );
 	}
 
 	/**

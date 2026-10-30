@@ -14,8 +14,3 @@ parameters:
 		- .phpstan/wp-cli.php
 	excludePaths:
 		- src/Admin/views
-	ignoreErrors:
-		# Temporary: PR 3 and PR 4 stubs accept dependencies they do not use yet.
-		-
-			identifier: property.onlyWritten
-			path: src/Robots/RobotsTxt.php
