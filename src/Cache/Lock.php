@@ -18,9 +18,32 @@ final class Lock {
 	private const TTL = 60;
 
 	public function acquire( int $post_id ): bool {
+		return $this->take( $this->name( $post_id ) );
+	}
+
+	/**
+	 * Takes one of a fixed number of render slots, so only a few pages are rendered at the same time.
+	 *
+	 * @return int|null The slot number, or null when all slots are in use.
+	 */
+	public function take_slot( int $max ): ?int {
+		for ( $slot = 1; $slot <= $max; $slot++ ) {
+			if ( $this->take( 'agentready_slot_' . $slot ) ) {
+				return $slot;
+			}
+		}
+
+		return null;
+	}
+
+	public function release_slot( int $slot ): void {
 		global $wpdb;
 
-		$name = $this->name( $post_id );
+		$wpdb->delete( $wpdb->options, array( 'option_name' => 'agentready_slot_' . $slot ) );
+	}
+
+	private function take( string $name ): bool {
+		global $wpdb;
 
 		if ( $this->insert( $name ) ) {
 			return true;

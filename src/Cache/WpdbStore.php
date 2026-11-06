@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace AgentReady\Cache;
 
+use AgentReady\Index\OutputCache;
+
 defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin-owned table.
@@ -53,12 +55,15 @@ final class WpdbStore implements Store {
 			),
 			array( '%d', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
+
+		OutputCache::purge();
 	}
 
 	public function delete( int $post_id ): void {
 		global $wpdb;
 
 		$wpdb->delete( Schema::table(), array( 'post_id' => $post_id ), array( '%d' ) );
+		OutputCache::purge();
 	}
 
 	public function mark_stale( int $post_id ): void {
@@ -83,6 +88,7 @@ final class WpdbStore implements Store {
 		$table = Schema::table();
 
 		$wpdb->query( "DELETE FROM {$table}" );
+		OutputCache::purge();
 	}
 
 	public function counts(): array {
