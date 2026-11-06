@@ -43,10 +43,11 @@ final class Notices {
 	 * @return array<int, array{message: string, check_url: string, dismiss_url: string}>
 	 */
 	private function changes(): array {
-		$notices = array();
+		$notices  = array();
+		$cron_off = $this->environment->cron_disabled();
 
 		foreach ( $this->changes->pending() as $key => $change ) {
-			$message = self::change_message( (string) $key, is_array( $change ) ? $change : array() );
+			$message = self::change_message( (string) $key, is_array( $change ) ? $change : array(), $cron_off );
 
 			if ( '' === $message ) {
 				continue;
@@ -54,7 +55,7 @@ final class Notices {
 
 			$notices[] = array(
 				'message'     => $message,
-				'check_url'   => Changes::PLUGINS === $key ? VerifyPage::url( array( 'tab' => 'all' ) ) : '',
+				'check_url'   => Changes::PLUGINS === $key || $cron_off ? VerifyPage::url( array( 'tab' => 'all' ) ) : '',
 				'dismiss_url' => wp_nonce_url( admin_url( 'admin-post.php?action=agentready_dismiss&key=' . rawurlencode( (string) $key ) ), 'agentready_dismiss' ),
 			);
 		}
@@ -65,7 +66,7 @@ final class Notices {
 	/**
 	 * @param array<string, mixed> $change Saved details of the change.
 	 */
-	public static function change_message( string $key, array $change ): string {
+	public static function change_message( string $key, array $change, bool $cron_disabled = false ): string {
 		if ( Changes::PLUGINS === $key ) {
 			$count = max( 1, (int) ( $change['count'] ?? 1 ) );
 
@@ -87,6 +88,14 @@ final class Notices {
 		);
 		$reason  = $reasons[ (string) ( $change['reason'] ?? '' ) ] ?? '';
 
-		return '' === $reason ? '' : $reason . '. ' . __( 'AgentReady is refreshing the stored Markdown of every page in the background.', 'agentready' );
+		if ( '' === $reason ) {
+			return '';
+		}
+
+		if ( $cron_disabled ) {
+			return $reason . '. ' . __( 'WP-Cron is disabled, so stored pages do not refresh by themselves. Run Check all pages, then update the ones that are out of date.', 'agentready' );
+		}
+
+		return $reason . '. ' . __( 'AgentReady is refreshing the stored Markdown of every page in the background.', 'agentready' );
 	}
 }
