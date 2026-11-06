@@ -21,6 +21,7 @@ use AgentReady\Admin\TermList;
 use AgentReady\Admin\VerifyPage;
 use AgentReady\Cache\Batch;
 use AgentReady\Cache\Candidates;
+use AgentReady\Cache\Changes;
 use AgentReady\Cache\Coverage;
 use AgentReady\Cache\Invalidator;
 use AgentReady\Cache\Lock;
@@ -108,6 +109,8 @@ final class Plugin {
 		$lock        = new Lock();
 		$pages       = new PageCache( $store, $generator, $lock, $eligibility, $environment );
 		$batch       = new Batch( $store, $pages, $post_types, $eligibility, $environment, $candidates );
+		$invalidator = new Invalidator( $store, $pages, $batch, $post_types );
+		$changes     = new Changes( $batch, $environment );
 		$status      = new PageStatus( $store, $eligibility, $environment );
 		$coverage    = new Coverage( $store, $candidates, $post_types, $eligibility );
 		$verifier    = new Verifier( $store, $generator, $renderer, $eligibility );
@@ -121,7 +124,8 @@ final class Plugin {
 			new Schema(),
 			$pages,
 			$batch,
-			new Invalidator( $store, $pages, $batch, $post_types ),
+			$invalidator,
+			$changes,
 			new Router( $urls, $eligibility, $pages, $environment, $llms, $llms_full, $llms_options, new MarkdownResponse() ),
 			new DiscoveryTags( $eligibility, $urls, $environment ),
 			new CronAuth( $options ),
@@ -129,14 +133,14 @@ final class Plugin {
 			$scan,
 			new ScanController( $scan, $environment ),
 			new RobotsTxt( $llms_options, $environment ),
-			new Seo(),
-			new Elementor(),
-			new Acf(),
+			new Seo( $invalidator ),
+			new Elementor( $invalidator, $batch, $environment ),
+			new Acf( $batch, $environment ),
 			new CustomPermalinks( $urls ),
 		);
 
 		if ( is_admin() ) {
-			$notices  = new Notices( $environment );
+			$notices  = new Notices( $environment, $changes );
 			$settings = new SettingsPage(
 				$options,
 				$post_types,
@@ -157,7 +161,7 @@ final class Plugin {
 			$this->components[] = $verify;
 			$this->components[] = new Menu( $settings, $llms_page, $verify );
 			$this->components[] = new MetaBox( $post_types, $options, $status );
-			$this->components[] = new CacheActions( $store, $pages, $batch, $post_types, $eligibility, $environment );
+			$this->components[] = new CacheActions( $store, $pages, $batch, $post_types, $eligibility, $environment, $changes );
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {

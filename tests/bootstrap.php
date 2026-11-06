@@ -20,3 +20,9 @@ if ( ! function_exists( 'wp_json_encode' ) ) {
 		return json_encode( $value, $flags );
 	}
 }
+
+if ( ! function_exists( '__' ) ) {
+	function __( $text, $domain = 'default' ) {
+		return $text;
+	}
+}
