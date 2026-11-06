@@ -41,7 +41,7 @@ $options = $vars['options'];
 			<input type="checkbox" name="<?php echo esc_attr( $name ); ?>[exclude_noindex]" value="1" <?php checked( (bool) $options->get( 'exclude_noindex', true ) ); ?> />
 			<?php esc_html_e( 'Leave out pages set to noindex', 'agentready' ); ?>
 		</label>
-		<p class="description"><?php esc_html_e( 'Skips pages that Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework mark as noindex, in llms.txt, llms-full.txt and as Markdown. Only the setting on the page itself is read.', 'agentready' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Skips pages your SEO plugin marks as noindex, in llms.txt, llms-full.txt and as Markdown. Only the setting on the page itself is read.', 'agentready' ); ?></p>
 	</div>
 </section>
 
