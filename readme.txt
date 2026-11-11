@@ -94,9 +94,12 @@ It adds comment lines that point to llms.txt (and llms-full.txt when it is on). 
 
 Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.
 
+= Who can edit llms.txt? =
+Administrators, through the `agentready_manage_files` capability that they get automatically. You can give that capability to any role or user with a role editor plugin, and those users see a menu with the llms.txt page only. Settings, Verify & Preview and the cache buttons stay with administrators. Editors can still hide a page or set its description from the AgentReady box on pages they can edit.
+
 = What is removed when I delete the plugin? =
 
-The stored Markdown table is always removed, and so are any saved HTTP Basic credentials. Your other settings and the choices saved on pages are removed only if you tick "Delete all data on uninstall" on the Environment tab.
+The stored Markdown table is always removed, and so are any saved HTTP Basic credentials. Your other settings and the choices saved on pages are removed only if you tick "Delete all data on uninstall" on the Environment tab. The llms.txt capability is removed from all roles and users in the same case.
 
 = My site asks for a username and password. =
 
@@ -137,6 +140,7 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 == Changelog ==
 
 = Unreleased =
+* New `agentready_manage_files` capability for the llms.txt page, llms-full.txt and the robots.txt line. Administrators get it automatically, and it can be given to any role or user. Filter `agentready_files_capability` maps it to another capability.
 * `llms.txt` and `llms-full.txt` are kept for up to five minutes instead of being built on every request, and are rebuilt at once when a page, an SEO field or a related setting changes.
 * At most three pages are rendered at the same time for visitors. When all slots are busy and a page has no stored copy yet, the visitor gets a short "try again" answer and the page is queued.
 * Saved HTTP Basic credentials are no longer sent if the page redirects from https to http.

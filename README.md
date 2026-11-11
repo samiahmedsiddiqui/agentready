@@ -72,6 +72,16 @@ AgentReady > llms.txt has three cards. These settings are saved apart from the m
 - **llms-full.txt.** Off by default. When on, `/llms-full.txt` joins the stored Markdown of every eligible page: a title, a `Source:` line with the page URL, then the body, without the metadata block. It reads only stored copies, so pages without one are left out until you generate them (Verify & Preview > All pages > Generate missing). The file stops at 5 MB (change it with `agentready_llms_full_max_bytes`), includes only whole pages, and ends with a note saying how many were left out. When the option is off, the address returns the normal 404 page.
 - **robots.txt.** Off by default. When on, WordPress's generated robots.txt gets comment lines such as `# llms.txt: https://example.com/llms.txt`. They add no allow or disallow rules, so crawler access does not change. They are skipped when the site asks search engines not to index it, and when a real `robots.txt` file exists on the server, because WordPress then does not generate one.
 
+## Who can manage the llms.txt files
+
+The llms.txt page (your own text, llms-full.txt and the robots.txt line) needs the `agentready_manage_files` capability. Administrators get it the first time they open the admin after the plugin is active. If you take it away from the administrator role it is not added back. Give it to any role or user with a role editor plugin, or in code:
+
+```php
+get_role( 'editor' )->add_cap( 'agentready_manage_files' );
+```
+
+A user who has this capability but not `manage_options` sees a menu with the llms.txt page only. Settings, Verify & Preview, the scan and the cache buttons stay with administrators. To use an existing capability instead, map it with the `agentready_files_capability` filter, for example `add_filter( 'agentready_files_capability', fn() => 'edit_pages' );`. The capability is removed from all roles and users when you delete the plugin with "Delete all data on uninstall" ticked.
+
 ## Verify & Preview
 
 AgentReady > Verify & Preview has two tabs.
@@ -132,7 +142,7 @@ wp agentready cache regenerate 42 57
 wp agentready cache regenerate --all
 ```
 
-Uninstalling always drops the table and clears any saved HTTP Basic credentials. Your other settings and the per-page choices are removed too only if "Delete all data on uninstall" is ticked.
+Uninstalling always drops the table and clears any saved HTTP Basic credentials. Your other settings, the per-page choices and the llms.txt capability are removed too only if "Delete all data on uninstall" is ticked.
 
 ## Hooks
 
@@ -148,6 +158,7 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | `agentready_resolve_post` | Map a request path to a post. |
 | `agentready_use_loopback` | Return `false` to skip fetching the page and use the post content. |
 | `agentready_loopback_timeout` | Seconds to wait for the page request (default 15). |
+| `agentready_files_capability` | Capability that is checked for the llms.txt page (default `agentready_manage_files`). |
 | `agentready_max_concurrent_renders` | Pages that may be rendered at the same time for visitors (default 3). |
 | `agentready_strip_selectors` | CSS selectors for elements to remove. |
 | `agentready_markdown` | Final Markdown for a page. |

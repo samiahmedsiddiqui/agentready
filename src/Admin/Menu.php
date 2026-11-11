@@ -43,11 +43,24 @@ final class Menu implements Hookable {
 	}
 
 	/**
-	 * Adds the menu and its sub-pages.
+	 * Adds the menu. Administrators get all pages. A user who may only manage the llms.txt files gets a menu with that page alone.
 	 *
 	 * @return void
 	 */
 	public function add_pages(): void {
+		if ( current_user_can( 'manage_options' ) ) {
+			$this->add_all_pages();
+		} elseif ( current_user_can( Capabilities::files() ) ) {
+			$this->add_files_page_only();
+		}
+	}
+
+	/**
+	 * Adds the full menu with Settings, llms.txt and Verify & Preview.
+	 *
+	 * @return void
+	 */
+	private function add_all_pages(): void {
 		add_menu_page(
 			__( 'AgentReady', 'agentready' ),
 			__( 'AgentReady', 'agentready' ),
@@ -59,8 +72,25 @@ final class Menu implements Hookable {
 		);
 
 		add_submenu_page( SettingsPage::SLUG, __( 'AgentReady Settings', 'agentready' ), __( 'Settings', 'agentready' ), 'manage_options', SettingsPage::SLUG, array( $this->settings, 'render' ) );
-		add_submenu_page( SettingsPage::SLUG, __( 'llms.txt', 'agentready' ), __( 'llms.txt', 'agentready' ), 'manage_options', LlmsPage::SLUG, array( $this->llms, 'render' ) );
+		add_submenu_page( SettingsPage::SLUG, __( 'llms.txt', 'agentready' ), __( 'llms.txt', 'agentready' ), Capabilities::files(), LlmsPage::SLUG, array( $this->llms, 'render' ) );
 		add_submenu_page( SettingsPage::SLUG, __( 'Verify & Preview', 'agentready' ), __( 'Verify & Preview', 'agentready' ), 'manage_options', VerifyPage::SLUG, array( $this->verify, 'render' ) );
+	}
+
+	/**
+	 * Adds a top-level menu with the llms.txt page alone.
+	 *
+	 * @return void
+	 */
+	private function add_files_page_only(): void {
+		add_menu_page(
+			__( 'llms.txt', 'agentready' ),
+			__( 'llms.txt', 'agentready' ),
+			Capabilities::files(),
+			LlmsPage::SLUG,
+			array( $this->llms, 'render' ),
+			$this->icon(),
+			self::POSITION
+		);
 	}
 
 	/**
@@ -113,7 +143,7 @@ final class Menu implements Hookable {
 	private function is_plugin_screen(): bool {
 		$screen = get_current_screen();
 
-		return $screen instanceof \WP_Screen && in_array( $screen->id, array( 'toplevel_page_' . SettingsPage::SLUG, 'agentready_page_' . LlmsPage::SLUG, 'agentready_page_' . VerifyPage::SLUG ), true );
+		return $screen instanceof \WP_Screen && in_array( $screen->id, array( 'toplevel_page_' . SettingsPage::SLUG, 'toplevel_page_' . LlmsPage::SLUG, 'agentready_page_' . LlmsPage::SLUG, 'agentready_page_' . VerifyPage::SLUG ), true );
 	}
 
 	/**

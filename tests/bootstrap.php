@@ -50,3 +50,13 @@ if ( ! function_exists( 'delete_transient' ) ) {
 		return true;
 	}
 }
+
+$GLOBALS['agentready_test_filters'] = array();
+
+if ( ! function_exists( 'apply_filters' ) ) {
+	function apply_filters( $hook_name, $value, ...$args ) {
+		$callback = $GLOBALS['agentready_test_filters'][ $hook_name ] ?? null;
+
+		return null === $callback ? $value : $callback( $value, ...$args );
+	}
+}

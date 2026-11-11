@@ -51,6 +51,7 @@ final class LlmsPage implements Hookable {
 	public function register(): void {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+		add_filter( 'option_page_capability_' . self::GROUP, array( Capabilities::class, 'files' ) );
 	}
 
 	/**
@@ -77,7 +78,7 @@ final class LlmsPage implements Hookable {
 	 * @return void
 	 */
 	public function enqueue( string $hook ): void {
-		if ( 'agentready_page_' . self::SLUG !== $hook ) {
+		if ( ! in_array( $hook, array( 'agentready_page_' . self::SLUG, 'toplevel_page_' . self::SLUG ), true ) ) {
 			return;
 		}
 
@@ -91,7 +92,7 @@ final class LlmsPage implements Hookable {
 	 * @return void
 	 */
 	public function render(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( Capabilities::files() ) ) {
 			return;
 		}
 
@@ -119,7 +120,7 @@ final class LlmsPage implements Hookable {
 				'stored'         => $cache['fresh'] + $cache['stale'],
 				'missing'        => $cache['missing'],
 				'robots_file'    => file_exists( get_home_path() . 'robots.txt' ),
-				'verify_all_url' => VerifyPage::url( array( 'tab' => 'all' ) ),
+				'verify_all_url' => current_user_can( 'manage_options' ) ? VerifyPage::url( array( 'tab' => 'all' ) ) : '',
 			)
 		);
 	}

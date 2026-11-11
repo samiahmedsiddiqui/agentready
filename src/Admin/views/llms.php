@@ -106,7 +106,9 @@ $notes = array(
 							)
 						);
 						?>
-						<a href="<?php echo esc_url( $vars['verify_all_url'] ); ?>"><?php esc_html_e( 'Generate the missing ones', 'agentready' ); ?></a>
+						<?php if ( '' !== $vars['verify_all_url'] ) : ?>
+							<a href="<?php echo esc_url( $vars['verify_all_url'] ); ?>"><?php esc_html_e( 'Generate the missing ones', 'agentready' ); ?></a>
+						<?php endif; ?>
 					<?php endif; ?>
 					<?php esc_html_e( 'Large sites are cut off at 5 MB.', 'agentready' ); ?>
 				</p>
