@@ -14,10 +14,14 @@ namespace AgentReady\Rendering;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Turns simple CSS selectors into XPath queries. Supported: tags, #id, .class, attribute tests, descendants and children. */
 final class Selector {
 
 	/**
-	 * @return string[] One XPath per valid selector in the list, in order.
+	 * Converts a list of selectors.
+	 *
+	 * @param string $selector Selectors separated by commas.
+	 * @return string[] One XPath per valid selector, in order.
 	 */
 	public function to_xpaths( string $selector ): array {
 		$xpaths = array();
@@ -34,7 +38,10 @@ final class Selector {
 	}
 
 	/**
-	 * @return string[] The comma-separated selectors, trimmed, ignoring commas inside brackets.
+	 * Splits a list of selectors at commas that are not inside brackets.
+	 *
+	 * @param string $selector Selectors separated by commas.
+	 * @return string[] The selectors, trimmed.
 	 */
 	public function split( string $selector ): array {
 		$parts = preg_split( '/,(?![^\[]*\])/', $selector );
@@ -52,7 +59,8 @@ final class Selector {
 	/**
 	 * Splits text with one or more selectors per line into supported and unsupported ones.
 	 *
-	 * @return array{valid: string[], invalid: string[]}
+	 * @param string $text Lines of selectors.
+	 * @return array{valid: string[], invalid: string[]} The selectors that can be used, and the ones that cannot.
 	 */
 	public function parse_list( string $text ): array {
 		$result = array(
@@ -69,6 +77,12 @@ final class Selector {
 		return $result;
 	}
 
+	/**
+	 * Converts one selector.
+	 *
+	 * @param string $selector A selector such as "main > .content".
+	 * @return string|null The XPath, or null when the selector is not supported.
+	 */
 	private function compile( string $selector ): ?string {
 		if ( '' === $selector ) {
 			return null;
@@ -102,6 +116,12 @@ final class Selector {
 		return $xpath;
 	}
 
+	/**
+	 * Converts one part of a selector, such as "div.card[data-x]".
+	 *
+	 * @param string $compound A tag with optional #id, .class and attribute tests.
+	 * @return string|null The XPath step, or null when it is not supported.
+	 */
 	private function compound( string $compound ): ?string {
 		if ( ! preg_match( '/^([a-zA-Z*][\w-]*)?(.*)$/', $compound, $match ) ) {
 			return null;
@@ -134,24 +154,38 @@ final class Selector {
 		return $tag . $predicates;
 	}
 
+	/**
+	 * Builds the XPath test for an attribute.
+	 *
+	 * @param string $name     Attribute name.
+	 * @param string $operator One of =, ^=, $=, *= or an empty string for "has the attribute".
+	 * @param string $value    Value to compare with.
+	 * @return string The test, in square brackets.
+	 */
 	private function attribute_predicate( string $name, string $operator, string $value ): string {
-		$attr = '@' . $name;
-		$lit  = $this->literal( $value );
+		$attribute = '@' . $name;
+		$quoted    = $this->literal( $value );
 
 		switch ( $operator ) {
 			case '=':
-				return "[{$attr}={$lit}]";
+				return "[{$attribute}={$quoted}]";
 			case '^=':
-				return "[starts-with({$attr}, {$lit})]";
+				return "[starts-with({$attribute}, {$quoted})]";
 			case '$=':
-				return "[substring({$attr}, string-length({$attr}) - string-length({$lit}) + 1) = {$lit}]";
+				return "[substring({$attribute}, string-length({$attribute}) - string-length({$quoted}) + 1) = {$quoted}]";
 			case '*=':
-				return "[contains({$attr}, {$lit})]";
+				return "[contains({$attribute}, {$quoted})]";
 			default:
-				return "[{$attr}]";
+				return "[{$attribute}]";
 		}
 	}
 
+	/**
+	 * Quotes a value as an XPath string.
+	 *
+	 * @param string $value Text.
+	 * @return string The quoted text.
+	 */
 	private function literal( string $value ): string {
 		if ( false === strpos( $value, "'" ) ) {
 			return "'" . $value . "'";
