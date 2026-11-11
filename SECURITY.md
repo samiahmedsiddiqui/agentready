@@ -8,7 +8,7 @@ Security fixes are released for the latest version of AgentWelcome. Please make 
 
 Please **don't** report security vulnerabilities in public issues or pull requests.
 
-Report them privately through [GitHub's private vulnerability reporting](https://github.com/samiahmedsiddiqui/agentready/security/advisories/new), including:
+Report them privately through [GitHub's private vulnerability reporting](https://github.com/samiahmedsiddiqui/agentwelcome/security/advisories/new), including:
 
 * The affected version.
 * What an attacker can do, and what access they need (e.g. unauthenticated, subscriber, editor).

@@ -24,4 +24,4 @@ jobs:
     uses: ./.github/workflows/reusable-coding-standards-php.yml
     permissions:
       contents: read
-    if: ${{ github.repository == 'samiahmedsiddiqui/agentready' || github.event_name == 'pull_request' }}
+    if: ${{ github.repository == 'samiahmedsiddiqui/agentwelcome' || github.event_name == 'pull_request' }}
