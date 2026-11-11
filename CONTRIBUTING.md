@@ -2,7 +2,7 @@
 
 Thanks for helping improve AgentWelcome!
 
-* **Bugs and feature requests:** open an [issue](https://github.com/samiahmedsiddiqui/agentready/issues/new/choose).
+* **Bugs and feature requests:** open an [issue](https://github.com/samiahmedsiddiqui/agentwelcome/issues/new/choose).
 * **Security issues:** don't open an issue; see [SECURITY.md](SECURITY.md).
 * **Pull requests:** see [Development](README.md#development) in the README for setup and linting. Every pull request runs the coding standards checks, PHPStan, a dependency audit and Plugin Check.
 

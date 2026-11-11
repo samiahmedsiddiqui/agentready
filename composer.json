@@ -10,8 +10,8 @@
 		}
 	],
 	"support": {
-		"issues": "https://github.com/samiahmedsiddiqui/agentready/issues",
-		"source": "https://github.com/samiahmedsiddiqui/agentready"
+		"issues": "https://github.com/samiahmedsiddiqui/agentwelcome/issues",
+		"source": "https://github.com/samiahmedsiddiqui/agentwelcome"
 	},
 	"require": {
 		"php": ">=8.0",
