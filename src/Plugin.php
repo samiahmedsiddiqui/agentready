@@ -12,6 +12,7 @@ namespace AgentReady;
 defined( 'ABSPATH' ) || exit;
 
 use AgentReady\Admin\CacheActions;
+use AgentReady\Admin\Capabilities;
 use AgentReady\Admin\LlmsPage;
 use AgentReady\Admin\Menu;
 use AgentReady\Admin\MetaBox;
@@ -147,6 +148,7 @@ final class Plugin {
 			$batch,
 			$invalidator,
 			$changes,
+			new Capabilities(),
 			new OutputCache(),
 			new Router( $urls, $eligibility, $pages, $environment, $llms, $llms_full, $llms_options, new MarkdownResponse() ),
 			new DiscoveryTags( $eligibility, $urls, $environment ),

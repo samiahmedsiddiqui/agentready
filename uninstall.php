@@ -8,6 +8,29 @@
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 /**
+ * Removes the llms.txt management capability from every role and from users who were given it directly.
+ */
+function agentready_remove_files_capability(): void {
+	foreach ( wp_roles()->role_objects as $role ) {
+		$role->remove_cap( 'agentready_manage_files' );
+	}
+
+	foreach ( get_users(
+		array(
+			'capability' => 'agentready_manage_files',
+			'fields'     => 'ID',
+			'number'     => -1,
+		)
+	) as $user_id ) {
+		$user = get_user_by( 'id', (int) $user_id );
+
+		if ( $user instanceof WP_User ) {
+			$user->remove_cap( 'agentready_manage_files' );
+		}
+	}
+}
+
+/**
  * Removes the stored Markdown and saved credentials, and the settings, the llms.txt text and per-page choices when the user asked for it.
  */
 function agentready_uninstall_site(): void {
@@ -34,6 +57,8 @@ function agentready_uninstall_site(): void {
 		delete_option( 'agentready_llms' );
 		delete_post_meta_by_key( '_agentready_exclude' );
 		delete_post_meta_by_key( '_agentready_description' );
+		delete_option( 'agentready_files_capability_granted' );
+		agentready_remove_files_capability();
 	} elseif ( is_array( $settings ) ) {
 		// Saved HTTP Basic credentials are secrets, so they never outlive the plugin.
 		$settings['http_auth_enabled']  = false;
