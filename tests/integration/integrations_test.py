@@ -42,6 +42,12 @@ def clear_batch():
     php("delete_option('agentwelcome_batch'); wp_unschedule_hook('agentwelcome_regenerate_batch');")
 
 
+def fire(code, pid):
+    """Runs PHP and, in the same process, reads the state of one stored page and whether a refresh is running. A cron run cannot slip in between."""
+    out = php(code + " global $wpdb; $s = $wpdb->get_var( $wpdb->prepare( \"SELECT state FROM {$wpdb->prefix}agentwelcome_pages WHERE post_id = %d\", " + str(pid) + " ) ); echo json_encode( array( 'state' => $s, 'running' => get_option( 'agentwelcome_batch' ) !== false ) );")
+    return json.loads(out.splitlines()[-1])
+
+
 def changes():
     return jphp("echo json_encode(get_option('agentwelcome_changes'));") or {}
 
@@ -186,10 +192,10 @@ try:
     check("it links to Check all pages", "page=agentwelcome-verify&#038;tab=all" in p or "page=agentwelcome-verify&amp;tab=all" in p)
     check("the notice also shows on the llms.txt and Verify pages", all("plugins were activated" in admin.get(u)[2] for u in ("/wp-admin/admin.php?page=agentwelcome-llms", "/wp-admin/admin.php?page=agentwelcome-verify")))
 
-    php("do_action('after_switch_theme');")
+    r = fire("do_action('after_switch_theme');", ids["integ-a"])
     c = changes()
     check("a theme switch is recorded", c["refresh"]["reason"] == "theme", c)
-    check("and marks every page out of date with a refresh started", state(ids["integ-a"]) == "stale" and batch_running())
+    check("and marks every page out of date with a refresh started", r["state"] == "stale" and r["running"], r)
     p = admin.get("/wp-admin/admin.php?page=agentwelcome")[2]
     check("the notice says the theme changed and pages are refreshing", "The active theme changed. AgentWelcome is refreshing the stored Markdown of every page in the background." in p)
     clear_batch()
@@ -197,10 +203,10 @@ try:
     check("saving the Customizer is recorded", changes()["refresh"]["reason"] == "customizer")
     clear_batch()
     theme = php("echo get_stylesheet();")
-    php(UPG + "do_action('upgrader_process_complete', null, array('action' => 'update', 'type' => 'theme', 'themes' => array('some-other-theme')));")
-    check("updating a different theme is not a change", changes()["refresh"]["reason"] == "customizer" and not batch_running())
-    php(UPG + "do_action('upgrader_process_complete', null, array('action' => 'update', 'type' => 'theme', 'themes' => array('%s')));" % theme)
-    check("updating the active theme is", changes()["refresh"]["reason"] == "theme_update" and batch_running())
+    r = fire(UPG + "do_action('upgrader_process_complete', null, array('action' => 'update', 'type' => 'theme', 'themes' => array('some-other-theme')));", ids["integ-a"])
+    check("updating a different theme is not a change", changes()["refresh"]["reason"] == "customizer" and not r["running"], r)
+    r = fire(UPG + "do_action('upgrader_process_complete', null, array('action' => 'update', 'type' => 'theme', 'themes' => array('%s')));" % theme, ids["integ-a"])
+    check("updating the active theme is", changes()["refresh"]["reason"] == "theme_update" and r["running"], r)
     p = admin.get("/wp-admin/admin.php?page=agentwelcome")[2]
     check("with its own wording", "The active theme was updated. AgentWelcome is refreshing" in p)
     clear_batch()
