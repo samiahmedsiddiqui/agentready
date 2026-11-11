@@ -95,6 +95,7 @@ It adds comment lines that point to llms.txt (and llms-full.txt when it is on). 
 Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.
 
 = Who can edit llms.txt? =
+
 Administrators, through the `agentready_manage_files` capability that they get automatically. You can give that capability to any role or user with a role editor plugin, and those users see a menu with the llms.txt page only. Settings, Verify & Preview and the cache buttons stay with administrators. Editors can still hide a page or set its description from the AgentReady box on pages they can edit.
 
 = What is removed when I delete the plugin? =
@@ -138,6 +139,7 @@ Yes. Set the content selector in AgentReady > Settings. The default tries `main`
 Yes. Add CSS selectors, one per line, under "Elements to exclude". They are removed in addition to the built-in list (navigation, sidebars, forms, scripts, hidden elements, and any site-level header or footer). Headers and footers inside an article are kept. Verify & Preview lets you try selectors without saving them.
 
 = How is this plugin developed? =
+
 Developed with AI coding tools and maintained by Sami Ahmed Siddiqui. Every change is reviewed by the author and checked with automated tests, PHPCS, PHPStan and Plugin Check before release.
 
 == Changelog ==
