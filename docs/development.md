@@ -13,7 +13,7 @@ composer install
 | `composer analyse` | Runs PHPStan. |
 | `composer test` | Runs the PHPUnit unit tests (no WordPress needed). |
 
-Every pull request runs these checks plus [Plugin Check](https://github.com/WordPress/plugin-check). See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to send a change.
+Every pull request runs these checks plus [Plugin Check](https://github.com/WordPress/plugin-check), the end-to-end suites in `tests/integration` and the wp-env tests in `tests/wp-env`. See the README in each folder for how to run them. See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to send a change.
 
 ## How this plugin is developed
 

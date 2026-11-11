@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<phpunit
+	bootstrap="bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	beStrictAboutTestsThatDoNotTestAnything="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+>
+	<testsuites>
+		<testsuite name="wp-env">
+			<directory suffix="Test.php">./</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
