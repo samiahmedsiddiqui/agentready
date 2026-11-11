@@ -61,7 +61,7 @@ final class PageCache implements Hookable {
 		$deadline = microtime( true ) + self::WAIT_SECONDS;
 
 		do {
-			$slot = $this->lock->take_slot( max( 1, (int) apply_filters( 'agentready_max_concurrent_renders', self::MAX_RENDERS ) ) );
+			$slot = $this->take_render_slot();
 
 			if ( null === $slot ) {
 				$this->schedule( $post->ID, self::REFRESH_DELAY );
@@ -93,6 +93,13 @@ final class PageCache implements Hookable {
 		} while ( microtime( true ) < $deadline );
 
 		return null;
+	}
+
+	/**
+	 * Only a few pages are rendered at the same time for visitors. Returns null when every slot is busy.
+	 */
+	private function take_render_slot(): ?int {
+		return $this->lock->take_slot( max( 1, (int) apply_filters( 'agentready_max_concurrent_renders', self::MAX_RENDERS ) ) );
 	}
 
 	/**

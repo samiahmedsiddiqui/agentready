@@ -50,8 +50,7 @@ final class Router implements Hookable {
 		}
 
 		if ( Urls::ROUTE_LLMS === $route['type'] ) {
-			$this->response->send( OutputCache::remember( OutputCache::LLMS, fn(): string => $this->llms->build() ), MarkdownResponse::TEXT );
-			$this->terminate();
+			$this->serve_index( OutputCache::LLMS, fn(): string => $this->llms->build() );
 		}
 
 		if ( Urls::ROUTE_LLMS_FULL === $route['type'] ) {
@@ -59,14 +58,30 @@ final class Router implements Hookable {
 				return;
 			}
 
-			$this->response->send( OutputCache::remember( OutputCache::FULL, fn(): string => $this->llms_full->build() ), MarkdownResponse::TEXT );
-			$this->terminate();
+			$this->serve_index( OutputCache::FULL, fn(): string => $this->llms_full->build() );
 		}
 
+		$this->serve_page( $route, trim( (string) $wp->request, '/' ) );
+	}
+
+	/**
+	 * @param callable(): string $build Builds the file when there is no saved copy.
+	 * @return never
+	 */
+	private function serve_index( string $key, callable $build ): void {
+		$this->response->send( OutputCache::remember( $key, $build ), MarkdownResponse::TEXT );
+		$this->terminate();
+	}
+
+	/**
+	 * @param array{type: string, path: string, home_alias: bool} $route   The parsed route.
+	 * @param string                                              $request The requested path.
+	 */
+	private function serve_page( array $route, string $request ): void {
 		$post = $this->urls->resolve( $route['path'], $route['home_alias'] );
 
 		if ( null === $post ) {
-			$this->redirect_to_canonical( $route, trim( (string) $wp->request, '/' ) );
+			$this->redirect_to_canonical( $route, $request );
 			return;
 		}
 
