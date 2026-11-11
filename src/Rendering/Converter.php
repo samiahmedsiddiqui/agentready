@@ -449,11 +449,11 @@ final class Converter {
 		return "\n\n" . implode( "\n", $lines ) . "\n\n";
 	}
 
-	private function list_block( DOMElement $list, bool $ordered, int $depth ): string {
-		$number = max( 1, (int) $list->getAttribute( 'start' ) );
+	private function list_block( DOMElement $node, bool $ordered, int $depth ): string {
+		$number = max( 1, (int) $node->getAttribute( 'start' ) );
 		$items  = array();
 
-		foreach ( $list->childNodes as $child ) {
+		foreach ( $node->childNodes as $child ) {
 			if ( ! $child instanceof DOMElement ) {
 				continue;
 			}
@@ -499,7 +499,9 @@ final class Converter {
 
 				$cells[] = str_replace( '|', '\\|', $this->inline( $cell, $depth, false ) );
 
-				for ( $i = 1; $i < max( 1, (int) $cell->getAttribute( 'colspan' ) ); $i++ ) {
+				$span = max( 1, (int) $cell->getAttribute( 'colspan' ) );
+
+				for ( $i = 1; $i < $span; $i++ ) {
 					$cells[] = '';
 				}
 			}

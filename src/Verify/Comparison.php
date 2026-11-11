@@ -40,9 +40,9 @@ final class Comparison {
 	/**
 	 * @return array<int, array{type: string, text: string}>
 	 */
-	public static function diff( string $old, string $new ): array {
-		$a = '' === $old ? array() : explode( "\n", $old );
-		$b = '' === $new ? array() : explode( "\n", $new );
+	public static function diff( string $before, string $after ): array {
+		$a = '' === $before ? array() : explode( "\n", $before );
+		$b = '' === $after ? array() : explode( "\n", $after );
 		$n = count( $a );
 		$m = count( $b );
 
@@ -123,7 +123,9 @@ final class Comparison {
 				continue;
 			}
 
-			for ( $k = max( 0, $index - $context ); $k <= min( $last, $index + $context ); $k++ ) {
+			$to = min( $last, $index + $context );
+
+			for ( $k = max( 0, $index - $context ); $k <= $to; $k++ ) {
 				$keep[ $k ] = true;
 			}
 		}
