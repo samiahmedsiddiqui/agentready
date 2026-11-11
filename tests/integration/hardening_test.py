@@ -28,6 +28,7 @@ def slots(count, on):
 
 
 old_title = php("echo get_option('blogname');")
+set_env(no_cron=True)
 try:
     wpcli("option", "update", "agentwelcome_llms", '{"mode":"automatic","custom":"","full":true,"robots_line":false}', "--format=json")
     pid = create_page("hard-a", "<p>Body of hard-a.</p>", post_name="hard-a")
@@ -83,6 +84,7 @@ try:
     slots(0, False)
     check("a stored page is served even when every slot is taken", (slots(3, True), get("/hard-b.md")[0])[1] == 200)
 finally:
+    clear_env()
     wpcli("option", "update", "blogname", old_title)
     slots(0, False)
     reset_state()
