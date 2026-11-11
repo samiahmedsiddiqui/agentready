@@ -14,10 +14,18 @@ use AgentReady\Content\PostTypes;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Counts the pages by state of their stored copy, including pages that have none yet. */
 final class Coverage {
 
+	/** Most pages without a copy that are checked; above this the count is reported as a minimum. */
 	public const LIMIT = 500;
 
+	/**
+	 * @param Store       $store       Stored copies.
+	 * @param Candidates  $candidates  Source of pages with no copy.
+	 * @param PostTypes   $post_types   Post types that are served.
+	 * @param Eligibility $eligibility Decides whether a page is served.
+	 */
 	public function __construct(
 		private Store $store,
 		private Candidates $candidates,
@@ -26,7 +34,9 @@ final class Coverage {
 	) {}
 
 	/**
-	 * @return array{fresh: int, stale: int, missing: int, capped: bool}
+	 * Counts fresh, stale and missing copies.
+	 *
+	 * @return array{fresh: int, stale: int, missing: int, capped: bool} Counts, and whether the missing count hit LIMIT.
 	 */
 	public function summary(): array {
 		$counts  = $this->store->counts();

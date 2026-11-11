@@ -15,8 +15,14 @@ defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin-owned table.
 
+/** Store backed by the agentready_pages table. The cached llms files are cleared whenever stored copies change. */
 final class WpdbStore implements Store {
 
+	/**
+	 * @param int  $post_id       Page ID.
+	 * @param bool $with_markdown False to leave the Markdown text out of the query.
+	 * @return Entry|null The stored copy, or null when none exists.
+	 */
 	public function get( int $post_id, bool $with_markdown = true ): ?Entry {
 		global $wpdb;
 
@@ -39,6 +45,10 @@ final class WpdbStore implements Store {
 		);
 	}
 
+	/**
+	 * @param Entry $entry Copy to store, replacing any earlier one.
+	 * @return void
+	 */
 	public function save( Entry $entry ): void {
 		global $wpdb;
 
@@ -59,6 +69,10 @@ final class WpdbStore implements Store {
 		OutputCache::purge();
 	}
 
+	/**
+	 * @param int $post_id Page ID.
+	 * @return void
+	 */
 	public function delete( int $post_id ): void {
 		global $wpdb;
 
@@ -66,6 +80,10 @@ final class WpdbStore implements Store {
 		OutputCache::purge();
 	}
 
+	/**
+	 * @param int $post_id Page ID.
+	 * @return void
+	 */
 	public function mark_stale( int $post_id ): void {
 		global $wpdb;
 
@@ -74,6 +92,9 @@ final class WpdbStore implements Store {
 		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET state = %s WHERE post_id = %d", Entry::STALE, $post_id ) );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function mark_all_stale(): void {
 		global $wpdb;
 
@@ -82,6 +103,9 @@ final class WpdbStore implements Store {
 		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET state = %s", Entry::STALE ) );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function clear(): void {
 		global $wpdb;
 
@@ -91,6 +115,9 @@ final class WpdbStore implements Store {
 		OutputCache::purge();
 	}
 
+	/**
+	 * @return array{fresh: int, stale: int} Copies per state.
+	 */
 	public function counts(): array {
 		global $wpdb;
 
@@ -108,6 +135,11 @@ final class WpdbStore implements Store {
 		return $counts;
 	}
 
+	/**
+	 * @param int $after Only IDs above this one.
+	 * @param int $limit Largest number of IDs to return.
+	 * @return int[] Page IDs in ascending order.
+	 */
 	public function ids( int $after, int $limit ): array {
 		global $wpdb;
 
