@@ -18,8 +18,16 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Builds llms.txt, from the generated list of pages, a custom text, or both. */
 final class LlmsTxt {
 
+	/**
+	 * @param PostTypes   $post_types  Post types that are served.
+	 * @param Eligibility $eligibility Decides whether a page is served.
+	 * @param Urls        $urls        Builds the addresses.
+	 * @param Description $description Finds the description of a page.
+	 * @param LlmsOptions $options     Settings of the llms files.
+	 */
 	public function __construct(
 		private PostTypes $post_types,
 		private Eligibility $eligibility,
@@ -28,6 +36,11 @@ final class LlmsTxt {
 		private LlmsOptions $options
 	) {}
 
+	/**
+	 * Builds the file for the current mode.
+	 *
+	 * @return string The text of llms.txt.
+	 */
 	public function build(): string {
 		$mode   = $this->options->mode();
 		$custom = $this->options->custom();
@@ -40,10 +53,13 @@ final class LlmsTxt {
 	}
 
 	/**
-	 * Joins the parts of the file for a mode. Custom text is used as written, and an empty one falls back to the generated file.
+	 * Joins the parts of the file for a mode. A custom text is used as written, and an empty one falls back to the generated file.
 	 *
+	 * @param string   $mode     One of the LlmsOptions modes.
+	 * @param string   $custom   Custom text.
 	 * @param string[] $heading  Generated title and tagline lines.
 	 * @param string[] $sections Generated page list lines.
+	 * @return string The file.
 	 */
 	public static function compose( string $mode, string $custom, array $heading, array $sections ): string {
 		if ( '' !== $custom && LlmsOptions::CUSTOM === $mode ) {
@@ -58,11 +74,13 @@ final class LlmsTxt {
 	}
 
 	/**
-	 * @return string[]
+	 * Title and tagline lines from the site name and description.
+	 *
+	 * @return string[] Lines of text.
 	 */
 	private function heading(): array {
-		$lines   = array( '# ' . $this->clean( get_bloginfo( 'name' ) ) );
-		$tagline = $this->clean( get_bloginfo( 'description' ) );
+		$lines   = array( '# ' . SingleLine::from( get_bloginfo( 'name' ) ) );
+		$tagline = SingleLine::from( get_bloginfo( 'description' ) );
 
 		if ( '' !== $tagline ) {
 			$lines[] = '';
@@ -73,7 +91,9 @@ final class LlmsTxt {
 	}
 
 	/**
-	 * @return string[]
+	 * One section per served post type, with a line for each page.
+	 *
+	 * @return string[] Lines of text.
 	 */
 	private function sections(): array {
 		$lines = array();
@@ -103,7 +123,10 @@ final class LlmsTxt {
 	}
 
 	/**
-	 * @return string[]
+	 * Lines for the pages of one post type.
+	 *
+	 * @param string $type Post type.
+	 * @return string[] One line per served page.
 	 */
 	private function entries( string $type ): array {
 		$hierarchical = is_post_type_hierarchical( $type );
@@ -133,6 +156,12 @@ final class LlmsTxt {
 		return $entries;
 	}
 
+	/**
+	 * Line for one page: a link to the Markdown version, with its description.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return string|null The line, or null when the page is not served.
+	 */
 	private function entry( WP_Post $post ): ?string {
 		$url = $this->urls->markdown_url( $post );
 
@@ -140,14 +169,10 @@ final class LlmsTxt {
 			return null;
 		}
 
-		$title = str_replace( array( '[', ']' ), array( '\\[', '\\]' ), $this->clean( get_the_title( $post ) ) );
+		$title = str_replace( array( '[', ']' ), array( '\\[', '\\]' ), SingleLine::from( get_the_title( $post ) ) );
 		$title = '' === $title ? $post->post_name : $title;
-		$text  = $this->clean( wp_trim_words( $this->description->get( $post ), 30 ) );
+		$text  = SingleLine::from( wp_trim_words( $this->description->get( $post ), 30 ) );
 
 		return '- [' . $title . '](' . $url . ')' . ( '' === $text ? '' : ': ' . $text );
-	}
-
-	private function clean( string $text ): string {
-		return trim( (string) preg_replace( '/\s+/', ' ', html_entity_decode( wp_strip_all_tags( $text ), ENT_QUOTES, 'UTF-8' ) ) );
 	}
 }

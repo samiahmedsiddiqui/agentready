@@ -15,15 +15,22 @@ use AgentReady\Http\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Collects what the admin pages show as notices: why the plugin is off, setup problems, and theme and plugin changes. */
 final class Notices {
 
+	/**
+	 * @param Environment $environment Tells whether the plugin is running on this site.
+	 * @param Changes     $changes     Theme and plugin changes that have not been dismissed.
+	 */
 	public function __construct(
 		private Environment $environment,
 		private Changes $changes
 	) {}
 
 	/**
-	 * @return array<string, mixed>
+	 * Values for the notices template.
+	 *
+	 * @return array<string, mixed> Values by name.
 	 */
 	public function data(): array {
 		$yoast  = get_option( 'wpseo' );
@@ -40,7 +47,9 @@ final class Notices {
 	}
 
 	/**
-	 * @return array<int, array{message: string, check_url: string, dismiss_url: string}>
+	 * Notices for theme and plugin changes, with their links.
+	 *
+	 * @return array<int, array{message: string, check_url: string, dismiss_url: string}> One entry per notice.
 	 */
 	private function changes(): array {
 		$notices  = array();
@@ -64,7 +73,12 @@ final class Notices {
 	}
 
 	/**
-	 * @param array<string, mixed> $change Saved details of the change.
+	 * Builds the text of a change notice.
+	 *
+	 * @param string               $key           Notice key, REFRESH or PLUGINS from the Changes class.
+	 * @param array<string, mixed> $change        Saved details of the change.
+	 * @param bool                 $cron_disabled Whether WP-Cron is disabled, which changes what is promised.
+	 * @return string The sentence, or an empty string for an unknown key or reason.
 	 */
 	public static function change_message( string $key, array $change, bool $cron_disabled = false ): string {
 		if ( Changes::PLUGINS === $key ) {

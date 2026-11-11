@@ -18,15 +18,27 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Reads the HTML of a page the way a visitor gets it, with a request to the site itself. When that fails, the post content is used instead. */
 final class Renderer {
 
+	/** Redirects followed before giving up. */
 	private const MAX_REDIRECTS = 3;
 
+	/**
+	 * @param Options $options Saved settings.
+	 * @param Urls    $urls    Builds the page addresses.
+	 */
 	public function __construct(
 		private Options $options,
 		private Urls $urls
 	) {}
 
+	/**
+	 * Reads the HTML of a page.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return RenderResult The HTML and how it was obtained.
+	 */
 	public function render( WP_Post $post ): RenderResult {
 		$url = $this->urls->permalink( $post );
 
@@ -43,6 +55,12 @@ final class Renderer {
 		return $result instanceof RenderResult ? $result : $this->fallback( $post, $result );
 	}
 
+	/**
+	 * Requests the page address, following redirects on the same site. Saved credentials are not sent over http when the first address was https.
+	 *
+	 * @param string $url Address of the page.
+	 * @return RenderResult|string The result, or an error code.
+	 */
 	private function loopback( string $url ): RenderResult|string {
 		$auth   = $this->options->http_auth();
 		$secure = 'https' === wp_parse_url( $url, PHP_URL_SCHEME );
@@ -92,8 +110,10 @@ final class Renderer {
 	}
 
 	/**
+	 * Builds the arguments of the request.
+	 *
 	 * @param array{user: string, password: string}|null $auth HTTP Basic credentials.
-	 * @return array<string, mixed>
+	 * @return array<string, mixed> Arguments for wp_remote_get().
 	 */
 	private function request_args( ?array $auth ): array {
 		$headers = array(
@@ -117,6 +137,12 @@ final class Renderer {
 		);
 	}
 
+	/**
+	 * Whether an address is on this site, with the same host and port.
+	 *
+	 * @param string $url Address.
+	 * @return bool True when it is.
+	 */
 	private function is_same_site( string $url ): bool {
 		$target = wp_parse_url( $url );
 		$home   = wp_parse_url( home_url() );
@@ -129,6 +155,13 @@ final class Renderer {
 			&& ( $target['port'] ?? null ) === ( $home['port'] ?? null );
 	}
 
+	/**
+	 * Builds the HTML from the post content, with the shortcodes and blocks processed.
+	 *
+	 * @param WP_Post $item The page.
+	 * @param string  $code Error code of the failed request, or an empty string when the request was not tried.
+	 * @return RenderResult The content, with a notice.
+	 */
 	private function fallback( WP_Post $item, string $code ): RenderResult {
 		global $post;
 
@@ -144,6 +177,12 @@ final class Renderer {
 		return new RenderResult( '<main>' . $content . '</main>', RenderResult::FALLBACK, $this->notice( $code ) );
 	}
 
+	/**
+	 * Turns an error code into a sentence for the admin.
+	 *
+	 * @param string $code Error code.
+	 * @return string The sentence, or an empty string for no error.
+	 */
 	private function notice( string $code ): string {
 		if ( '' === $code ) {
 			return '';

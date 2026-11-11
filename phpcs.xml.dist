@@ -14,9 +14,6 @@
 	<config name="minimum_wp_version" value="6.0"/>
 
 	<rule ref="WordPress">
-		<exclude name="Squiz.Commenting.FunctionComment"/>
-		<exclude name="Squiz.Commenting.ClassComment"/>
-		<exclude name="Squiz.Commenting.VariableComment"/>
 		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
 	</rule>
 	<rule ref="PHPCompatibilityWP"/>

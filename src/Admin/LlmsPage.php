@@ -18,14 +18,25 @@ use AgentReady\Settings\LlmsOptions;
 
 defined( 'ABSPATH' ) || exit;
 
+/** The llms.txt page: file mode and custom text, llms-full.txt and the robots.txt line. */
 final class LlmsPage implements Hookable {
 
+	/** Page slug. */
 	public const SLUG = 'agentready-llms';
 
+	/** Settings group of the form. */
 	private const GROUP = 'agentready_llms_group';
 
+	/** Longest preview of the file shown on the page, in characters. */
 	private const PREVIEW_CHARS = 20000;
 
+	/**
+	 * @param LlmsOptions $options     Settings of the llms files.
+	 * @param LlmsTxt     $llms        Builds llms.txt for the preview.
+	 * @param Coverage    $coverage    Counts the stored pages.
+	 * @param Environment $environment Tells whether the plugin is running on this site.
+	 * @param Notices     $notices     Notices to show.
+	 */
 	public function __construct(
 		private LlmsOptions $options,
 		private LlmsTxt $llms,
@@ -34,11 +45,19 @@ final class LlmsPage implements Hookable {
 		private Notices $notices
 	) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
+	/**
+	 * Registers the setting with its cleaning function.
+	 *
+	 * @return void
+	 */
 	public function register_settings(): void {
 		register_setting(
 			self::GROUP,
@@ -51,6 +70,12 @@ final class LlmsPage implements Hookable {
 		);
 	}
 
+	/**
+	 * Loads the style and script on this page.
+	 *
+	 * @param string $hook Admin page hook.
+	 * @return void
+	 */
 	public function enqueue( string $hook ): void {
 		if ( 'agentready_page_' . self::SLUG !== $hook ) {
 			return;
@@ -60,6 +85,11 @@ final class LlmsPage implements Hookable {
 		wp_enqueue_script( 'agentready-admin', AGENTREADY_URL . 'assets/js/admin.js', array(), Assets::version( 'assets/js/admin.js' ), true );
 	}
 
+	/**
+	 * Prints the page.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;

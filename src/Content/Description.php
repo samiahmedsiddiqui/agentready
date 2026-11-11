@@ -13,17 +13,31 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Works out the short description of a page for llms.txt and the front matter. */
 final class Description {
 
+	/** An SEO plugin template tag such as %%sitename%% or #post_title. */
+	private const TEMPLATE_TAG = '/%{1,2}[a-z_]+(?:\([^)]*\))?%{1,2}|#[a-z]+_[a-z_]+/i';
+
+	/** Meta keys where SEO plugins keep the description of a page. */
 	public const SEO_META_KEYS = array( '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc', '_genesis_description' );
 
 	/**
 	 * Whether the text still holds template tags such as %%sitename%%, %title% or #site_title.
+	 *
+	 * @param string $text Description text.
+	 * @return bool True when a tag is left.
 	 */
 	public static function has_unresolved_tags( string $text ): bool {
-		return 1 === preg_match( '/%{1,2}[a-z_]+(?:\([^)]*\))?%{1,2}|#[a-z]+_[a-z_]+/i', $text );
+		return 1 === preg_match( self::TEMPLATE_TAG, $text );
 	}
 
+	/**
+	 * Finds the description of a page: the one set in the editor box, then the SEO plugin description, then the excerpt.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return string The description, or an empty string when there is none.
+	 */
 	public function get( WP_Post $post ): string {
 		$override = trim( (string) get_post_meta( $post->ID, PostMeta::DESCRIPTION, true ) );
 
@@ -37,6 +51,12 @@ final class Description {
 		return (string) apply_filters( 'agentready_description', $text, $post );
 	}
 
+	/**
+	 * Reads the description saved by an SEO plugin. A text whose tags cannot be resolved is skipped.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return string The description, or an empty string.
+	 */
 	private function seo( WP_Post $post ): string {
 		$keys = (array) apply_filters( 'agentready_meta_description_keys', self::SEO_META_KEYS, $post );
 
@@ -66,6 +86,11 @@ final class Description {
 
 	/**
 	 * Lets the SEO plugin that wrote the text fill in its own template tags.
+	 *
+	 * @param string  $text Description text.
+	 * @param WP_Post $post The page.
+	 * @param string  $key  Meta key the text came from.
+	 * @return string Text with the tags filled in.
 	 */
 	private function resolve( string $text, WP_Post $post, string $key ): string {
 		if ( ! self::has_unresolved_tags( $text ) ) {
@@ -97,6 +122,12 @@ final class Description {
 		return $text;
 	}
 
+	/**
+	 * Turns an excerpt into plain text of at most 30 words.
+	 *
+	 * @param string $text Excerpt.
+	 * @return string Plain text.
+	 */
 	private function clean( string $text ): string {
 		$text = wp_strip_all_tags( strip_shortcodes( $text ) );
 		$text = (string) preg_replace( '/\s+/', ' ', html_entity_decode( $text, ENT_QUOTES, 'UTF-8' ) );

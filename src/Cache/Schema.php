@@ -13,25 +13,40 @@ use AgentReady\Contracts\Hookable;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Creates and upgrades the table that holds the stored Markdown. */
 final class Schema implements Hookable {
 
+	/** Version of the table layout. Raise it when the columns change. */
 	public const DB_VERSION = '1';
-	public const OPTION     = 'agentready_db_version';
+	/** Option that records the installed table version. */
+	public const OPTION = 'agentready_db_version';
 
+	/**
+	 * Name of the table, with the site prefix.
+	 *
+	 * @return string Table name.
+	 */
 	public static function table(): string {
 		global $wpdb;
 
 		return $wpdb->prefix . 'agentready_pages';
 	}
 
+	/**
+	 * Adds the multisite table cleanup and creates the table when it is missing.
+	 *
+	 * @return void
+	 */
 	public function register(): void {
 		add_filter( 'wpmu_drop_tables', array( $this, 'drop_with_site' ) );
 		$this->maybe_upgrade();
 	}
 
 	/**
-	 * @param string[] $tables Tables dropped with a deleted site.
-	 * @return string[]
+	 * Adds the table to the ones WordPress drops when a multisite site is deleted.
+	 *
+	 * @param string[] $tables Tables dropped with the site.
+	 * @return string[] The tables, with this one added.
 	 */
 	public function drop_with_site( array $tables ): array {
 		$tables[] = self::table();
@@ -39,6 +54,11 @@ final class Schema implements Hookable {
 		return $tables;
 	}
 
+	/**
+	 * Creates or updates the table when the installed version is older than DB_VERSION.
+	 *
+	 * @return void
+	 */
 	public function maybe_upgrade(): void {
 		if ( self::DB_VERSION === get_option( self::OPTION ) ) {
 			return;

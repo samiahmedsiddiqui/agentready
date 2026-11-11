@@ -22,8 +22,21 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** WP-CLI commands to inspect, clear and rebuild the stored Markdown. Run them with: wp agentready cache. */
 final class Command implements Hookable {
 
+	/** Page IDs read from the database at a time. */
+	private const CHUNK_SIZE = 200;
+
+	/**
+	 * @param Store       $store       Stored copies.
+	 * @param PageCache   $pages       Generates the copies.
+	 * @param PostTypes   $post_types  Post types that are served.
+	 * @param Eligibility $eligibility Decides whether a page is served.
+	 * @param Environment $environment Tells whether the plugin is running on this site.
+	 * @param Candidates  $candidates  Source of the pages to go through.
+	 * @param Coverage    $coverage    Counts the pages by state.
+	 */
 	public function __construct(
 		private Store $store,
 		private PageCache $pages,
@@ -34,6 +47,9 @@ final class Command implements Hookable {
 		private Coverage $coverage
 	) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		WP_CLI::add_command( 'agentready cache', $this );
 	}
@@ -127,14 +143,16 @@ final class Command implements Hookable {
 	}
 
 	/**
-	 * @return int[]
+	 * IDs of every page that is served.
+	 *
+	 * @return int[] Page IDs.
 	 */
 	private function all_ids(): array {
 		$ids  = array();
 		$last = 0;
 
 		do {
-			$chunk = $this->candidates->after( $this->post_types->enabled(), $last, 200 );
+			$chunk = $this->candidates->after( $this->post_types->enabled(), $last, self::CHUNK_SIZE );
 			$ids   = array_merge( $ids, $chunk );
 			$last  = (int) end( $chunk );
 		} while ( ! empty( $chunk ) );

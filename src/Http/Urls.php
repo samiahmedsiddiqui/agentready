@@ -14,24 +14,42 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Builds and reads the addresses of the Markdown pages and llms files. */
 final class Urls {
 
-	public const ROUTE_LLMS      = 'llms';
+	/** Route type of /llms.txt. */
+	public const ROUTE_LLMS = 'llms';
+	/** Route type of /llms-full.txt. */
 	public const ROUTE_LLMS_FULL = 'llms_full';
-	public const ROUTE_PAGE      = 'page';
+	/** Route type of the Markdown version of a page. */
+	public const ROUTE_PAGE = 'page';
 
-	public const HOME_LONG    = 'index.html.md';
-	public const HOME_SHORT   = 'index.md';
+	/** File name of the Markdown homepage that cannot clash with a page. */
+	public const HOME_LONG = 'index.html.md';
+	/** Shorter file name of the Markdown homepage. */
+	public const HOME_SHORT = 'index.md';
+	/** File name used unless the settings say otherwise. */
 	public const HOME_DEFAULT = self::HOME_SHORT;
 
+	/**
+	 * @param Options|null $options Saved settings. Without them the default homepage file name is used.
+	 */
 	public function __construct( private ?Options $options = null ) {}
 
+	/**
+	 * Whether the site uses pretty permalinks. The Markdown addresses need them.
+	 *
+	 * @return bool True when they are on.
+	 */
 	public static function has_pretty_permalinks(): bool {
 		return '' !== (string) get_option( 'permalink_structure' );
 	}
 
 	/**
-	 * @return array{type: string, path: string, home_alias: bool}|null
+	 * Works out what a request path asks for.
+	 *
+	 * @param string $request Request path.
+	 * @return array{type: string, path: string, home_alias: bool}|null The route, or null when the path is not one of ours.
 	 */
 	public function parse_route( string $request ): ?array {
 		$request = trim( $request, '/' );
@@ -59,20 +77,24 @@ final class Urls {
 		$path = substr( $request, 0, -3 );
 
 		if ( 1 === preg_match( '#(^|/)index\.html$#', $path ) ) {
-			return $this->route( (string) preg_replace( '#(^|/)index\.html$#', '', $path ), false );
+			return $this->page_route( (string) preg_replace( '#(^|/)index\.html$#', '', $path ), false );
 		}
 
 		if ( 1 === preg_match( '#(^|/)index$#', $path ) ) {
-			return $this->route( (string) preg_replace( '#(^|/)index$#', '', $path ), 'index' === $path );
+			return $this->page_route( (string) preg_replace( '#(^|/)index$#', '', $path ), 'index' === $path );
 		}
 
-		return '' === $path ? null : $this->route( $path, false );
+		return '' === $path ? null : $this->page_route( $path, false );
 	}
 
 	/**
-	 * @return array{type: string, path: string, home_alias: bool}
+	 * Builds the route of a page.
+	 *
+	 * @param string $path       Page path without the .md ending.
+	 * @param bool   $home_alias True when the path was /index.md, which can also mean the homepage.
+	 * @return array{type: string, path: string, home_alias: bool} The route.
 	 */
-	private function route( string $path, bool $home_alias ): array {
+	private function page_route( string $path, bool $home_alias ): array {
 		return array(
 			'type'       => self::ROUTE_PAGE,
 			'path'       => $home_alias ? 'index' : trim( $path, '/' ),
@@ -81,13 +103,21 @@ final class Urls {
 	}
 
 	/**
-	 * @param string $setting   The saved homepage URL choice.
+	 * Chooses the file name of the Markdown homepage.
+	 *
+	 * @param string $setting   The saved choice.
 	 * @param bool   $collision Whether a real page already uses the slug "index".
+	 * @return string File name.
 	 */
 	public static function home_file_name( string $setting, bool $collision ): string {
 		return self::HOME_LONG === $setting || $collision ? self::HOME_LONG : self::HOME_SHORT;
 	}
 
+	/**
+	 * File name of the Markdown homepage.
+	 *
+	 * @return string File name.
+	 */
 	public function home_file(): string {
 		$setting = null === $this->options ? self::HOME_DEFAULT : (string) $this->options->get( 'home_markdown_url', self::HOME_DEFAULT );
 
@@ -96,6 +126,8 @@ final class Urls {
 
 	/**
 	 * Whether a page other than the homepage has the slug "index", which would make /index.md ambiguous.
+	 *
+	 * @return bool True when one does.
 	 */
 	public function index_collision(): bool {
 		$post  = $this->post_from_path( 'index', true );
@@ -104,6 +136,12 @@ final class Urls {
 		return $post instanceof WP_Post && ( ! $front instanceof WP_Post || $post->ID !== $front->ID );
 	}
 
+	/**
+	 * Pretty address of a page.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return string|null The address, or null when the page has only a plain one.
+	 */
 	public function permalink( WP_Post $post ): ?string {
 		if ( ! self::has_pretty_permalinks() ) {
 			return null;
@@ -118,6 +156,12 @@ final class Urls {
 		return $url;
 	}
 
+	/**
+	 * Address of the Markdown version of a page.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return string|null The address, or null when the page has no pretty address.
+	 */
 	public function markdown_url( WP_Post $post ): ?string {
 		$url = $this->permalink( $post );
 
@@ -135,7 +179,12 @@ final class Urls {
 	}
 
 	/**
-	 * @param bool $strict Require the post's own permalink to match the path exactly.
+	 * Finds the page that a path belongs to.
+	 *
+	 * @param string $path       Page path without the .md ending.
+	 * @param bool   $home_alias True to fall back to the homepage, for /index.md.
+	 * @param bool   $strict     Require the page's own address to match the path exactly.
+	 * @return WP_Post|null The page, or null when none matches.
 	 */
 	public function resolve( string $path, bool $home_alias = false, bool $strict = true ): ?WP_Post {
 		if ( '' === $path ) {
@@ -151,6 +200,12 @@ final class Urls {
 		return $post;
 	}
 
+	/**
+	 * Finds the page that an address belongs to.
+	 *
+	 * @param string $url Full address or path, with or without .md.
+	 * @return WP_Post|null The page, or null when none matches or it is on another site.
+	 */
 	public function resolve_url( string $url ): ?WP_Post {
 		$parts = wp_parse_url( $url );
 		$home  = wp_parse_url( home_url() );
@@ -176,6 +231,11 @@ final class Urls {
 		return $this->resolve( $path, false, false );
 	}
 
+	/**
+	 * The page that is set as the static homepage.
+	 *
+	 * @return WP_Post|null The page, or null when the homepage shows posts.
+	 */
 	private function front_page(): ?WP_Post {
 		if ( 'page' !== get_option( 'show_on_front' ) ) {
 			return null;
@@ -186,6 +246,13 @@ final class Urls {
 		return $id > 0 ? get_post( $id ) : null;
 	}
 
+	/**
+	 * Looks up a page by its path.
+	 *
+	 * @param string $path   Page path.
+	 * @param bool   $strict Require the page's own address to match the path exactly.
+	 * @return WP_Post|null The page, or null when none matches.
+	 */
 	private function post_from_path( string $path, bool $strict ): ?WP_Post {
 		$post = null;
 		// Plugins such as Custom Permalinks only understand a path here, so try that before the full URL.
@@ -223,7 +290,10 @@ final class Urls {
 	}
 
 	/**
-	 * @return string|null The Markdown URL path relative to the site, for example company/about-us.md.
+	 * Path of the Markdown version of a page, relative to the site, such as company/about-us.md.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return string|null The path, or null when the page has no pretty address.
 	 */
 	public function markdown_path( WP_Post $post ): ?string {
 		$url = $this->markdown_url( $post );
@@ -231,6 +301,12 @@ final class Urls {
 		return null === $url ? null : $this->relative_path( (string) wp_parse_url( $url, PHP_URL_PATH ) );
 	}
 
+	/**
+	 * Removes the folder of the site from a path.
+	 *
+	 * @param string $path Path.
+	 * @return string Path without the folder and slashes at the ends.
+	 */
 	private function relative_path( string $path ): string {
 		$path = trim( $path, '/' );
 		$home = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );

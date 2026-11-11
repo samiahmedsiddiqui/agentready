@@ -11,8 +11,16 @@ namespace AgentReady\Rendering;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Turns the addresses found in a page into absolute ones. */
 final class UrlResolver {
 
+	/**
+	 * Makes an address absolute. Only http, https, mailto and tel addresses are kept.
+	 *
+	 * @param string $base Address of the page the link was found on.
+	 * @param string $url  Address found in the page.
+	 * @return string The absolute address, or an empty string when it is empty or uses another scheme.
+	 */
 	public static function resolve( string $base, string $url ): string {
 		if ( '' === $url ) {
 			return '';
@@ -51,6 +59,12 @@ final class UrlResolver {
 		return $origin . self::normalize_path( $url );
 	}
 
+	/**
+	 * Removes "." and ".." parts from the path of an address.
+	 *
+	 * @param string $url Path, with an optional query or fragment.
+	 * @return string The path without those parts.
+	 */
 	private static function normalize_path( string $url ): string {
 		$suffix = '';
 

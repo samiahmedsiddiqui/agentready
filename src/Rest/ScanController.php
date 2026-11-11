@@ -17,17 +17,30 @@ use WP_REST_Server;
 
 defined( 'ABSPATH' ) || exit;
 
+/** REST route that reports the progress of the scan of all pages. */
 final class ScanController implements Hookable {
 
+	/**
+	 * @param Scan        $scan        The scan.
+	 * @param Environment $environment Tells whether WP-Cron is disabled.
+	 */
 	public function __construct(
 		private Scan $scan,
 		private Environment $environment
 	) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		add_action( 'rest_api_init', array( $this, 'routes' ) );
 	}
 
+	/**
+	 * Registers the route.
+	 *
+	 * @return void
+	 */
 	public function routes(): void {
 		register_rest_route(
 			'agentready/v1',
@@ -40,6 +53,11 @@ final class ScanController implements Hookable {
 		);
 	}
 
+	/**
+	 * Reports the progress. Without WP-Cron each call also runs one small step of the scan.
+	 *
+	 * @return WP_REST_Response Whether it runs, and the counts so far.
+	 */
 	public function show(): WP_REST_Response {
 		// Without WP-Cron, the open page drives the scan: each poll runs one small batch.
 		if ( $this->environment->cron_disabled() && $this->scan->status()['running'] ) {

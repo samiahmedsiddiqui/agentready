@@ -11,8 +11,11 @@ namespace AgentReady\Content;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Meta keys this plugin saves on pages. */
 final class PostMeta {
 
-	public const EXCLUDE     = '_agentready_exclude';
+	/** Set when the page is hidden from AgentReady. */
+	public const EXCLUDE = '_agentready_exclude';
+	/** Description for llms.txt that is set in the editor box. */
 	public const DESCRIPTION = '_agentready_description';
 }

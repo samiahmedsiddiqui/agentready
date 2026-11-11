@@ -13,11 +13,16 @@ defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Dynamic IN list over core and plugin tables.
 
+/** Finds pages that may need a stored copy. */
 final class Candidates {
 
 	/**
-	 * @param string[] $types Enabled post types.
-	 * @return int[] Published post IDs above $after.
+	 * Lists published pages in ID order, for walking through all of them in batches.
+	 *
+	 * @param string[] $types Post types to include.
+	 * @param int      $after Only IDs above this one.
+	 * @param int      $limit Largest number of IDs to return.
+	 * @return int[] Page IDs.
 	 */
 	public function after( array $types, int $after, int $limit ): array {
 		global $wpdb;
@@ -32,8 +37,11 @@ final class Candidates {
 	}
 
 	/**
-	 * @param string[] $types Enabled post types.
-	 * @return int[] Published, unprotected post IDs with no stored copy.
+	 * Lists published, unprotected pages that have no stored copy.
+	 *
+	 * @param string[] $types Post types to include.
+	 * @param int      $limit Largest number of IDs to return.
+	 * @return int[] Page IDs.
 	 */
 	public function missing( array $types, int $limit ): array {
 		global $wpdb;

@@ -14,12 +14,16 @@ use WP_Term;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Lists the terms of public taxonomies for the exclusion setting. */
 final class TermList {
 
+	/** Most terms listed for one taxonomy. */
 	public const LIMIT = 200;
 
 	/**
-	 * @return array<int, array{taxonomy: WP_Taxonomy, terms: array<int, array{term: WP_Term, depth: int}>, total: int}>
+	 * Lists the terms of each public taxonomy that has any.
+	 *
+	 * @return array<int, array{taxonomy: WP_Taxonomy, terms: array<int, array{term: WP_Term, depth: int}>, total: int}> One entry per taxonomy, with the terms listed and the real total.
 	 */
 	public function groups(): array {
 		$groups = array();
@@ -56,9 +60,11 @@ final class TermList {
 	}
 
 	/**
+	 * Orders terms for display, with children under their parents when the taxonomy is hierarchical.
+	 *
 	 * @param WP_Term[] $terms        Terms to order.
 	 * @param bool      $hierarchical Whether children are shown under their parents.
-	 * @return array<int, array{term: WP_Term, depth: int}>
+	 * @return array<int, array{term: WP_Term, depth: int}> Terms with their depth.
 	 */
 	private function ordered( array $terms, bool $hierarchical ): array {
 		if ( ! $hierarchical ) {

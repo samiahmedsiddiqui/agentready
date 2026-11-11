@@ -17,8 +17,10 @@ use DOMXPath;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Finds the main content in the HTML of a page and removes what should not be in the Markdown. */
 final class Extractor {
 
+	/** Selectors of elements that are removed from the content: scripts, navigation, forms, comments and hidden or screen-reader-only parts. */
 	public const DEFAULT_STRIP = array(
 		'script',
 		'style',
@@ -45,6 +47,7 @@ final class Extractor {
 		'.sharedaddy',
 	);
 
+	/** XPath queries for page headers and footers, which cannot be written as the simple selectors. Headers and footers inside the content are kept. */
 	public const STRIP_XPATHS = array(
 		'.//*[@role="banner"]',
 		'.//*[@role="contentinfo"]',
@@ -52,14 +55,18 @@ final class Extractor {
 		'.//footer[not(ancestor::article or ancestor::main or ancestor::section)]',
 	);
 
+	/** Elements whose text is not page text. */
 	private const SKIP_TAGS = array( 'script', 'style', 'noscript', 'template', 'svg', 'canvas', 'iframe', 'select', 'option', 'button', 'input', 'textarea', 'head' );
 
+	/** Elements that stay inside a line of text. */
 	private const INLINE_TAGS = array( 'a', 'abbr', 'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'del', 'dfn', 'em', 'font', 'i', 'img', 'ins', 'kbd', 'label', 'mark', 'q', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'u', 'var', 'wbr', 'br' );
 
+	/** Attributes where lazy-loading scripts keep the real image address. */
 	private const LAZY_ATTRIBUTES = array( 'data-src', 'data-lazy-src', 'data-original' );
 
 	/**
-	 * @param string[] $strip CSS selectors for elements to remove.
+	 * @param Selector $selector Converts selectors to XPath.
+	 * @param string[] $strip    Selectors of elements to remove.
 	 */
 	public function __construct(
 		private Selector $selector,
@@ -67,12 +74,23 @@ final class Extractor {
 	) {}
 
 	/**
-	 * @param string[] $selectors Extra CSS selectors for elements to remove.
+	 * Makes a copy that removes more elements.
+	 *
+	 * @param string[] $selectors Extra selectors of elements to remove.
+	 * @return self The new extractor.
 	 */
 	public function with_extra( array $selectors ): self {
 		return new self( $this->selector, array_merge( $this->strip, $selectors ) );
 	}
 
+	/**
+	 * Finds the content area, removes what is left out and makes the addresses absolute.
+	 *
+	 * @param string $html     HTML of the page.
+	 * @param string $selector Selectors of the content area, separated by commas.
+	 * @param string $base_url Address of the page, for relative links.
+	 * @return DOMElement|null The cleaned content area, or null when the HTML cannot be read or has no content.
+	 */
 	public function extract( string $html, string $selector, string $base_url ): ?DOMElement {
 		$dom = $this->load( $html );
 
@@ -97,54 +115,58 @@ final class Extractor {
 	/**
 	 * Text blocks of the content area, split into those kept and those removed by the exclusions.
 	 *
-	 * @return array{kept: string[], excluded: string[]}
+	 * @param string $html     HTML of the page.
+	 * @param string $selector Selectors of the content area, separated by commas.
+	 * @return array{kept: string[], excluded: string[]} The blocks of text.
 	 */
 	public function text_blocks( string $html, string $selector ): array {
-		$dom = $this->load( $html );
+		$empty = array(
+			'kept'     => array(),
+			'excluded' => array(),
+		);
+		$dom   = $this->load( $html );
 
 		if ( null === $dom ) {
-			return array(
-				'kept'     => array(),
-				'excluded' => array(),
-			);
+			return $empty;
 		}
 
 		$xpath = new DOMXPath( $dom );
 		$node  = $this->find( $xpath, $selector );
 
 		if ( null === $node ) {
-			return array(
-				'kept'     => array(),
-				'excluded' => array(),
-			);
+			return $empty;
 		}
 
-		$all = array();
-		$this->collect( $node, $all );
+		$all_blocks = array();
+		$this->collect( $node, $all_blocks );
 		$this->strip( $xpath, $node );
 
 		$kept = array();
 		$this->collect( $node, $kept );
 
-		$left = array_count_values( $kept );
-		$gone = array();
+		$unmatched = array_count_values( $kept );
+		$removed   = array();
 
-		foreach ( $all as $block ) {
-			if ( ! empty( $left[ $block ] ) ) {
-				--$left[ $block ];
+		foreach ( $all_blocks as $block ) {
+			if ( ! empty( $unmatched[ $block ] ) ) {
+				--$unmatched[ $block ];
 			} else {
-				$gone[] = $block;
+				$removed[] = $block;
 			}
 		}
 
 		return array(
 			'kept'     => $kept,
-			'excluded' => $gone,
+			'excluded' => $removed,
 		);
 	}
 
 	/**
-	 * @param string[] $blocks Collected text blocks.
+	 * Collects the text blocks under a node, skipping hidden elements and elements that hold no page text.
+	 *
+	 * @param DOMNode  $node   Node to read.
+	 * @param string[] $blocks Collected text blocks, added to by reference.
+	 * @return void
 	 */
 	private function collect( DOMNode $node, array &$blocks ): void {
 		$text = '';
@@ -184,7 +206,11 @@ final class Extractor {
 	}
 
 	/**
-	 * @param string[] $blocks Collected text blocks.
+	 * Adds a block of text when it holds at least two letters or digits in a row.
+	 *
+	 * @param string   $text   Text of the block.
+	 * @param string[] $blocks Collected text blocks, added to by reference.
+	 * @return void
 	 */
 	private function add_block( string $text, array &$blocks ): void {
 		$text = trim( (string) preg_replace( '/\s+/u', ' ', str_replace( "\xc2\xa0", ' ', $text ) ) );
@@ -194,6 +220,12 @@ final class Extractor {
 		}
 	}
 
+	/**
+	 * Whether an element holds only elements that stay inside a line of text.
+	 *
+	 * @param DOMElement $element Element to check.
+	 * @return bool True when it does.
+	 */
 	private function is_inline_only( DOMElement $element ): bool {
 		foreach ( $element->getElementsByTagName( '*' ) as $descendant ) {
 			if ( ! in_array( strtolower( $descendant->nodeName ), self::INLINE_TAGS, true ) ) {
@@ -204,12 +236,24 @@ final class Extractor {
 		return true;
 	}
 
+	/**
+	 * Whether an element is hidden by an attribute or an inline style.
+	 *
+	 * @param DOMElement $element Element to check.
+	 * @return bool True when it is hidden.
+	 */
 	private function is_hidden( DOMElement $element ): bool {
 		return $element->hasAttribute( 'hidden' )
 			|| 'true' === strtolower( $element->getAttribute( 'aria-hidden' ) )
 			|| 1 === preg_match( '/display\s*:\s*none|visibility\s*:\s*hidden/i', $element->getAttribute( 'style' ) );
 	}
 
+	/**
+	 * Parses HTML.
+	 *
+	 * @param string $html HTML of the page.
+	 * @return DOMDocument|null The document, or null when the HTML is empty or cannot be parsed.
+	 */
 	private function load( string $html ): ?DOMDocument {
 		if ( '' === trim( $html ) || ! class_exists( DOMDocument::class ) ) {
 			return null;
@@ -239,6 +283,13 @@ final class Extractor {
 		return $dom;
 	}
 
+	/**
+	 * Finds the first element that matches the selectors and has content. The page body is the last choice.
+	 *
+	 * @param DOMXPath $xpath    Query object for the document.
+	 * @param string   $selector Selectors separated by commas.
+	 * @return DOMElement|null The element, or null when none has content.
+	 */
 	private function find( DOMXPath $xpath, string $selector ): ?DOMElement {
 		$queries   = $this->selector->to_xpaths( $selector );
 		$queries[] = '//body';
@@ -260,6 +311,12 @@ final class Extractor {
 		return null;
 	}
 
+	/**
+	 * Whether an element has text, an image, a frame or media.
+	 *
+	 * @param DOMElement $element Element to check.
+	 * @return bool True when it does.
+	 */
 	private function has_content( DOMElement $element ): bool {
 		if ( '' !== trim( $element->textContent ) ) {
 			return true;
@@ -274,6 +331,13 @@ final class Extractor {
 		return false;
 	}
 
+	/**
+	 * Removes comments, page headers and footers, and the elements that match the strip selectors.
+	 *
+	 * @param DOMXPath   $xpath Query object for the document.
+	 * @param DOMElement $root  Content area.
+	 * @return void
+	 */
 	private function strip( DOMXPath $xpath, DOMElement $root ): void {
 		$relative = array_merge( array( './/comment()' ), self::STRIP_XPATHS );
 		$document = array();
@@ -292,7 +356,11 @@ final class Extractor {
 	}
 
 	/**
+	 * Removes nodes that sit inside the content area.
+	 *
 	 * @param DOMNodeList<DOMNode>|false $nodes Nodes to remove when they sit inside the root.
+	 * @param DOMElement                 $root  Content area.
+	 * @return void
 	 */
 	private function remove( $nodes, DOMElement $root ): void {
 		if ( false === $nodes ) {
@@ -306,6 +374,13 @@ final class Extractor {
 		}
 	}
 
+	/**
+	 * Whether a node is inside the content area.
+	 *
+	 * @param DOMNode    $node Node to check.
+	 * @param DOMElement $root Content area.
+	 * @return bool True when it is a descendant of the root.
+	 */
 	private function is_inside( DOMNode $node, DOMElement $root ): bool {
 		$parent = $node->parentNode;
 
@@ -320,6 +395,13 @@ final class Extractor {
 		return false;
 	}
 
+	/**
+	 * Copies the real image address from a lazy-loading attribute when the image has no usable address.
+	 *
+	 * @param DOMXPath   $xpath Query object for the document.
+	 * @param DOMElement $root  Content area.
+	 * @return void
+	 */
 	private function prepare_media( DOMXPath $xpath, DOMElement $root ): void {
 		$images = $xpath->query( './/img', $root );
 
@@ -345,6 +427,14 @@ final class Extractor {
 		}
 	}
 
+	/**
+	 * Makes the links and image addresses absolute. Addresses with an unsupported scheme are removed.
+	 *
+	 * @param DOMXPath   $xpath    Query object for the document.
+	 * @param DOMElement $root     Content area.
+	 * @param string     $base_url Address of the page.
+	 * @return void
+	 */
 	private function absolutize( DOMXPath $xpath, DOMElement $root, string $base_url ): void {
 		$nodes = $xpath->query( './/*[@href or @src]', $root );
 

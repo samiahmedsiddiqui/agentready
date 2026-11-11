@@ -14,22 +14,31 @@ use AgentReady\Settings\Options;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Sends the saved HTTP Basic credentials with WordPress's own request to wp-cron.php, so background work still runs on a protected site. */
 final class CronAuth implements Hookable {
 
+	/**
+	 * @param Options $options Saved settings.
+	 */
 	public function __construct( private Options $options ) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		add_filter( 'cron_request', array( $this, 'add_credentials' ) );
 	}
 
 	/**
+	 * Adds the credentials to a cron request that goes to this site.
+	 *
 	 * @param mixed $request The request WordPress is about to send to wp-cron.php.
-	 * @return mixed
+	 * @return mixed The request, with the Authorization header added when it applies.
 	 */
 	public function add_credentials( mixed $request ): mixed {
 		$auth = $this->options->http_auth();
 
-		if ( null === $auth || ! is_array( $request ) || ! isset( $request['url'] ) || ! is_array( $request['args'] ?? null ) || ! $this->is_this_site( (string) $request['url'] ) ) {
+		if ( null === $auth || ! is_array( $request ) || ! $this->is_site_request( $request ) ) {
 			return $request;
 		}
 
@@ -38,6 +47,22 @@ final class CronAuth implements Hookable {
 		return $request;
 	}
 
+	/**
+	 * Whether a request has an address and arguments, and the address belongs to this site.
+	 *
+	 * @param array<mixed> $request The request.
+	 * @return bool True when it does.
+	 */
+	private function is_site_request( array $request ): bool {
+		return isset( $request['url'] ) && is_array( $request['args'] ?? null ) && $this->is_this_site( (string) $request['url'] );
+	}
+
+	/**
+	 * Whether an address is on the site's own host.
+	 *
+	 * @param string $url Address.
+	 * @return bool True when the host matches the home or site address.
+	 */
 	private function is_this_site( string $url ): bool {
 		$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
 

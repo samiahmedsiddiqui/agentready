@@ -11,10 +11,18 @@ namespace AgentReady\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Encrypts stored secrets with a key derived from the site's auth salt. */
 final class Secret {
 
+	/** Marks a value as encrypted and records the format version. */
 	private const PREFIX = 'v1:';
 
+	/**
+	 * Encrypts a value.
+	 *
+	 * @param string $plain Text to encrypt.
+	 * @return string Encrypted text, or an empty string when the input is empty.
+	 */
 	public static function encrypt( string $plain ): string {
 		if ( '' === $plain ) {
 			return '';
@@ -26,6 +34,12 @@ final class Secret {
 		return self::PREFIX . base64_encode( $nonce . $cipher ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Binary-safe storage, not obfuscation.
 	}
 
+	/**
+	 * Decrypts a value made by encrypt().
+	 *
+	 * @param string $stored Encrypted text.
+	 * @return string The original text, or an empty string when it cannot be decrypted.
+	 */
 	public static function decrypt( string $stored ): string {
 		if ( 0 !== strpos( $stored, self::PREFIX ) ) {
 			return '';
@@ -44,6 +58,11 @@ final class Secret {
 		return false === $plain ? '' : $plain;
 	}
 
+	/**
+	 * Key derived from the auth salt of the site.
+	 *
+	 * @return string Binary key.
+	 */
 	private static function key(): string {
 		return sodium_crypto_generichash( wp_salt( 'auth' ) . 'agentready', '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES );
 	}

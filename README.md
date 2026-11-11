@@ -136,6 +136,8 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 
 ## Hooks
 
+`llms.txt` and `llms-full.txt` are kept for up to five minutes, so a filter that changes which pages they list or how they read can take that long to show.
+
 | Filter | Purpose |
 | --- | --- |
 | `agentready_is_eligible` | Exclude a post programmatically. Receives `$eligible` and the `WP_Post`. |
@@ -153,8 +155,8 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | `agentready_meta_description_keys` | Post meta keys read as the SEO meta description, in order. |
 | `agentready_check_site_address` | Return `false` to turn off the automatic pause when the site address changes. |
 | `agentready_compare_ignore` | Regular expressions for text that Verify & Preview and the scan leave out when comparing. |
-| `agentready_llms_txt` | Final `llms.txt` content. The result is kept for up to five minutes. |
-| `agentready_llms_full_txt` | Final `llms-full.txt` content. The result is kept for up to five minutes. |
+| `agentready_llms_txt` | Final `llms.txt` content. |
+| `agentready_llms_full_txt` | Final `llms-full.txt` content. |
 | `agentready_llms_full_max_bytes` | Size limit of `llms-full.txt` (default 5,000,000 bytes). |
 | `agentready_llms_max_items` | Entries per post type in `llms.txt` (default 500). |
 | `agentready_content_type` | Content type of the Markdown response. |
