@@ -29,13 +29,20 @@ final class CronAuth implements Hookable {
 	public function add_credentials( mixed $request ): mixed {
 		$auth = $this->options->http_auth();
 
-		if ( null === $auth || ! is_array( $request ) || ! isset( $request['url'] ) || ! is_array( $request['args'] ?? null ) || ! $this->is_this_site( (string) $request['url'] ) ) {
+		if ( null === $auth || ! is_array( $request ) || ! $this->is_site_request( $request ) ) {
 			return $request;
 		}
 
 		$request['args']['headers']['Authorization'] = 'Basic ' . base64_encode( $auth['user'] . ':' . $auth['password'] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Required by the HTTP Basic scheme.
 
 		return $request;
+	}
+
+	/**
+	 * @param array<mixed> $request A request with a URL and arguments.
+	 */
+	private function is_site_request( array $request ): bool {
+		return isset( $request['url'] ) && is_array( $request['args'] ?? null ) && $this->is_this_site( (string) $request['url'] );
 	}
 
 	private function is_this_site( string $url ): bool {

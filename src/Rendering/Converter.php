@@ -188,7 +188,7 @@ final class Converter {
 
 			$alt = $this->standalone_alt( $block );
 
-			if ( null !== $alt && ( $this->same_text( $alt, (string) end( $kept ) ) || ( $i + 1 < $count && $this->same_text( $alt, $blocks[ $i + 1 ] ) ) ) ) {
+			if ( null !== $alt && $this->repeats_neighbour( $alt, $kept, $blocks, $i ) ) {
 				continue;
 			}
 
@@ -196,6 +196,16 @@ final class Converter {
 		}
 
 		return implode( "\n\n", $kept );
+	}
+
+	/**
+	 * Whether an image alt text only repeats the block before it or the block after it.
+	 *
+	 * @param string[] $kept   Blocks kept so far.
+	 * @param string[] $blocks All blocks.
+	 */
+	private function repeats_neighbour( string $alt, array $kept, array $blocks, int $index ): bool {
+		return $this->same_text( $alt, (string) end( $kept ) ) || ( $index + 1 < count( $blocks ) && $this->same_text( $alt, $blocks[ $index + 1 ] ) );
 	}
 
 	/**

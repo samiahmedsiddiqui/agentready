@@ -32,11 +32,15 @@ final class RobotsTxt implements Hookable {
 	 * @param mixed $indexable Whether the site asks search engines to index it.
 	 */
 	public function append( mixed $output, mixed $indexable ): mixed {
-		if ( ! is_string( $output ) || ! (bool) (int) $indexable || ! $this->options->robots_line() || ! Urls::has_pretty_permalinks() || ! $this->environment->is_active() ) {
+		if ( ! is_string( $output ) || ! $this->should_add( (bool) (int) $indexable ) ) {
 			return $output;
 		}
 
 		return $output . self::lines( home_url( '/llms.txt' ), $this->options->full_enabled() ? home_url( '/llms-full.txt' ) : null );
+	}
+
+	private function should_add( bool $indexable ): bool {
+		return $indexable && $this->options->robots_line() && Urls::has_pretty_permalinks() && $this->environment->is_active();
 	}
 
 	/**
