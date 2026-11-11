@@ -98,6 +98,8 @@ final class LlmsPage implements Hookable {
 
 		$preview = $this->llms->build();
 		$custom  = $this->options->custom();
+		$full    = $this->options->full_custom();
+		$host    = (string) wp_parse_url( home_url(), PHP_URL_HOST );
 		$cache   = $this->coverage->summary();
 
 		View::render(
@@ -109,9 +111,12 @@ final class LlmsPage implements Hookable {
 				'mode'           => $this->options->mode(),
 				'custom'         => $custom,
 				'full'           => $this->options->full_enabled(),
+				'full_mode'      => $this->options->full_mode(),
+				'full_custom'    => $full,
+				'full_notes'     => LlmsOptions::check( $full, $host ),
 				'robots_line'    => $this->options->robots_line(),
 				'max_bytes'      => LlmsOptions::MAX_BYTES,
-				'notes'          => LlmsOptions::check( $custom, (string) wp_parse_url( home_url(), PHP_URL_HOST ) ),
+				'notes'          => LlmsOptions::check( $custom, $host ),
 				'preview'        => strlen( $preview ) > self::PREVIEW_CHARS ? substr( $preview, 0, self::PREVIEW_CHARS ) . "\n…" : $preview,
 				'pretty'         => Urls::has_pretty_permalinks(),
 				'active'         => $this->environment->is_active(),

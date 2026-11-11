@@ -42,6 +42,7 @@ final class Notices {
 			'pretty'     => Urls::has_pretty_permalinks(),
 			'yoast_llms' => is_array( $yoast ) && ! empty( $yoast['enable_llms_txt'] ),
 			'llms_file'  => file_exists( get_home_path() . 'llms.txt' ),
+			'full_file'  => file_exists( get_home_path() . 'llms-full.txt' ),
 			'changes'    => $this->changes(),
 		);
 	}

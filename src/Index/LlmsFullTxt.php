@@ -1,6 +1,6 @@
 <?php
 /**
- * Builds /llms-full.txt, the stored Markdown of all eligible pages in one file.
+ * Builds /llms-full.txt: the stored Markdown of all eligible pages in one file, your own text, or both.
  *
  * @package AgentWelcome
  */
@@ -12,12 +12,13 @@ namespace AgentWelcome\Index;
 use AgentWelcome\Cache\Store;
 use AgentWelcome\Content\Eligibility;
 use AgentWelcome\Http\Urls;
+use AgentWelcome\Settings\LlmsOptions;
 use Generator;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
-/** Builds llms-full.txt, the stored Markdown of all served pages in one file. */
+/** Builds llms-full.txt, from the stored Markdown of all served pages, a custom text, or both. */
 final class LlmsFullTxt {
 
 	/** Default size limit of the file, in bytes. */
@@ -35,21 +36,30 @@ final class LlmsFullTxt {
 	 * @param Store       $store       Stored copies.
 	 * @param Eligibility $eligibility Decides whether a page is served.
 	 * @param Urls        $urls        Builds the addresses.
+	 * @param LlmsOptions $options     Settings of the llms files.
 	 */
 	public function __construct(
 		private Store $store,
 		private Eligibility $eligibility,
-		private Urls $urls
+		private Urls $urls,
+		private LlmsOptions $options
 	) {}
 
 	/**
-	 * Builds the file. Whole pages are added until the size limit, and a note says how many were left out.
+	 * Builds the file for the current mode. A custom text is served as written. Otherwise whole pages are added after the heading or the custom text until the size limit, and a note says how many were left out.
 	 *
 	 * @return string The text of llms-full.txt.
 	 */
 	public function build(): string {
+		$mode   = $this->options->full_mode();
+		$custom = $this->options->full_custom();
+
+		if ( self::is_custom_only( $mode, $custom ) ) {
+			return (string) apply_filters( 'agentwelcome_llms_full_txt', $custom . "\n" );
+		}
+
 		$max  = max( 100000, (int) apply_filters( 'agentwelcome_llms_full_max_bytes', self::MAX_BYTES ) );
-		$text = '# ' . SingleLine::from( get_bloginfo( 'name' ) ) . "\n";
+		$text = self::start( $mode, $custom, SingleLine::from( get_bloginfo( 'name' ) ) );
 		$left = 0;
 
 		foreach ( $this->blocks() as $block ) {
@@ -67,6 +77,33 @@ final class LlmsFullTxt {
 		}
 
 		return (string) apply_filters( 'agentwelcome_llms_full_txt', $text );
+	}
+
+	/**
+	 * Whether the file is only the custom text. An empty text falls back to the generated file.
+	 *
+	 * @param string $mode   One of the LlmsOptions modes.
+	 * @param string $custom Custom text.
+	 * @return bool True when the custom text is served as written.
+	 */
+	public static function is_custom_only( string $mode, string $custom ): bool {
+		return LlmsOptions::CUSTOM === $mode && '' !== $custom;
+	}
+
+	/**
+	 * The text the generated file starts with: the custom text in Hybrid mode, otherwise the site heading.
+	 *
+	 * @param string $mode      One of the LlmsOptions modes.
+	 * @param string $custom    Custom text.
+	 * @param string $site_name Site name, on one line.
+	 * @return string The start of the file, ending with a line break.
+	 */
+	public static function start( string $mode, string $custom, string $site_name ): string {
+		if ( LlmsOptions::HYBRID === $mode && '' !== $custom ) {
+			return $custom . "\n";
+		}
+
+		return '# ' . $site_name . "\n";
 	}
 
 	/**

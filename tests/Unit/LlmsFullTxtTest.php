@@ -11,6 +11,7 @@ namespace AgentWelcome\Tests\Unit;
 
 use AgentWelcome\Index\LlmsFullTxt;
 use AgentWelcome\Robots\RobotsTxt;
+use AgentWelcome\Settings\LlmsOptions;
 use PHPUnit\Framework\TestCase;
 
 final class LlmsFullTxtTest extends TestCase {
@@ -66,5 +67,30 @@ final class LlmsFullTxtTest extends TestCase {
 			"\n# AgentWelcome\n# llms.txt: https://example.com/llms.txt\n# llms-full.txt: https://example.com/llms-full.txt\n",
 			RobotsTxt::lines( 'https://example.com/llms.txt', 'https://example.com/llms-full.txt' )
 		);
+	}
+
+	public function test_a_custom_text_is_served_alone(): void {
+		$this->assertTrue( LlmsFullTxt::is_custom_only( LlmsOptions::CUSTOM, '# Mine' ) );
+	}
+
+	public function test_an_empty_custom_text_falls_back_to_the_generated_file(): void {
+		$this->assertFalse( LlmsFullTxt::is_custom_only( LlmsOptions::CUSTOM, '' ) );
+	}
+
+	public function test_the_other_modes_are_not_custom_only(): void {
+		$this->assertFalse( LlmsFullTxt::is_custom_only( LlmsOptions::AUTOMATIC, '# Mine' ) );
+		$this->assertFalse( LlmsFullTxt::is_custom_only( LlmsOptions::HYBRID, '# Mine' ) );
+	}
+
+	public function test_the_generated_file_starts_with_the_site_heading(): void {
+		$this->assertSame( "# My site\n", LlmsFullTxt::start( LlmsOptions::AUTOMATIC, '# Mine', 'My site' ) );
+	}
+
+	public function test_hybrid_starts_with_the_custom_text(): void {
+		$this->assertSame( "# Mine\n\nIntro\n", LlmsFullTxt::start( LlmsOptions::HYBRID, "# Mine\n\nIntro", 'My site' ) );
+	}
+
+	public function test_hybrid_without_a_text_starts_with_the_site_heading(): void {
+		$this->assertSame( "# My site\n", LlmsFullTxt::start( LlmsOptions::HYBRID, '', 'My site' ) );
 	}
 }

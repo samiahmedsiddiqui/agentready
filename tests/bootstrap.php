@@ -60,3 +60,9 @@ if ( ! function_exists( 'apply_filters' ) ) {
 		return null === $callback ? $value : $callback( $value, ...$args );
 	}
 }
+
+if ( ! function_exists( 'wp_check_invalid_utf8' ) ) {
+	function wp_check_invalid_utf8( $text, $strip = false ) {
+		return mb_check_encoding( (string) $text, 'UTF-8' ) ? $text : ( $strip ? (string) iconv( 'UTF-8', 'UTF-8//IGNORE', (string) $text ) : '' );
+	}
+}
