@@ -137,6 +137,9 @@ Yes. Set the content selector in AgentReady > Settings. The default tries `main`
 
 Yes. Add CSS selectors, one per line, under "Elements to exclude". They are removed in addition to the built-in list (navigation, sidebars, forms, scripts, hidden elements, and any site-level header or footer). Headers and footers inside an article are kept. Verify & Preview lets you try selectors without saving them.
 
+= How is this plugin developed? =
+Developed with AI coding tools and maintained by Sami Ahmed Siddiqui. Every change is reviewed by the author and checked with automated tests, PHPCS, PHPStan and Plugin Check before release.
+
 == Changelog ==
 
 = Unreleased =
