@@ -1,13 +1,13 @@
 # Integration tests
 
-These suites run the plugin on a real WordPress with a SQLite database, served by PHP's built-in web server. They check what the unit tests cannot: serving `.md` and `llms.txt`, the stored copies and their refresh, noindex handling, permissions, the admin pages, WP-Cron on and off, and uninstall. GitHub Actions runs them for every pull request on the lowest and the highest supported PHP version (`.github/workflows/integration-tests.yml`).
+These suites run the plugin on a real WordPress, served by PHP's built-in web server. The database is SQLite by default, or an existing MySQL or MariaDB server when `DB_ENGINE=mysql` is set for `setup.sh`. They check what the unit tests cannot: serving `.md` and `llms.txt`, the stored copies and their refresh, noindex handling, permissions, the admin pages, WP-Cron on and off, and uninstall. GitHub Actions runs them for every pull request on the lowest and the highest supported PHP version with SQLite, and on MySQL and MariaDB (`.github/workflows/integration-tests.yml`).
 
 ## Run them
 
 You need `php` with the DOM and SQLite extensions, [WP-CLI](https://wp-cli.org), `curl`, `unzip`, `zsh`, Python 3 and Node.js. WP-CLI is expected at `/usr/local/bin/wp`; set `WP_CLI` to another path if needed.
 
 ```bash
-tests/integration/setup.sh      # builds the test site in tests/integration/wp-test (about a minute)
+tests/integration/setup.sh      # builds the test site in tests/integration/wp-test (about a minute). For MySQL: DB_ENGINE=mysql tests/integration/setup.sh
 tests/integration/deploy.sh     # installs the plugin from the last commit and resets its state
 tests/integration/serve.sh start
 tests/integration/run.sh        # runs every suite, and exits with 1 if a check fails

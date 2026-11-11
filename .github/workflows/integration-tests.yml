@@ -67,3 +67,79 @@ jobs:
         run: |
           tail -n 60 tests/integration/wp-test/server.log || true
           tail -n 60 tests/integration/wp-test/wp/wp-content/debug.log || true
+
+  integration-database:
+    name: PHP ${{ matrix.php }} on ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    services:
+      database:
+        image: ${{ matrix.image }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress
+        ports:
+          - 3306:3306
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.0', name: 'MySQL 8.0', image: 'mysql:8.0' }
+          - { php: '8.4', name: 'MariaDB 10.11', image: 'mariadb:10.11' }
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, libxml, mbstring, curl, zip, mysqli
+          tools: wp-cli
+          coverage: none
+
+      - name: Install zsh
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Wait for the database
+        run: |
+          for i in $(seq 1 30); do
+            mysqladmin ping -h 127.0.0.1 -uroot -proot --silent && exit 0
+            sleep 2
+          done
+          echo "The database did not start." >&2
+          exit 1
+
+      - name: Build the test site
+        run: tests/integration/setup.sh
+        env:
+          WP_CLI: /usr/local/bin/wp
+          DB_ENGINE: mysql
+
+      - name: Install the plugin
+        run: tests/integration/deploy.sh
+        env:
+          WP_CLI: /usr/local/bin/wp
+
+      - name: Start the server
+        run: tests/integration/serve.sh start
+
+      - name: Run the integration suites
+        run: tests/integration/run.sh
+        env:
+          WP_CLI: /usr/local/bin/wp
+
+      - name: Show the server and debug logs
+        if: failure()
+        run: |
+          tail -n 60 tests/integration/wp-test/server.log || true
+          tail -n 60 tests/integration/wp-test/wp/wp-content/debug.log || true

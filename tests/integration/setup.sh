@@ -1,18 +1,26 @@
 #!/bin/zsh
-# Builds a throwaway WordPress on SQLite in ./wp-test with the content the test scripts expect.
+# Builds a throwaway WordPress in ./wp-test with the content the test scripts expect. The database is SQLite unless DB_ENGINE=mysql,
+# which uses an existing MySQL or MariaDB server (DB_HOST, DB_NAME, DB_USER and DB_PASS, default 127.0.0.1, wordpress, root and root).
 # Needs php, wp-cli (set WP_CLI to its path if it is not /usr/local/bin/wp), curl, unzip and network access. Takes about a minute.
 KIT=${0:A:h}; ROOT=$KIT/wp-test; PORT=8899
 wpcli() { php -d error_reporting=0 -d display_errors=0 ${WP_CLI:-/usr/local/bin/wp} "$@" 2>&1 | grep -v "^Deprecated\|^PHP Deprecated"; }
 rm -rf $ROOT && mkdir -p $ROOT && cd $ROOT || exit 1
 curl -sSL -o wordpress.zip https://wordpress.org/latest.zip && unzip -q wordpress.zip && mv wordpress wp
+if [[ ${DB_ENGINE:-sqlite} != mysql ]]; then
 curl -sSL -o sqlite.zip https://downloads.wordpress.org/plugin/sqlite-database-integration.zip && unzip -q sqlite.zip -d wp/wp-content/plugins
 sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$ROOT/wp/wp-content/plugins/sqlite-database-integration#g" -e "s#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#g" wp/wp-content/plugins/sqlite-database-integration/db.copy > wp/wp-content/db.php
+fi
 cp $KIT/router.php $ROOT/router.php
 mkdir -p wp/wp-content/mu-plugins wp/wp-content/themes
 cp $KIT/mu-plugins/test-setup.php wp/wp-content/mu-plugins/
 cp -R $KIT/themes/agentwelcome-test wp/wp-content/themes/
 cd wp
-wpcli config create --dbname=agentwelcome --dbuser=x --dbpass=x --skip-check --force | tail -1
+if [[ ${DB_ENGINE:-sqlite} == mysql ]]; then
+  wpcli config create --dbhost=${DB_HOST:-127.0.0.1} --dbname=${DB_NAME:-wordpress} --dbuser=${DB_USER:-root} --dbpass=${DB_PASS:-root} --force | tail -1
+  wpcli db reset --yes | tail -1
+else
+  wpcli config create --dbname=agentwelcome --dbuser=x --dbpass=x --skip-check --force | tail -1
+fi
 wpcli config set WP_DEBUG true --raw >/dev/null; wpcli config set WP_DEBUG_LOG true --raw >/dev/null; wpcli config set WP_DEBUG_DISPLAY false --raw >/dev/null
 wpcli core install --url=http://127.0.0.1:$PORT --title="AgentWelcome Test" --admin_user=admin --admin_password=agentwelcome-test-pw --admin_email=admin@example.test --skip-email | tail -1
 wpcli rewrite structure '/%postname%/' >/dev/null
