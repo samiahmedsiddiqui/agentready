@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       AgentReady – llms.txt & Markdown for AI Agents
  * Description:       Serves an llms.txt index and a clean Markdown version of every page, built from the rendered output so ACF, Gutenberg, Elementor and classic content all work.
- * Version:           0.1.0
+ * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Sami Ahmed Siddiqui
@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'AGENTREADY_VERSION', '0.1.0' );
+define( 'AGENTREADY_VERSION', '1.0.0' );
 define( 'AGENTREADY_FILE', __FILE__ );
 define( 'AGENTREADY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AGENTREADY_URL', plugin_dir_url( __FILE__ ) );

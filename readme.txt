@@ -4,7 +4,7 @@ Tags: llms-txt, markdown, ai, llm, seo
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 0.1.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,31 +142,5 @@ Developed with AI coding tools and maintained by Sami Ahmed Siddiqui. Every chan
 
 == Changelog ==
 
-= Unreleased =
-* New `agentready_manage_files` capability for the llms.txt page, llms-full.txt and the robots.txt line. Administrators get it automatically, and it can be given to any role or user. Filter `agentready_files_capability` maps it to another capability.
-* `llms.txt` and `llms-full.txt` are kept for up to five minutes instead of being built on every request, and are rebuilt at once when a page, an SEO field or a related setting changes.
-* At most three pages are rendered at the same time for visitors. When all slots are busy and a page has no stored copy yet, the visitor gets a short "try again" answer and the page is queued.
-* Saved HTTP Basic credentials are no longer sent if the page redirects from https to http.
-* Pages that an SEO plugin marks as noindex are left out of llms.txt, llms-full.txt and the Markdown files by default. A new setting in the Exclusions card turns this off.
-* Saving an ACF options page, or an Elementor saved template, refreshes every stored page. Saving a page in Elementor refreshes that page.
-* Changing a page's SEO meta description or noindex setting refreshes that page.
-* Switching or updating the theme and saving the Customizer refresh every stored page in the background, with a notice. Plugin activations, deactivations and updates show a notice that points to Check all pages.
-* New llms.txt page: serve your own llms.txt, or your text followed by the generated list of pages. Text can be loaded from a file.
-* Optional `/llms-full.txt` with the Markdown of every page, capped at 5 MB.
-* Optional comment lines in robots.txt that point to llms.txt and llms-full.txt.
-* AgentReady pauses itself when the site address changes (a staging copy or a move), with a Resume button, because host copies can rewrite the Allowed URLs setting.
-* New AgentReady menu with Settings and Verify & Preview pages. The settings moved from the Settings menu to AgentReady > Settings.
-* Verify & Preview checks a page against its stored Markdown, previews it, and updates it. The All pages tab scans every stored page in the background and reports which differ.
-* The Markdown front matter description follows the same order as llms.txt and is left out when none is set, instead of using a summary of the page body.
-* Post types, pages and taxonomy terms share one Exclusions card.
-* Saved HTTP Basic credentials are always removed when the plugin is deleted.
-* `llms.txt` descriptions come from the per-page description, then the SEO meta description, then the excerpt. They no longer fall back to text taken from the page content.
-* Stored Markdown with background refresh, on-demand generation and manual regenerate and clear controls.
-* Environment control: production by default, optional staging, development and local, allowed URLs, and the `AGENTREADY_ENABLED` and `AGENTREADY_ALLOWED_URLS` constants.
-* Settings split into tabs, with system info.
-* The homepage Markdown URL is now `/index.md`, with a setting to use `/index.html.md` instead. Both keep working.
-* "Delete all data on uninstall" option.
-* WP-CLI commands `wp agentready cache clear|regenerate|status`.
-
-= 0.1.0 =
+= 1.0.0 =
 * Initial release.
