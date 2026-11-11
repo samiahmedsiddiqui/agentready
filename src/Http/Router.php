@@ -21,8 +21,19 @@ use WP;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Answers requests for the Markdown pages, llms.txt and llms-full.txt before WordPress loads a template. */
 final class Router implements Hookable {
 
+	/**
+	 * @param Urls             $urls         Reads and builds the addresses.
+	 * @param Eligibility      $eligibility  Decides whether a page is served.
+	 * @param PageCache        $pages        Gives the stored copy of a page.
+	 * @param Environment      $environment  Tells whether the plugin is running on this site.
+	 * @param LlmsTxt          $llms         Builds llms.txt.
+	 * @param LlmsFullTxt      $llms_full    Builds llms-full.txt.
+	 * @param LlmsOptions      $llms_options Settings of the llms files.
+	 * @param MarkdownResponse $response     Sends the answer.
+	 */
 	public function __construct(
 		private Urls $urls,
 		private Eligibility $eligibility,
@@ -34,10 +45,19 @@ final class Router implements Hookable {
 		private MarkdownResponse $response
 	) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		add_action( 'parse_request', array( $this, 'maybe_serve' ), 1 );
 	}
 
+	/**
+	 * Serves the request when it is for one of the files of this plugin.
+	 *
+	 * @param WP $wp The WordPress request.
+	 * @return void
+	 */
 	public function maybe_serve( WP $wp ): void {
 		if ( ! Urls::has_pretty_permalinks() || ! $this->is_read_request() || ! $this->environment->is_active() ) {
 			return;
@@ -65,6 +85,9 @@ final class Router implements Hookable {
 	}
 
 	/**
+	 * Sends an llms file, from the saved copy when there is one, and stops.
+	 *
+	 * @param string             $key   Name of the saved copy.
 	 * @param callable(): string $build Builds the file when there is no saved copy.
 	 * @return never
 	 */
@@ -74,8 +97,11 @@ final class Router implements Hookable {
 	}
 
 	/**
+	 * Sends the Markdown of a page, or redirects to its real address, or lets WordPress carry on.
+	 *
 	 * @param array{type: string, path: string, home_alias: bool} $route   The parsed route.
 	 * @param string                                              $request The requested path.
+	 * @return void
 	 */
 	private function serve_page( array $route, string $request ): void {
 		$post = $this->urls->resolve( $route['path'], $route['home_alias'] );
@@ -108,10 +134,11 @@ final class Router implements Hookable {
 	}
 
 	/**
-	 * Sends a request for a valid page under the wrong path (such as its original permalink) to the real Markdown URL.
+	 * Sends a request for a valid page under the wrong path (such as its original permalink) to the real Markdown address.
 	 *
 	 * @param array{type: string, path: string, home_alias: bool} $route   The parsed route.
 	 * @param string                                              $request The requested path.
+	 * @return void
 	 */
 	private function redirect_to_canonical( array $route, string $request ): void {
 		$post = $this->urls->resolve( $route['path'], $route['home_alias'], false );
@@ -130,6 +157,11 @@ final class Router implements Hookable {
 		$this->terminate();
 	}
 
+	/**
+	 * Whether the request only reads.
+	 *
+	 * @return bool True for GET and HEAD.
+	 */
 	private function is_read_request(): bool {
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) : 'GET';
 
@@ -137,6 +169,8 @@ final class Router implements Hookable {
 	}
 
 	/**
+	 * Ends the request.
+	 *
 	 * @return never
 	 */
 	private function terminate(): void {
