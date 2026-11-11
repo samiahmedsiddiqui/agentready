@@ -165,7 +165,7 @@ final class Extractor {
 	 * Collects the text blocks under a node, skipping hidden elements and elements that hold no page text.
 	 *
 	 * @param DOMNode  $node   Node to read.
-	 * @param string[] $blocks Collected text blocks, added to by this method.
+	 * @param string[] $blocks Collected text blocks, added to by reference.
 	 * @return void
 	 */
 	private function collect( DOMNode $node, array &$blocks ): void {
@@ -209,7 +209,7 @@ final class Extractor {
 	 * Adds a block of text when it holds at least two letters or digits in a row.
 	 *
 	 * @param string   $text   Text of the block.
-	 * @param string[] $blocks Collected text blocks, added to by this method.
+	 * @param string[] $blocks Collected text blocks, added to by reference.
 	 * @return void
 	 */
 	private function add_block( string $text, array &$blocks ): void {

@@ -20,7 +20,7 @@ final class Changes implements Hookable {
 	/** Option that holds the notices that have not been dismissed. */
 	public const OPTION = 'agentready_changes';
 
-	/** Notice key for a theme change that started a refresh of every page. */
+	/** Notice key for a change that refreshed every page: a theme switch, a theme update or a Customizer save. */
 	public const REFRESH = 'refresh';
 	/** Notice key for the count of changed plugins. */
 	public const PLUGINS = 'plugins';
