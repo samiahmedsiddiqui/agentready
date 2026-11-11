@@ -19,6 +19,10 @@ final class LlmsOptions {
 	public const CUSTOM    = 'custom';
 	public const HYBRID    = 'hybrid';
 
+	private const CONTROL_CHARS = '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/';
+	private const TITLE_LINE    = '/\A#[ \t]+\S/';
+	private const LINK_URL      = '#\]\(\s*<?(https?://[^)\s>]+)#i';
+
 	public const MAX_BYTES   = 200000;
 	public const LARGE_BYTES = 100000;
 
@@ -84,7 +88,7 @@ final class LlmsOptions {
 	 */
 	public static function normalise( string $text ): string {
 		$text = str_replace( array( "\r\n", "\r" ), "\n", $text );
-		$text = (string) preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text );
+		$text = (string) preg_replace( self::CONTROL_CHARS, '', $text );
 
 		return trim( $text );
 	}
@@ -102,7 +106,7 @@ final class LlmsOptions {
 			return $notes;
 		}
 
-		if ( 1 !== preg_match( '/\A#[ \t]+\S/', $text ) ) {
+		if ( 1 !== preg_match( self::TITLE_LINE, $text ) ) {
 			$notes[] = 'no_title';
 		}
 
@@ -118,7 +122,7 @@ final class LlmsOptions {
 	}
 
 	private static function has_external_link( string $text, string $host ): bool {
-		if ( '' === $host || false === preg_match_all( '#\]\(\s*<?(https?://[^)\s>]+)#i', $text, $found ) ) {
+		if ( '' === $host || false === preg_match_all( self::LINK_URL, $text, $found ) ) {
 			return false;
 		}
 

@@ -12,6 +12,7 @@ namespace AgentReady\Index;
 use AgentReady\Cache\Store;
 use AgentReady\Content\Eligibility;
 use AgentReady\Http\Urls;
+use Generator;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,6 +23,9 @@ final class LlmsFullTxt {
 
 	private const BATCH = 100;
 
+	private const FRONT_MATTER = '/\A---\n.*?\n---\n/s';
+	private const TOP_HEADING  = '/\A(# [^\n]+)\n*(.*)\z/s';
+
 	public function __construct(
 		private Store $store,
 		private Eligibility $eligibility,
@@ -29,43 +33,18 @@ final class LlmsFullTxt {
 	) {}
 
 	public function build(): string {
-		$max    = max( 100000, (int) apply_filters( 'agentready_llms_full_max_bytes', self::MAX_BYTES ) );
-		$text   = '# ' . self::line( get_bloginfo( 'name' ) ) . "\n";
-		$left   = 0;
-		$full   = false;
-		$cursor = 0;
+		$max  = max( 100000, (int) apply_filters( 'agentready_llms_full_max_bytes', self::MAX_BYTES ) );
+		$text = '# ' . self::line( get_bloginfo( 'name' ) ) . "\n";
+		$left = 0;
 
-		do {
-			$ids   = $this->store->ids( $cursor, self::BATCH );
-			$count = count( $ids );
-
-			foreach ( $ids as $id ) {
-				$cursor = $id;
-				$post   = get_post( $id );
-
-				if ( ! $post instanceof WP_Post || ! $this->eligibility->is_eligible( $post ) ) {
-					continue;
-				}
-
-				$entry = $this->store->get( $id );
-				$body  = null === $entry ? '' : self::strip_front_matter( $entry->markdown );
-				$url   = $this->urls->permalink( $post );
-
-				if ( '' === $body || null === $url ) {
-					continue;
-				}
-
-				$block = self::block( self::line( get_the_title( $post ) ), $url, $body );
-
-				if ( $full || strlen( $text ) + strlen( $block ) > $max ) {
-					$full = true;
-					++$left;
-					continue;
-				}
-
-				$text .= $block;
+		foreach ( $this->blocks() as $block ) {
+			if ( $left > 0 || strlen( $text ) + strlen( $block ) > $max ) {
+				++$left;
+				continue;
 			}
-		} while ( self::BATCH === $count );
+
+			$text .= $block;
+		}
 
 		if ( $left > 0 ) {
 			/* translators: %d: number of pages left out. */
@@ -76,10 +55,46 @@ final class LlmsFullTxt {
 	}
 
 	/**
+	 * The text of each eligible stored page, in page ID order.
+	 *
+	 * @return Generator<int, string>
+	 */
+	private function blocks(): Generator {
+		$cursor = 0;
+
+		do {
+			$ids = $this->store->ids( $cursor, self::BATCH );
+
+			foreach ( $ids as $id ) {
+				$cursor = $id;
+				$block  = $this->block_for( $id );
+
+				if ( null !== $block ) {
+					yield $block;
+				}
+			}
+		} while ( self::BATCH === count( $ids ) );
+	}
+
+	private function block_for( int $id ): ?string {
+		$post = get_post( $id );
+
+		if ( ! $post instanceof WP_Post || ! $this->eligibility->is_eligible( $post ) ) {
+			return null;
+		}
+
+		$entry = $this->store->get( $id );
+		$body  = null === $entry ? '' : self::strip_front_matter( $entry->markdown );
+		$url   = $this->urls->permalink( $post );
+
+		return '' === $body || null === $url ? null : self::block( self::line( get_the_title( $post ) ), $url, $body );
+	}
+
+	/**
 	 * Removes the metadata block stored at the top of a page.
 	 */
 	public static function strip_front_matter( string $markdown ): string {
-		$stripped = preg_replace( '/\A---\n.*?\n---\n/s', '', $markdown, 1 );
+		$stripped = preg_replace( self::FRONT_MATTER, '', $markdown, 1 );
 
 		return trim( is_string( $stripped ) ? $stripped : $markdown );
 	}
@@ -90,7 +105,7 @@ final class LlmsFullTxt {
 	public static function block( string $title, string $url, string $body ): string {
 		$source = 'Source: ' . $url;
 
-		if ( 1 === preg_match( '/\A(# [^\n]+)\n*(.*)\z/s', $body, $match ) ) {
+		if ( 1 === preg_match( self::TOP_HEADING, $body, $match ) ) {
 			return "\n---\n\n" . $match[1] . "\n\n" . $source . "\n" . ( '' === $match[2] ? '' : "\n" . $match[2] . "\n" );
 		}
 
