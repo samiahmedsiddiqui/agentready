@@ -11,6 +11,7 @@ namespace AgentReady\Verify;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Compares two Markdown texts line by line, and checks that the text of a page is in its Markdown. */
 final class Comparison {
 
 	/** The metadata block at the top of a stored page. */
@@ -19,15 +20,24 @@ final class Comparison {
 	/** A Markdown link or image, to keep only its text. */
 	private const MARKDOWN_LINK = '/!?\[([^\]]*)\]\([^)]*\)/';
 
+	/** Line type: the line is in both texts. */
 	public const SAME = 'same';
-	public const ADD  = 'add';
-	public const DEL  = 'del';
-	public const GAP  = 'gap';
+	/** Line type: the line is only in the new text. */
+	public const ADD = 'add';
+	/** Line type: the line is only in the old text. */
+	public const DEL = 'del';
+	/** Line type: a gap between kept parts of a long diff. */
+	public const GAP = 'gap';
 
+	/** Largest table the line-by-line diff builds. Longer texts are compared by whole lines. */
 	private const MAX_CELLS = 250000;
 
 	/**
-	 * @param string[] $ignore Regular expressions for text to leave out of the comparison.
+	 * Makes two texts comparable: unifies line endings, removes what should be ignored, and trims the ends and blank runs.
+	 *
+	 * @param string   $markdown Markdown text.
+	 * @param string[] $ignore   Regular expressions for text to leave out of the comparison.
+	 * @return string The cleaned text.
 	 */
 	public static function normalise( string $markdown, array $ignore = array() ): string {
 		$text = str_replace( array( "\r\n", "\r" ), "\n", $markdown );
@@ -44,70 +54,77 @@ final class Comparison {
 	}
 
 	/**
-	 * @return array<int, array{type: string, text: string}>
+	 * Compares two texts line by line.
+	 *
+	 * @param string $before Old text.
+	 * @param string $after  New text.
+	 * @return array<int, array{type: string, text: string}> Lines with their type.
 	 */
 	public static function diff( string $before, string $after ): array {
-		$a = '' === $before ? array() : explode( "\n", $before );
-		$b = '' === $after ? array() : explode( "\n", $after );
-		$n = count( $a );
-		$m = count( $b );
+		$old_lines = '' === $before ? array() : explode( "\n", $before );
+		$new_lines = '' === $after ? array() : explode( "\n", $after );
+		$old_count = count( $old_lines );
+		$new_count = count( $new_lines );
 
-		if ( $n * $m > self::MAX_CELLS ) {
-			return self::diff_by_set( $a, $b );
+		if ( $old_count * $new_count > self::MAX_CELLS ) {
+			return self::diff_by_set( $old_lines, $new_lines );
 		}
 
-		$table = array_fill( 0, $n + 1, array_fill( 0, $m + 1, 0 ) );
+		$common_lengths = array_fill( 0, $old_count + 1, array_fill( 0, $new_count + 1, 0 ) );
 
-		for ( $i = $n - 1; $i >= 0; $i-- ) {
-			for ( $j = $m - 1; $j >= 0; $j-- ) {
-				$table[ $i ][ $j ] = $a[ $i ] === $b[ $j ] ? $table[ $i + 1 ][ $j + 1 ] + 1 : max( $table[ $i + 1 ][ $j ], $table[ $i ][ $j + 1 ] );
+		for ( $old_index = $old_count - 1; $old_index >= 0; $old_index-- ) {
+			for ( $new_index = $new_count - 1; $new_index >= 0; $new_index-- ) {
+				$common_lengths[ $old_index ][ $new_index ] = $old_lines[ $old_index ] === $new_lines[ $new_index ] ? $common_lengths[ $old_index + 1 ][ $new_index + 1 ] + 1 : max( $common_lengths[ $old_index + 1 ][ $new_index ], $common_lengths[ $old_index ][ $new_index + 1 ] );
 			}
 		}
 
-		$out = array();
-		$i   = 0;
-		$j   = 0;
+		$lines     = array();
+		$old_index = 0;
+		$new_index = 0;
 
-		while ( $i < $n && $j < $m ) {
-			if ( $a[ $i ] === $b[ $j ] ) {
-				$out[] = array(
+		while ( $old_index < $old_count && $new_index < $new_count ) {
+			if ( $old_lines[ $old_index ] === $new_lines[ $new_index ] ) {
+				$lines[] = array(
 					'type' => self::SAME,
-					'text' => $a[ $i ],
+					'text' => $old_lines[ $old_index ],
 				);
-				++$i;
-				++$j;
-			} elseif ( $table[ $i + 1 ][ $j ] >= $table[ $i ][ $j + 1 ] ) {
-				$out[] = array(
+				++$old_index;
+				++$new_index;
+			} elseif ( $common_lengths[ $old_index + 1 ][ $new_index ] >= $common_lengths[ $old_index ][ $new_index + 1 ] ) {
+				$lines[] = array(
 					'type' => self::DEL,
-					'text' => $a[ $i++ ],
+					'text' => $old_lines[ $old_index++ ],
 				);
 			} else {
-				$out[] = array(
+				$lines[] = array(
 					'type' => self::ADD,
-					'text' => $b[ $j++ ],
+					'text' => $new_lines[ $new_index++ ],
 				);
 			}
 		}
 
-		for ( ; $i < $n; $i++ ) {
-			$out[] = array(
+		for ( ; $old_index < $old_count; $old_index++ ) {
+			$lines[] = array(
 				'type' => self::DEL,
-				'text' => $a[ $i ],
+				'text' => $old_lines[ $old_index ],
 			);
 		}
 
-		for ( ; $j < $m; $j++ ) {
-			$out[] = array(
+		for ( ; $new_index < $new_count; $new_index++ ) {
+			$lines[] = array(
 				'type' => self::ADD,
-				'text' => $b[ $j ],
+				'text' => $new_lines[ $new_index ],
 			);
 		}
 
-		return $out;
+		return $lines;
 	}
 
 	/**
+	 * Counts the lines that were added or removed.
+	 *
 	 * @param array<int, array{type: string, text: string}> $diff Result of diff().
+	 * @return int Number of changed lines.
 	 */
 	public static function changed( array $diff ): int {
 		return count( array_filter( $diff, static fn( array $line ): bool => self::SAME !== $line['type'] ) );
@@ -118,7 +135,7 @@ final class Comparison {
 	 *
 	 * @param array<int, array{type: string, text: string}> $diff    Result of diff().
 	 * @param int                                           $context Unchanged lines to keep on each side.
-	 * @return array<int, array{type: string, text: string}>
+	 * @return array<int, array{type: string, text: string}> The kept lines, with a gap line where parts were left out.
 	 */
 	public static function condense( array $diff, int $context = 2 ): array {
 		$keep = array();
@@ -167,6 +184,9 @@ final class Comparison {
 
 	/**
 	 * Letters and digits only, lower case, without the front matter and link addresses.
+	 *
+	 * @param string $markdown Markdown text.
+	 * @return string The reduced text.
 	 */
 	public static function plain_key( string $markdown ): string {
 		$text = (string) preg_replace( self::FRONT_MATTER, '', $markdown );
@@ -176,8 +196,11 @@ final class Comparison {
 	}
 
 	/**
-	 * @param string[] $blocks Text blocks taken from the page.
-	 * @return array{total: int, found: int, missing: string[]}
+	 * Checks which text blocks of the page appear in the Markdown.
+	 *
+	 * @param string[] $blocks   Text blocks taken from the page.
+	 * @param string   $markdown The Markdown.
+	 * @return array{total: int, found: int, missing: string[]} Blocks counted, blocks found, and the ones missing.
 	 */
 	public static function coverage( array $blocks, string $markdown ): array {
 		$plain   = self::plain_key( $markdown );
@@ -208,6 +231,12 @@ final class Comparison {
 		);
 	}
 
+	/**
+	 * Reduces a text to lower case letters and digits, so layout differences do not matter.
+	 *
+	 * @param string $text Text.
+	 * @return string The reduced text.
+	 */
 	private static function key( string $text ): string {
 		$text = function_exists( 'mb_strtolower' ) ? mb_strtolower( $text, 'UTF-8' ) : strtolower( $text );
 
@@ -215,33 +244,33 @@ final class Comparison {
 	}
 
 	/**
-	 * Fallback for very long texts: lines only on one side, without alignment.
+	 * Fallback for very long texts: lines that are only on one side, without alignment.
 	 *
-	 * @param string[] $a Old lines.
-	 * @param string[] $b New lines.
-	 * @return array<int, array{type: string, text: string}>
+	 * @param string[] $old_lines Old lines.
+	 * @param string[] $new_lines New lines.
+	 * @return array<int, array{type: string, text: string}> Lines with their type.
 	 */
-	private static function diff_by_set( array $a, array $b ): array {
-		$in_b = array_flip( $b );
-		$in_a = array_flip( $a );
-		$out  = array();
+	private static function diff_by_set( array $old_lines, array $new_lines ): array {
+		$in_new = array_flip( $new_lines );
+		$in_old = array_flip( $old_lines );
+		$lines  = array();
 
-		foreach ( $a as $line ) {
-			$out[] = array(
-				'type' => isset( $in_b[ $line ] ) ? self::SAME : self::DEL,
+		foreach ( $old_lines as $line ) {
+			$lines[] = array(
+				'type' => isset( $in_new[ $line ] ) ? self::SAME : self::DEL,
 				'text' => $line,
 			);
 		}
 
-		foreach ( $b as $line ) {
-			if ( ! isset( $in_a[ $line ] ) ) {
-				$out[] = array(
+		foreach ( $new_lines as $line ) {
+			if ( ! isset( $in_old[ $line ] ) ) {
+				$lines[] = array(
 					'type' => self::ADD,
 					'text' => $line,
 				);
 			}
 		}
 
-		return $out;
+		return $lines;
 	}
 }

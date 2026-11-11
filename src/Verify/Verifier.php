@@ -17,8 +17,15 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Compares the stored copy of a page with the Markdown it would produce now. */
 final class Verifier {
 
+	/**
+	 * @param Store       $store       Stored copies.
+	 * @param Generator   $generator   Builds the Markdown of a page.
+	 * @param Renderer    $renderer    Renders the page.
+	 * @param Eligibility $eligibility Decides whether a page is served.
+	 */
 	public function __construct(
 		private Store $store,
 		private Generator $generator,
@@ -27,8 +34,12 @@ final class Verifier {
 	) {}
 
 	/**
+	 * Renders the page, builds its Markdown and compares it with the stored copy.
+	 *
+	 * @param WP_Post                                    $post      The page.
 	 * @param array{selector?: string, strip?: string[]} $overrides Settings to use instead of the saved ones.
 	 * @param bool                                       $coverage  Also check the page text against the Markdown.
+	 * @return VerifyResult The outcome.
 	 */
 	public function verify( WP_Post $post, array $overrides = array(), bool $coverage = true ): VerifyResult {
 		$reason = $this->eligibility->reason( $post );
@@ -56,14 +67,14 @@ final class Verifier {
 			return $result;
 		}
 
-		$ignore = array_map( 'strval', (array) apply_filters( 'agentready_compare_ignore', array(), $post ) );
-		$old    = Comparison::normalise( $entry->markdown, $ignore );
-		$new    = Comparison::normalise( $page->markdown, $ignore );
+		$ignore      = array_map( 'strval', (array) apply_filters( 'agentready_compare_ignore', array(), $post ) );
+		$stored_text = Comparison::normalise( $entry->markdown, $ignore );
+		$fresh_text  = Comparison::normalise( $page->markdown, $ignore );
 
-		$result->state = $old === $new ? VerifyResult::IN_SYNC : VerifyResult::DIFFERS;
+		$result->state = $stored_text === $fresh_text ? VerifyResult::IN_SYNC : VerifyResult::DIFFERS;
 
 		if ( VerifyResult::DIFFERS === $result->state ) {
-			$result->diff    = Comparison::diff( $old, $new );
+			$result->diff    = Comparison::diff( $stored_text, $fresh_text );
 			$result->changed = Comparison::changed( $result->diff );
 		}
 
