@@ -25,12 +25,12 @@ final class Capabilities implements Hookable {
 	public const GRANTED_OPTION = 'agentready_files_capability_granted';
 
 	/**
-	 * Gives administrators the capability on the first admin request after the plugin is installed.
+	 * Gives administrators the capability on the first admin request after the plugin is installed. It runs before the menu is built, so the page shows at once.
 	 *
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_init', array( $this, 'grant_to_administrators' ) );
+		add_action( 'admin_menu', array( $this, 'grant_to_administrators' ), 1 );
 	}
 
 	/**
@@ -45,7 +45,7 @@ final class Capabilities implements Hookable {
 	}
 
 	/**
-	 * Adds the capability to the administrator role, once.
+	 * Adds the capability to the administrator role, once, and refreshes the capabilities of the current user.
 	 *
 	 * @return void
 	 */
@@ -58,6 +58,7 @@ final class Capabilities implements Hookable {
 
 		if ( null !== $role ) {
 			$role->add_cap( self::FILES );
+			wp_get_current_user()->get_role_caps();
 		}
 
 		update_option( self::GRANTED_OPTION, '1', true );
