@@ -146,6 +146,7 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | `agentready_resolve_post` | Map a request path to a post. |
 | `agentready_use_loopback` | Return `false` to skip fetching the page and use the post content. |
 | `agentready_loopback_timeout` | Seconds to wait for the page request (default 15). |
+| `agentready_max_concurrent_renders` | Pages that may be rendered at the same time for visitors (default 3). |
 | `agentready_strip_selectors` | CSS selectors for elements to remove. |
 | `agentready_markdown` | Final Markdown for a page. |
 | `agentready_description` | The description used in the metadata and `llms.txt`. |
