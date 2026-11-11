@@ -63,13 +63,28 @@ use AgentReady\Settings\Sanitizer;
 use AgentReady\Verify\Scan;
 use AgentReady\Verify\Verifier;
 
+/** Starts the plugin: builds the components and lets each one attach its hooks. */
 final class Plugin {
 
+	/**
+	 * The one instance of the plugin.
+	 *
+	 * @var self|null
+	 */
 	private static ?self $instance = null;
 
-	/** @var Hookable[] */
+	/**
+	 * Components that attach hooks.
+	 *
+	 * @var Hookable[]
+	 */
 	private array $components = array();
 
+	/**
+	 * Creates the plugin once.
+	 *
+	 * @return void
+	 */
 	public static function boot(): void {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
@@ -77,6 +92,11 @@ final class Plugin {
 		}
 	}
 
+	/**
+	 * Builds the components and registers them. Without the PHP DOM extension only a notice is added.
+	 *
+	 * @return void
+	 */
 	private function init(): void {
 		if ( ! class_exists( 'DOMDocument' ) ) {
 			add_action( 'admin_notices', array( $this, 'missing_dom_notice' ) );
@@ -175,6 +195,11 @@ final class Plugin {
 		}
 	}
 
+	/**
+	 * Tells administrators that the plugin is inactive because the PHP DOM extension is missing.
+	 *
+	 * @return void
+	 */
 	public function missing_dom_notice(): void {
 		if ( current_user_can( 'manage_options' ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'AgentReady needs the PHP DOM extension, which is not available on this server. The plugin is inactive.', 'agentready' ) . '</p></div>';

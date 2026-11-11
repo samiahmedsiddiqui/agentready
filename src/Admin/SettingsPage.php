@@ -20,16 +20,32 @@ use AgentReady\Settings\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
 
+/** The main settings page, with its Content, Rendering and Environment tabs. */
 final class SettingsPage implements Hookable {
 
+	/** Page slug, also the slug of the top-level menu. */
 	public const SLUG = 'agentready';
 
+	/** Settings group of the form. */
 	private const GROUP = 'agentready_group';
 
+	/** Selectors offered as examples for the main content. */
 	private const COMMON_CONTENT = array( 'main', '[role="main"]', 'article', '#content', '#main', '#primary', '.site-content', '.entry-content', '.post-content', '.page-content' );
 
+	/** Selectors offered as examples for parts to remove. */
 	private const COMMON_EXCLUDES = array( '.breadcrumb', '.breadcrumbs', '.cookie-notice', '.related-posts', '.post-navigation', '.author-box', '.share-buttons', '.newsletter-signup' );
 
+	/**
+	 * @param Options     $options     Saved settings.
+	 * @param PostTypes   $post_types  Post types that are served.
+	 * @param Sanitizer   $sanitizer   Cleans the submitted settings.
+	 * @param Environment $environment Tells whether the plugin is running on this site.
+	 * @param Coverage    $coverage    Counts the pages by state.
+	 * @param Batch       $batch       Tells whether a refresh is running.
+	 * @param TermList    $terms       Lists the terms that can be excluded.
+	 * @param Urls        $urls        Builds the addresses.
+	 * @param Notices     $notices     Notices to show.
+	 */
 	public function __construct(
 		private Options $options,
 		private PostTypes $post_types,
@@ -42,12 +58,20 @@ final class SettingsPage implements Hookable {
 		private Notices $notices
 	) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( AGENTREADY_FILE ), array( $this, 'action_links' ) );
 	}
 
+	/**
+	 * Registers the setting with its cleaning function.
+	 *
+	 * @return void
+	 */
 	public function register_settings(): void {
 		register_setting(
 			self::GROUP,
@@ -60,6 +84,12 @@ final class SettingsPage implements Hookable {
 		);
 	}
 
+	/**
+	 * Loads the style and script on this page.
+	 *
+	 * @param string $hook Admin page hook.
+	 * @return void
+	 */
 	public function enqueue( string $hook ): void {
 		if ( 'toplevel_page_' . self::SLUG !== $hook ) {
 			return;
@@ -70,8 +100,10 @@ final class SettingsPage implements Hookable {
 	}
 
 	/**
+	 * Adds a Settings link to the plugin's row on the Plugins screen.
+	 *
 	 * @param string[] $links Existing action links.
-	 * @return string[]
+	 * @return string[] The links, with Settings first.
 	 */
 	public function action_links( array $links ): array {
 		array_unshift( $links, '<a href="' . esc_url( $this->url() ) . '">' . esc_html__( 'Settings', 'agentready' ) . '</a>' );
@@ -79,10 +111,20 @@ final class SettingsPage implements Hookable {
 		return $links;
 	}
 
+	/**
+	 * Address of the page.
+	 *
+	 * @return string Admin address.
+	 */
 	public function url(): string {
 		return admin_url( 'admin.php?page=' . self::SLUG );
 	}
 
+	/**
+	 * Prints the page.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -104,6 +146,11 @@ final class SettingsPage implements Hookable {
 		);
 	}
 
+	/**
+	 * Prints the settings form inside the page.
+	 *
+	 * @return void
+	 */
 	public function render_form(): void {
 		View::render(
 			'settings-form',
@@ -129,7 +176,9 @@ final class SettingsPage implements Hookable {
 	}
 
 	/**
-	 * @return array<string, mixed>
+	 * Values for the status card.
+	 *
+	 * @return array<string, mixed> Values by name.
 	 */
 	private function status(): array {
 		global $wp_version;
@@ -155,8 +204,10 @@ final class SettingsPage implements Hookable {
 	}
 
 	/**
+	 * Post types for the settings form.
+	 *
 	 * @param bool $all Every available type with its exclusion state, or only the enabled ones.
-	 * @return array<int, array{slug: string, label: string, published: string, excluded: bool}>
+	 * @return array<int, array{slug: string, label: string, published: string, excluded: bool}> One entry per type.
 	 */
 	private function types( bool $all ): array {
 		$types = array();
@@ -174,6 +225,12 @@ final class SettingsPage implements Hookable {
 		return $types;
 	}
 
+	/**
+	 * Text that says how many pages of a type are published.
+	 *
+	 * @param string $type Post type.
+	 * @return string Text such as "12 published".
+	 */
 	private function published_label( string $type ): string {
 		$counts = wp_count_posts( $type );
 		$total  = is_object( $counts ) && isset( $counts->publish ) ? (int) $counts->publish : 0;

@@ -22,10 +22,21 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Handles the buttons and links that clear or rebuild the stored Markdown: the settings buttons, the row action and the bulk action. */
 final class CacheActions implements Hookable {
 
+	/** Name of the bulk action. */
 	private const BULK = 'agentready_regenerate';
 
+	/**
+	 * @param Store       $store       Stored copies.
+	 * @param PageCache   $pages       Generates the copies.
+	 * @param Batch       $batch       Refreshes many pages.
+	 * @param PostTypes   $post_types  Post types that are served.
+	 * @param Eligibility $eligibility Decides whether a page is served.
+	 * @param Environment $environment Tells whether the plugin is running on this site.
+	 * @param Changes     $changes     Theme and plugin changes.
+	 */
 	public function __construct(
 		private Store $store,
 		private PageCache $pages,
@@ -36,6 +47,9 @@ final class CacheActions implements Hookable {
 		private Changes $changes
 	) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		add_action( 'admin_post_agentready_cache', array( $this, 'handle_settings' ) );
 		add_action( 'admin_post_agentready_regenerate_post', array( $this, 'handle_row' ) );
@@ -47,12 +61,15 @@ final class CacheActions implements Hookable {
 		add_action( 'admin_notices', array( $this, 'notices' ) );
 	}
 
+	/**
+	 * Handles the Regenerate all and Clear cache buttons.
+	 *
+	 * @return void
+	 */
 	public function handle_settings(): void {
 		check_admin_referer( 'agentready_cache' );
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
-		}
+		$this->require_manage_options();
 
 		$action = isset( $_POST['cache_action'] ) ? sanitize_key( wp_unslash( $_POST['cache_action'] ) ) : '';
 		$notice = 'unknown';
@@ -77,12 +94,15 @@ final class CacheActions implements Hookable {
 		exit;
 	}
 
+	/**
+	 * Handles the Resume button, which accepts the current site address.
+	 *
+	 * @return void
+	 */
 	public function handle_resume(): void {
 		check_admin_referer( 'agentready_resume' );
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
-		}
+		$this->require_manage_options();
 
 		SiteAddress::remember();
 
@@ -90,12 +110,15 @@ final class CacheActions implements Hookable {
 		exit;
 	}
 
+	/**
+	 * Handles the Dismiss link of a change notice.
+	 *
+	 * @return void
+	 */
 	public function handle_dismiss(): void {
 		check_admin_referer( 'agentready_dismiss' );
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
-		}
+		$this->require_manage_options();
 
 		$key = isset( $_GET['key'] ) ? sanitize_key( wp_unslash( $_GET['key'] ) ) : '';
 
@@ -109,6 +132,11 @@ final class CacheActions implements Hookable {
 		exit;
 	}
 
+	/**
+	 * Handles the Regenerate Markdown link of one page.
+	 *
+	 * @return void
+	 */
 	public function handle_row(): void {
 		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 
@@ -142,8 +170,22 @@ final class CacheActions implements Hookable {
 	}
 
 	/**
+	 * Stops the request when the user may not manage options.
+	 *
+	 * @return void
+	 */
+	private function require_manage_options(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
+		}
+	}
+
+	/**
+	 * Adds Regenerate Markdown to the row actions of a served page.
+	 *
 	 * @param array<string, string> $actions Row actions.
-	 * @return array<string, string>
+	 * @param WP_Post               $post    The page.
+	 * @return array<string, string> The actions.
 	 */
 	public function row_actions( array $actions, WP_Post $post ): array {
 		if ( ! $this->environment->is_active() || ! current_user_can( 'edit_post', $post->ID ) || ! $this->eligibility->is_eligible( $post ) ) {
@@ -166,6 +208,11 @@ final class CacheActions implements Hookable {
 		return $actions;
 	}
 
+	/**
+	 * Adds the bulk action to the lists of the served post types.
+	 *
+	 * @return void
+	 */
 	public function register_bulk(): void {
 		foreach ( $this->post_types->enabled() as $type ) {
 			add_filter( "bulk_actions-edit-{$type}", array( $this, 'bulk_actions' ) );
@@ -174,8 +221,10 @@ final class CacheActions implements Hookable {
 	}
 
 	/**
+	 * Adds Regenerate Markdown to the bulk actions.
+	 *
 	 * @param array<string, string> $actions Bulk actions.
-	 * @return array<string, string>
+	 * @return array<string, string> The actions.
 	 */
 	public function bulk_actions( array $actions ): array {
 		if ( $this->environment->is_active() ) {
@@ -186,9 +235,12 @@ final class CacheActions implements Hookable {
 	}
 
 	/**
-	 * @param mixed $redirect Redirect URL.
+	 * Queues a refresh for the selected pages that are served.
+	 *
+	 * @param mixed $redirect Redirect address.
 	 * @param mixed $action   Bulk action name.
-	 * @param mixed $ids      Selected post IDs.
+	 * @param mixed $ids      Selected page IDs.
+	 * @return mixed The address to go to, with the result added.
 	 */
 	public function handle_bulk( mixed $redirect, mixed $action, mixed $ids ): mixed {
 		if ( self::BULK !== $action || ! is_string( $redirect ) || ! $this->environment->is_active() ) {
@@ -216,6 +268,11 @@ final class CacheActions implements Hookable {
 		);
 	}
 
+	/**
+	 * Prints the result of the last action.
+	 *
+	 * @return void
+	 */
 	public function notices(): void {
 		$code = isset( $_GET['agentready_notice'] ) ? sanitize_key( wp_unslash( $_GET['agentready_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only message code.
 

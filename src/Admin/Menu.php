@@ -13,24 +13,40 @@ use AgentReady\Contracts\Hookable;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Adds the AgentReady menu and its pages, and the footer text on them. */
 final class Menu implements Hookable {
 
+	/** Profile of the author, linked in the footer. */
 	private const AUTHOR_URL = 'https://www.linkedin.com/in/sami-ahmed-siddiqui/';
 
+	/** Position of the menu in the admin sidebar. */
 	private const POSITION = 81;
 
+	/**
+	 * @param SettingsPage $settings Settings page.
+	 * @param LlmsPage     $llms     llms.txt page.
+	 * @param VerifyPage   $verify   Verify and Preview page.
+	 */
 	public function __construct(
 		private SettingsPage $settings,
 		private LlmsPage $llms,
 		private VerifyPage $verify
 	) {}
 
+	/**
+	 * @return void
+	 */
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_pages' ) );
 		add_filter( 'admin_footer_text', array( $this, 'footer_text' ), 11 );
 		add_filter( 'update_footer', array( $this, 'footer_version' ), 11 );
 	}
 
+	/**
+	 * Adds the menu and its sub-pages.
+	 *
+	 * @return void
+	 */
 	public function add_pages(): void {
 		add_menu_page(
 			__( 'AgentReady', 'agentready' ),
@@ -47,6 +63,12 @@ final class Menu implements Hookable {
 		add_submenu_page( SettingsPage::SLUG, __( 'Verify & Preview', 'agentready' ), __( 'Verify & Preview', 'agentready' ), 'manage_options', VerifyPage::SLUG, array( $this->verify, 'render' ) );
 	}
 
+	/**
+	 * Replaces the admin footer text on the plugin pages.
+	 *
+	 * @param mixed $text Current footer text.
+	 * @return mixed The new text on the plugin pages, otherwise the text unchanged.
+	 */
 	public function footer_text( mixed $text ): mixed {
 		if ( ! $this->is_plugin_screen() ) {
 			return $text;
@@ -68,6 +90,12 @@ final class Menu implements Hookable {
 		);
 	}
 
+	/**
+	 * Replaces the WordPress version in the footer on the plugin pages.
+	 *
+	 * @param mixed $text Current footer text.
+	 * @return mixed The plugin version on the plugin pages, otherwise the text unchanged.
+	 */
 	public function footer_version( mixed $text ): mixed {
 		if ( ! $this->is_plugin_screen() ) {
 			return $text;
@@ -77,6 +105,11 @@ final class Menu implements Hookable {
 		return esc_html( sprintf( __( 'AgentReady %s', 'agentready' ), AGENTREADY_VERSION ) );
 	}
 
+	/**
+	 * Whether the current admin screen is one of the plugin pages.
+	 *
+	 * @return bool True when it is.
+	 */
 	private function is_plugin_screen(): bool {
 		$screen = get_current_screen();
 
@@ -84,7 +117,9 @@ final class Menu implements Hookable {
 	}
 
 	/**
-	 * A sparkle, the common symbol for AI, as an SVG that WordPress recolors to match the admin scheme.
+	 * Menu icon: a sparkle, as an SVG that WordPress recolors to match the admin scheme.
+	 *
+	 * @return string Data URI of the icon.
 	 */
 	private function icon(): string {
 		$svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="#a7aaad" d="M8 5Q8 12 15 12Q8 12 8 19Q8 12 1 12Q8 12 8 5ZM15.5 1Q15.5 4.5 19 4.5Q15.5 4.5 15.5 8Q15.5 4.5 12 4.5Q15.5 4.5 15.5 1Z"/></svg>';
