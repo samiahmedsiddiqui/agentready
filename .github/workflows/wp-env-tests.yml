@@ -36,6 +36,9 @@ jobs:
           persist-credentials: false
           show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
+      - name: Install the PHPUnit polyfills
+        run: composer install --no-interaction --prefer-dist
+
       - name: Start wp-env
         run: npx --yes @wordpress/env start
 

@@ -42,7 +42,7 @@ jobs:
           coverage: none
 
       - name: Install zsh
-        run: sudo apt-get update && sudo apt-get install -y zsh
+        run: command -v zsh || (sudo apt-get update && sudo apt-get install -y zsh)
 
       - name: Build the test site
         run: tests/integration/setup.sh

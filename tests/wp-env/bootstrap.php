@@ -15,8 +15,8 @@ if ( getenv( 'WP_PHPUNIT__TESTS_CONFIG' ) && ! defined( 'WP_TESTS_CONFIG_FILE_PA
 	define( 'WP_TESTS_CONFIG_FILE_PATH', getenv( 'WP_PHPUNIT__TESTS_CONFIG' ) );
 }
 
-if ( getenv( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) && ! defined( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) ) {
-	define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', getenv( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) );
+if ( ! defined( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) ) {
+	define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', getenv( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) ? getenv( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) : dirname( __DIR__, 2 ) . '/vendor/yoast/phpunit-polyfills' );
 }
 
 require_once $agentwelcome_tests_dir . '/includes/functions.php';
