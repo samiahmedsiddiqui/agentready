@@ -91,13 +91,13 @@ final class PageCache implements Hookable {
 			}
 
 			try {
-				$made = $this->regenerate( $post, false );
+				$served = $this->generate_unless_fresh( $post );
 			} finally {
 				$this->lock->release_slot( $slot );
 			}
 
-			if ( null !== $made ) {
-				return new Served( $made, Served::MISS );
+			if ( null !== $served ) {
+				return $served;
 			}
 
 			if ( null !== $entry ) {
@@ -126,30 +126,48 @@ final class PageCache implements Hookable {
 	}
 
 	/**
-	 * Generates and stores the copy of a page.
+	 * Generates and stores the copy of a page, even when a current one exists.
 	 *
-	 * @param WP_Post $post  The page.
-	 * @param bool    $force Rebuild even if another request just stored a current copy.
+	 * @param WP_Post $post The page.
 	 * @return Entry|null The new copy, or null when another request holds the lock.
 	 */
-	public function regenerate( WP_Post $post, bool $force = true ): ?Entry {
+	public function regenerate( WP_Post $post ): ?Entry {
 		if ( ! $this->lock->acquire( $post->ID ) ) {
 			return null;
 		}
 
 		try {
-			if ( ! $force ) {
-				$current = $this->store->get( $post->ID );
+			$entry = $this->build( $post );
+			$this->store->save( $entry );
 
-				if ( null !== $current && Freshness::FRESH === Freshness::classify( $current, AGENTWELCOME_VERSION ) ) {
-					return $current;
-				}
+			return $entry;
+		} finally {
+			$this->lock->release( $post->ID );
+		}
+	}
+
+	/**
+	 * Generates the copy of a page unless another request has just stored a current one.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return Served|null MISS when this request generated the copy, HIT when it found a current one, or null when another request holds the lock.
+	 */
+	private function generate_unless_fresh( WP_Post $post ): ?Served {
+		if ( ! $this->lock->acquire( $post->ID ) ) {
+			return null;
+		}
+
+		try {
+			$current = $this->store->get( $post->ID );
+
+			if ( null !== $current && Freshness::FRESH === Freshness::classify( $current, AGENTWELCOME_VERSION ) ) {
+				return new Served( $current, Served::HIT );
 			}
 
 			$entry = $this->build( $post );
 			$this->store->save( $entry );
 
-			return $entry;
+			return new Served( $entry, Served::MISS );
 		} finally {
 			$this->lock->release( $post->ID );
 		}
