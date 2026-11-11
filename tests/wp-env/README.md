@@ -7,7 +7,7 @@ Docker, Node.js and Composer are needed. From the repository root:
 ```bash
 composer install          # installs the PHPUnit polyfills that the WordPress test library needs
 npx @wordpress/env start
-npx @wordpress/env run tests-cli --env-cwd=wp-content/plugins/agentwelcome phpunit -c tests/wp-env/phpunit.xml.dist
+npx @wordpress/env run tests-cli --env-cwd=wp-content/plugins/agentwelcome vendor/bin/phpunit -c tests/wp-env/phpunit.xml.dist
 npx @wordpress/env stop
 ```
 

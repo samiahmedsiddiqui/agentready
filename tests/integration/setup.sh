@@ -1,7 +1,7 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 # Builds a throwaway WordPress on SQLite in ./wp-test with the content the test scripts expect.
 # Needs php, wp-cli (set WP_CLI to its path if it is not /usr/local/bin/wp), curl, unzip and network access. Takes about a minute.
-KIT=${0:A:h}; ROOT=$KIT/wp-test; PORT=8899
+KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd); ROOT=$KIT/wp-test; PORT=8899
 wpcli() { php -d error_reporting=0 -d display_errors=0 ${WP_CLI:-/usr/local/bin/wp} "$@" 2>&1 | grep -v "^Deprecated\|^PHP Deprecated"; }
 rm -rf $ROOT && mkdir -p $ROOT && cd $ROOT || exit 1
 curl -sSL -o wordpress.zip https://wordpress.org/latest.zip && unzip -q wordpress.zip && mv wordpress wp

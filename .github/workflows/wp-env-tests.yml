@@ -43,7 +43,7 @@ jobs:
         run: npx --yes @wordpress/env start
 
       - name: Run the tests
-        run: npx @wordpress/env run tests-cli --env-cwd="wp-content/plugins/$(basename "$PWD")" phpunit -c tests/wp-env/phpunit.xml.dist
+        run: npx @wordpress/env run tests-cli --env-cwd="wp-content/plugins/$(basename "$PWD")" vendor/bin/phpunit -c tests/wp-env/phpunit.xml.dist
 
       - name: Show the debug log
         if: failure()
