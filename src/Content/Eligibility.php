@@ -14,20 +14,35 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Decides whether a page gets a Markdown version. */
 final class Eligibility {
 
+	/**
+	 * @param PostTypes  $post_types Post types that are served.
+	 * @param Exclusions $exclusions Pages that are left out.
+	 * @param Urls       $urls       Builds the page addresses.
+	 */
 	public function __construct(
 		private PostTypes $post_types,
 		private Exclusions $exclusions,
 		private Urls $urls
 	) {}
 
+	/**
+	 * Whether the page is served.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return bool True when it is.
+	 */
 	public function is_eligible( WP_Post $post ): bool {
 		return null === $this->reason( $post );
 	}
 
 	/**
-	 * @return string|null Why the post is not served, or null when it is eligible.
+	 * Finds why a page is not served.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return string|null A reason code, or null when the page is served.
 	 */
 	public function reason( WP_Post $post ): ?string {
 		if ( 'publish' !== $post->post_status ) {
@@ -55,6 +70,12 @@ final class Eligibility {
 		return apply_filters( 'agentready_is_eligible', true, $post ) ? null : 'filtered';
 	}
 
+	/**
+	 * Turns a reason code into a sentence.
+	 *
+	 * @param string $reason Code from reason().
+	 * @return string Sentence for people, or the code when it is unknown.
+	 */
 	public function describe( string $reason ): string {
 		$labels = array(
 			'not_published'      => __( 'The page is not published.', 'agentready' ),

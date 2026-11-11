@@ -16,16 +16,27 @@ use AgentReady\Rendering\Selector;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Cleans the main settings when they are saved. */
 final class Sanitizer {
 
-	/** @var array<string, mixed>|null */
+	/**
+	 * Result of the last cleaning, because WordPress runs the sanitizer twice on the first save.
+	 *
+	 * @var array<string, mixed>|null
+	 */
 	private ?array $last = null;
 
+	/**
+	 * @param PostTypes $post_types Available post types.
+	 * @param Options   $options    Saved settings.
+	 */
 	public function __construct( private PostTypes $post_types, private Options $options ) {}
 
 	/**
+	 * Cleans submitted settings.
+	 *
 	 * @param mixed $input Raw submitted value.
-	 * @return array<string, mixed>
+	 * @return array<string, mixed> Settings by name.
 	 */
 	public function sanitize( mixed $input ): array {
 		// WordPress calls the sanitizer a second time with its own output on the first save.
@@ -72,7 +83,10 @@ final class Sanitizer {
 	}
 
 	/**
+	 * Cleans the list of allowed addresses. When the list is set in wp-config.php the saved value is kept.
+	 *
 	 * @param array<string, mixed> $input Raw submitted values.
+	 * @return string One address per line.
 	 */
 	private function allowed_urls( array $input ): string {
 		if ( defined( 'AGENTREADY_ALLOWED_URLS' ) ) {
@@ -83,7 +97,10 @@ final class Sanitizer {
 	}
 
 	/**
-	 * @param string[] $invalid Selectors that could not be used.
+	 * Shows a warning that lists selectors that cannot be used.
+	 *
+	 * @param string[] $invalid Selectors that were ignored.
+	 * @return void
 	 */
 	private function report_invalid( array $invalid ): void {
 		if ( empty( $invalid ) ) {
@@ -103,8 +120,10 @@ final class Sanitizer {
 	}
 
 	/**
+	 * Cleans the HTTP Basic credentials. The password is encrypted, and the saved one is kept when none is submitted.
+	 *
 	 * @param array<string, mixed> $input Raw submitted values.
-	 * @return array<string, string>
+	 * @return array<string, string> The user and the encrypted password.
 	 */
 	private function http_auth( array $input ): array {
 		$current = $this->options->all();

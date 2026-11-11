@@ -11,14 +11,19 @@ namespace AgentReady\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Main settings of the plugin, saved as one option. */
 final class Options {
 
+	/** Option name. */
 	public const KEY = 'agentready_settings';
 
+	/** Selectors tried, in order, to find the main content of a page. An empty setting means these are used. */
 	public const DEFAULT_SELECTOR = 'main, [role="main"], #content, #main, .site-content, article';
 
 	/**
-	 * @return array<string, mixed>
+	 * Default values of the settings.
+	 *
+	 * @return array<string, mixed> Settings by name.
 	 */
 	public static function defaults(): array {
 		return array(
@@ -40,7 +45,9 @@ final class Options {
 	}
 
 	/**
-	 * @return array<string, mixed>
+	 * Saved settings, filled in with the defaults.
+	 *
+	 * @return array<string, mixed> Settings by name.
 	 */
 	public function all(): array {
 		$saved = get_option( self::KEY, array() );
@@ -48,6 +55,13 @@ final class Options {
 		return array_merge( self::defaults(), is_array( $saved ) ? $saved : array() );
 	}
 
+	/**
+	 * Reads one setting.
+	 *
+	 * @param string $key      Setting name.
+	 * @param mixed  $fallback Value to return when the setting does not exist.
+	 * @return mixed The saved value, or the fallback.
+	 */
 	public function get( string $key, mixed $fallback = null ): mixed {
 		$all = $this->all();
 
@@ -55,7 +69,9 @@ final class Options {
 	}
 
 	/**
-	 * @return string The saved content selector, or an empty string to auto-detect.
+	 * Selector that was set for the main content.
+	 *
+	 * @return string The saved selector, or an empty string to detect it automatically.
 	 */
 	public function content_selector(): string {
 		$selector = trim( (string) $this->get( 'content_selector', '' ) );
@@ -63,12 +79,19 @@ final class Options {
 		return self::DEFAULT_SELECTOR === $selector ? '' : $selector;
 	}
 
+	/**
+	 * Whether the HTTP Basic credentials are set in wp-config.php.
+	 *
+	 * @return bool True when both constants are defined.
+	 */
 	public function http_auth_from_constants(): bool {
 		return defined( 'AGENTREADY_HTTP_AUTH_USER' ) && defined( 'AGENTREADY_HTTP_AUTH_PASSWORD' );
 	}
 
 	/**
-	 * @return array{user: string, password: string}|null
+	 * Credentials for a site that is protected with HTTP Basic authentication.
+	 *
+	 * @return array{user: string, password: string}|null The credentials, or null when the option is off or no user is set.
 	 */
 	public function http_auth(): ?array {
 		if ( ! $this->get( 'http_auth_enabled' ) ) {

@@ -13,15 +13,27 @@ use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
+/** Reads whether an SEO plugin marks a page as noindex. */
 final class Noindex {
 
-	public const YOAST    = '_yoast_wpseo_meta-robots-noindex';
+	/** Meta key of Yoast SEO. */
+	public const YOAST = '_yoast_wpseo_meta-robots-noindex';
+	/** Meta key of Rank Math. */
 	public const RANKMATH = 'rank_math_robots';
+	/** Meta key of SEOPress. */
 	public const SEOPRESS = '_seopress_robots_index';
-	public const TSF      = '_genesis_noindex';
+	/** Meta key of The SEO Framework. */
+	public const TSF = '_genesis_noindex';
 
+	/** Meta keys of all the supported plugins except All in One SEO, which keeps its own table. */
 	public const KEYS = array( self::YOAST, self::RANKMATH, self::SEOPRESS, self::TSF );
 
+	/**
+	 * Whether an active SEO plugin marks the page as noindex.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return bool True when it does.
+	 */
 	public function is_noindex( WP_Post $post ): bool {
 		$values = array();
 
@@ -35,7 +47,10 @@ final class Noindex {
 	}
 
 	/**
-	 * @param array<string, mixed> $values Saved meta values by key. Only keys of active plugins should be passed.
+	 * Reads the choice from saved meta values.
+	 *
+	 * @param array<string, mixed> $values Saved values by meta key. Only keys of active plugins should be passed.
+	 * @return bool True when a value means noindex.
 	 */
 	public static function from_meta( array $values ): bool {
 		$rank = $values[ self::RANKMATH ] ?? array();
@@ -49,7 +64,7 @@ final class Noindex {
 	/**
 	 * Meta keys of the SEO plugins that are active, so leftovers of a removed plugin are ignored.
 	 *
-	 * @return string[]
+	 * @return string[] Meta keys.
 	 */
 	private function active_keys(): array {
 		$active = array(
@@ -62,6 +77,12 @@ final class Noindex {
 		return array_keys( array_filter( (array) apply_filters( 'agentready_noindex_sources', $active ) ) );
 	}
 
+	/**
+	 * Reads the choice from All in One SEO.
+	 *
+	 * @param WP_Post $post The page.
+	 * @return bool True when it marks the page as noindex.
+	 */
 	private function aioseo( WP_Post $post ): bool {
 		if ( ! function_exists( 'aioseo' ) || ! class_exists( '\AIOSEO\Plugin\Common\Models\Post' ) ) {
 			return false;
