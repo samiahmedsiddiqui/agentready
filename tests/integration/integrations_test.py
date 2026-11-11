@@ -110,6 +110,7 @@ try:
     wpcli("post", "meta", "delete", str(ids[slug]), "_yoast_wpseo_meta-robots-noindex")
     clear_env()
 
+    set_env(no_cron=True)
     print("--- SEO meta changes refresh the page")
     slug = "integ-d"
     md(slug)
@@ -142,10 +143,10 @@ try:
     for slug in ("integ-a", "integ-e"):
         md(slug)
     php("do_action('agentwelcome_generate_post', %d);" % ids["integ-a"])
-    set_env(enabled=False)
+    set_env(enabled=False, no_cron=True)
     php("do_action('acf/save_post', 'options');")
     check("nothing happens while AgentWelcome is switched off", not batch_running())
-    clear_env()
+    set_env(no_cron=True)
 
     print("--- Elementor")
     for slug in ("integ-a", "integ-e"):
@@ -161,6 +162,7 @@ try:
     php("do_action('elementor/document/after_save', 'not a document', array()); do_action('elementor/document/after_save', new class { public function get_main_id() { return 99999999; } }, array());")
     check("a bad or unknown document is ignored", not batch_running())
 
+    clear_env()
     print("--- theme and plugin changes")
     wpcli("option", "delete", "agentwelcome_changes")
     for slug in ("integ-a", "integ-e"):
