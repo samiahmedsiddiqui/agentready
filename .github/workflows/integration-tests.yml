@@ -1,0 +1,69 @@
+name: Integration tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  integration:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.0', '8.4' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, libxml, mbstring, curl, zip, sqlite3, pdo_sqlite
+          tools: wp-cli
+          coverage: none
+
+      - name: Install zsh
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Build the test site
+        run: tests/integration/setup.sh
+        env:
+          WP_CLI: /usr/local/bin/wp
+
+      - name: Install the plugin
+        run: tests/integration/deploy.sh
+        env:
+          WP_CLI: /usr/local/bin/wp
+
+      - name: Start the server
+        run: tests/integration/serve.sh start
+
+      - name: Run the integration suites
+        run: tests/integration/run.sh
+        env:
+          WP_CLI: /usr/local/bin/wp
+
+      - name: Show the server and debug logs
+        if: failure()
+        run: |
+          tail -n 60 tests/integration/wp-test/server.log || true
+          tail -n 60 tests/integration/wp-test/wp/wp-content/debug.log || true

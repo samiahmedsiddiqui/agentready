@@ -3,3 +3,4 @@
 .DS_Store
 /.cache/
 .phpunit.result.cache
+/tests/integration/wp-test/
