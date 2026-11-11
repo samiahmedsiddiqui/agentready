@@ -17,6 +17,9 @@ defined( 'ABSPATH' ) || exit;
 
 final class Acf implements Hookable {
 
+	/** ACF save targets that are not an options page: new posts, users, widgets, comments, and posts or terms by ID. */
+	private const NOT_OPTIONS_TARGET = '/^(new_post|user_|widget_|comment_)|_\d+$/';
+
 	public function __construct(
 		private Batch $batch,
 		private Environment $environment
@@ -40,6 +43,6 @@ final class Acf implements Hookable {
 			return false;
 		}
 
-		return 1 !== preg_match( '/^(new_post|user_|widget_|comment_)|_\d+$/', $post_id );
+		return 1 !== preg_match( self::NOT_OPTIONS_TARGET, $post_id );
 	}
 }

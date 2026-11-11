@@ -16,6 +16,21 @@ defined( 'ABSPATH' ) || exit;
 
 final class Converter {
 
+	/** The start of a Markdown block: heading, list item, quote, table row, code fence or image. */
+	private const BLOCK_START = '/^(#|[-*+] |\d+[.)] |>|\||`{3}|!\[)/';
+
+	/** A block that is only an image. */
+	private const STANDALONE_IMAGE = '/^!\[([^\]]*)\]\([^)]*\)$/';
+
+	/** Heading, quote and bullet markers at the start of plain text. */
+	private const BLOCK_MARKER_ESCAPE = '/^(\s*)(#{1,6}(?=\s)|[>+-](?=\s))/';
+
+	/** A number followed by . or ) at the start of plain text. */
+	private const NUMBER_MARKER_ESCAPE = '/^(\s*\d+)([.)])(?=\s)/';
+
+	/** An underscore at the edge of a word. */
+	private const EDGE_UNDERSCORE = '/(?<![\p{L}\p{N}])_|_(?![\p{L}\p{N}])/u';
+
 	private const BREAK = "\x01";
 
 	private const MAX_DEPTH = 100;
@@ -240,11 +255,11 @@ final class Converter {
 	}
 
 	private function is_plain( string $block ): bool {
-		return 0 === preg_match( '/^(#|[-*+] |\d+[.)] |>|\||`{3}|!\[)/', $block ) && ! in_array( $block, self::ICONS, true );
+		return 0 === preg_match( self::BLOCK_START, $block ) && ! in_array( $block, self::ICONS, true );
 	}
 
 	private function standalone_alt( string $block ): ?string {
-		return 1 === preg_match( '/^!\[([^\]]*)\]\([^)]*\)$/', $block, $match ) && '' !== trim( $match[1] ) ? $match[1] : null;
+		return 1 === preg_match( self::STANDALONE_IMAGE, $block, $match ) && '' !== trim( $match[1] ) ? $match[1] : null;
 	}
 
 	private function same_text( string $a, string $b ): bool {
@@ -281,9 +296,9 @@ final class Converter {
 		}
 
 		$text = $this->escape( $text );
-		$text = (string) preg_replace( '/^(\s*)(#{1,6}(?=\s)|[>+-](?=\s))/', '$1\\\\$2', $text );
+		$text = (string) preg_replace( self::BLOCK_MARKER_ESCAPE, '$1\\\\$2', $text );
 
-		return (string) preg_replace( '/^(\s*\d+)([.)])(?=\s)/', '$1\\\\$2', $text );
+		return (string) preg_replace( self::NUMBER_MARKER_ESCAPE, '$1\\\\$2', $text );
 	}
 
 	private function escape( string $text ): string {
@@ -293,7 +308,7 @@ final class Converter {
 			$text
 		);
 
-		return (string) preg_replace( '/(?<![\p{L}\p{N}])_|_(?![\p{L}\p{N}])/u', '\\_', $text );
+		return (string) preg_replace( self::EDGE_UNDERSCORE, '\\_', $text );
 	}
 
 	private function fence( string $content, string $character ): string {

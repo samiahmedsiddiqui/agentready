@@ -13,6 +13,12 @@ defined( 'ABSPATH' ) || exit;
 
 final class Comparison {
 
+	/** The metadata block at the top of a stored page. */
+	private const FRONT_MATTER = '/\A---\n.*?\n---\n/s';
+
+	/** A Markdown link or image, to keep only its text. */
+	private const MARKDOWN_LINK = '/!?\[([^\]]*)\]\([^)]*\)/';
+
 	public const SAME = 'same';
 	public const ADD  = 'add';
 	public const DEL  = 'del';
@@ -163,8 +169,8 @@ final class Comparison {
 	 * Letters and digits only, lower case, without the front matter and link addresses.
 	 */
 	public static function plain_key( string $markdown ): string {
-		$text = (string) preg_replace( '/\A---\n.*?\n---\n/s', '', $markdown );
-		$text = (string) preg_replace( '/!?\[([^\]]*)\]\([^)]*\)/', '$1', $text );
+		$text = (string) preg_replace( self::FRONT_MATTER, '', $markdown );
+		$text = (string) preg_replace( self::MARKDOWN_LINK, '$1', $text );
 
 		return self::key( $text );
 	}

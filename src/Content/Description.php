@@ -15,13 +15,16 @@ defined( 'ABSPATH' ) || exit;
 
 final class Description {
 
+	/** An SEO plugin template tag such as %%sitename%% or #post_title. */
+	private const TEMPLATE_TAG = '/%{1,2}[a-z_]+(?:\([^)]*\))?%{1,2}|#[a-z]+_[a-z_]+/i';
+
 	public const SEO_META_KEYS = array( '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc', '_genesis_description' );
 
 	/**
 	 * Whether the text still holds template tags such as %%sitename%%, %title% or #site_title.
 	 */
 	public static function has_unresolved_tags( string $text ): bool {
-		return 1 === preg_match( '/%{1,2}[a-z_]+(?:\([^)]*\))?%{1,2}|#[a-z]+_[a-z_]+/i', $text );
+		return 1 === preg_match( self::TEMPLATE_TAG, $text );
 	}
 
 	public function get( WP_Post $post ): string {
