@@ -2,16 +2,16 @@
 /**
  * Refreshes every page when an ACF options page is saved, because options can show up anywhere.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Integrations;
+namespace AgentWelcome\Integrations;
 
-use AgentReady\Cache\Batch;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
+use AgentWelcome\Cache\Batch;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
 
 defined( 'ABSPATH' ) || exit;
 

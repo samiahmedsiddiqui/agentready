@@ -2,14 +2,14 @@
 /**
  * Tests for how the llms.txt file is put together.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Index\LlmsTxt;
+use AgentWelcome\Index\LlmsTxt;
 use PHPUnit\Framework\TestCase;
 
 final class LlmsTxtTest extends TestCase {

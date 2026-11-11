@@ -2,14 +2,14 @@
 /**
  * Tests for telling one site address from another.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Environment\SiteAddress;
+use AgentWelcome\Environment\SiteAddress;
 use PHPUnit\Framework\TestCase;
 
 final class SiteAddressTest extends TestCase {

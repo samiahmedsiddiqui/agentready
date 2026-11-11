@@ -2,17 +2,17 @@
 /**
  * Opt-in comment in robots.txt that points to llms.txt. It adds no allow or disallow rules.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Robots;
+namespace AgentWelcome\Robots;
 
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Http\Urls;
-use AgentReady\Settings\LlmsOptions;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Settings\LlmsOptions;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -68,7 +68,7 @@ final class RobotsTxt implements Hookable {
 	 * @return string The lines, starting with a line break.
 	 */
 	public static function lines( string $llms, ?string $full ): string {
-		$lines = "\n# AgentReady\n# llms.txt: " . $llms . "\n";
+		$lines = "\n# AgentWelcome\n# llms.txt: " . $llms . "\n";
 
 		if ( null !== $full ) {
 			$lines .= '# llms-full.txt: ' . $full . "\n";

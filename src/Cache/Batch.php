@@ -2,17 +2,17 @@
 /**
  * Warms the cache in small background batches, and removes copies of pages that are no longer served.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Content\Eligibility;
-use AgentReady\Content\PostTypes;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -20,11 +20,11 @@ defined( 'ABSPATH' ) || exit;
 final class Batch implements Hookable {
 
 	/** Cron hook of the refresh run. */
-	public const JOB = 'agentready_regenerate_batch';
+	public const JOB = 'agentwelcome_regenerate_batch';
 	/** Cron hook of the removal of copies that are no longer served. */
-	public const PRUNE = 'agentready_prune';
+	public const PRUNE = 'agentwelcome_prune';
 	/** Option that holds where the refresh stopped. It exists only while a refresh is running. */
-	public const OPTION = 'agentready_batch';
+	public const OPTION = 'agentwelcome_batch';
 
 	/** Pages handled in one cron run. */
 	private const PAGES_PER_RUN = 5;
@@ -174,7 +174,7 @@ final class Batch implements Hookable {
 
 		$entry = $this->store->get( $id, false );
 
-		if ( Freshness::FRESH === Freshness::classify( $entry, AGENTREADY_VERSION ) ) {
+		if ( Freshness::FRESH === Freshness::classify( $entry, AGENTWELCOME_VERSION ) ) {
 			return;
 		}
 

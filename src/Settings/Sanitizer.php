@@ -2,17 +2,17 @@
 /**
  * Sanitizes settings before they are saved.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Settings;
+namespace AgentWelcome\Settings;
 
-use AgentReady\Content\PostTypes;
-use AgentReady\Environment\Environment;
-use AgentReady\Http\Urls;
-use AgentReady\Rendering\Selector;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Rendering\Selector;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -89,7 +89,7 @@ final class Sanitizer {
 	 * @return string One address per line.
 	 */
 	private function allowed_urls( array $input ): string {
-		if ( defined( 'AGENTREADY_ALLOWED_URLS' ) ) {
+		if ( defined( 'AGENTWELCOME_ALLOWED_URLS' ) ) {
 			return (string) $this->options->get( 'allowed_urls', '' );
 		}
 
@@ -109,10 +109,10 @@ final class Sanitizer {
 
 		add_settings_error(
 			Options::KEY,
-			'agentready_invalid_selector',
+			'agentwelcome_invalid_selector',
 			sprintf(
 				/* translators: %s: list of CSS selectors. */
-				__( 'These selectors are not supported and were ignored: %s', 'agentready' ),
+				__( 'These selectors are not supported and were ignored: %s', 'agentwelcome' ),
 				implode( ', ', $invalid )
 			),
 			'warning'

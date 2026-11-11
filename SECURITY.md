@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Security fixes are released for the latest version of AgentReady. Please make sure a vulnerability still applies to it before reporting.
+Security fixes are released for the latest version of AgentWelcome. Please make sure a vulnerability still applies to it before reporting.
 
 ## Reporting a Vulnerability
 

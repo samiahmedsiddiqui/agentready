@@ -2,12 +2,12 @@
 /**
  * Finds the posts that should have a stored copy.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
 defined( 'ABSPATH' ) || exit;
 

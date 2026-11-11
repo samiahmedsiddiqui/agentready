@@ -2,12 +2,12 @@
 /**
  * Compares stored Markdown with fresh Markdown and checks page text against Markdown.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Verify;
+namespace AgentWelcome\Verify;
 
 defined( 'ABSPATH' ) || exit;
 

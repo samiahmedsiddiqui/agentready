@@ -2,18 +2,18 @@
 /**
  * Builds /llms.txt: a Markdown index of every eligible page.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Index;
+namespace AgentWelcome\Index;
 
-use AgentReady\Content\Description;
-use AgentReady\Content\Eligibility;
-use AgentReady\Content\PostTypes;
-use AgentReady\Http\Urls;
-use AgentReady\Settings\LlmsOptions;
+use AgentWelcome\Content\Description;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Settings\LlmsOptions;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -49,7 +49,7 @@ final class LlmsTxt {
 			? self::compose( $mode, $custom, array(), array() )
 			: self::compose( $mode, $custom, $this->heading(), $this->sections() );
 
-		return (string) apply_filters( 'agentready_llms_txt', $text );
+		return (string) apply_filters( 'agentwelcome_llms_txt', $text );
 	}
 
 	/**
@@ -135,7 +135,7 @@ final class LlmsTxt {
 				'post_type'        => $type,
 				'post_status'      => 'publish',
 				'has_password'     => false,
-				'posts_per_page'   => (int) apply_filters( 'agentready_llms_max_items', 500, $type ),
+				'posts_per_page'   => (int) apply_filters( 'agentwelcome_llms_max_items', 500, $type ),
 				'orderby'          => $hierarchical ? 'menu_order title' : 'date',
 				'order'            => $hierarchical ? 'ASC' : 'DESC',
 				'no_found_rows'    => true,

@@ -2,16 +2,16 @@
 /**
  * Describes the stored copy of one page for the editor box and the REST API.
  *
- * @package AgentReady\Cache
+ * @package AgentWelcome\Cache
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Content\Eligibility;
-use AgentReady\Environment\Environment;
-use AgentReady\Rendering\RenderResult;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Rendering\RenderResult;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -60,24 +60,24 @@ final class PageStatus {
 		}
 
 		$base['can_regenerate'] = true;
-		$state                  = Freshness::classify( $entry, AGENTREADY_VERSION );
+		$state                  = Freshness::classify( $entry, AGENTWELCOME_VERSION );
 
 		if ( null === $entry || Freshness::MISSING === $state ) {
 			return array_merge(
 				$base,
 				array(
 					'state' => Freshness::MISSING,
-					'label' => __( 'Not generated yet. It is created on the first request.', 'agentready' ),
+					'label' => __( 'Not generated yet. It is created on the first request.', 'agentwelcome' ),
 				)
 			);
 		}
 
 		$labels = array(
-			Freshness::FRESH    => __( 'Up to date.', 'agentready' ),
+			Freshness::FRESH    => __( 'Up to date.', 'agentwelcome' ),
 			Freshness::STALE    => RenderResult::FALLBACK === $entry->source
-				? __( 'Built from the post content only. A new attempt is made later.', 'agentready' )
-				: __( 'Out of date. The old copy is served while a new one is built.', 'agentready' ),
-			Freshness::OUTDATED => __( 'Built by an older plugin version. It is rebuilt on the next request.', 'agentready' ),
+				? __( 'Built from the post content only. A new attempt is made later.', 'agentwelcome' )
+				: __( 'Out of date. The old copy is served while a new one is built.', 'agentwelcome' ),
+			Freshness::OUTDATED => __( 'Built by an older plugin version. It is rebuilt on the next request.', 'agentwelcome' ),
 		);
 
 		return array_merge(
@@ -87,9 +87,9 @@ final class PageStatus {
 				'label'  => $labels[ $state ],
 				'detail' => sprintf(
 					/* translators: 1: date and time, 2: how the page was read. */
-					__( 'Generated %1$s. Source: %2$s.', 'agentready' ),
+					__( 'Generated %1$s. Source: %2$s.', 'agentwelcome' ),
 					wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $entry->timestamp() ),
-					RenderResult::LOOPBACK === $entry->source ? __( 'rendered page', 'agentready' ) : __( 'post content', 'agentready' )
+					RenderResult::LOOPBACK === $entry->source ? __( 'rendered page', 'agentwelcome' ) : __( 'post content', 'agentwelcome' )
 				),
 			)
 		);
@@ -106,7 +106,7 @@ final class PageStatus {
 			'state' => self::UNAVAILABLE,
 			'label' => sprintf(
 				/* translators: %s: reason. */
-				__( 'Not served. %s', 'agentready' ),
+				__( 'Not served. %s', 'agentwelcome' ),
 				$label
 			),
 		);

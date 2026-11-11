@@ -2,12 +2,12 @@
 /**
  * Extracts the main content area from a page and strips non-content markup.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rendering;
+namespace AgentWelcome\Rendering;
 
 use DOMDocument;
 use DOMElement;

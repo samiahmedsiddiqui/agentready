@@ -2,16 +2,16 @@
 /**
  * Adds the rel="alternate" Markdown link to the page head.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Http;
+namespace AgentWelcome\Http;
 
-use AgentReady\Content\Eligibility;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;

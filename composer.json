@@ -1,5 +1,5 @@
 {
-	"name": "yasglobal/agentready",
+	"name": "yasglobal/agentwelcome",
 	"description": "Serves an llms.txt index and a Markdown version of every page for AI agents. Works with ACF, Gutenberg, Elementor and classic content.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
@@ -30,7 +30,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"AgentReady\\": "src/"
+			"AgentWelcome\\": "src/"
 		}
 	},
 	"prefer-stable": true,

@@ -2,15 +2,15 @@
 /**
  * Tests for the wording of the theme and plugin change notices.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Admin\Notices;
-use AgentReady\Cache\Changes;
+use AgentWelcome\Admin\Notices;
+use AgentWelcome\Cache\Changes;
 use PHPUnit\Framework\TestCase;
 
 final class NoticesTest extends TestCase {

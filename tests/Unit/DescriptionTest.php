@@ -2,14 +2,14 @@
 /**
  * Tests for spotting template tags left in an SEO description.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Content\Description;
+use AgentWelcome\Content\Description;
 use PHPUnit\Framework\TestCase;
 
 final class DescriptionTest extends TestCase {

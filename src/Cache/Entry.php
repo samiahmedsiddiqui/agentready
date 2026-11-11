@@ -2,16 +2,16 @@
 /**
  * A stored Markdown copy of one page.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
 defined( 'ABSPATH' ) || exit;
 
-/** Stored Markdown of one page, as kept in the agentready_pages table. */
+/** Stored Markdown of one page, as kept in the agentwelcome_pages table. */
 final class Entry {
 
 	/** The copy matches the page as it was last generated. */

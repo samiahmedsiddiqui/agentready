@@ -2,12 +2,12 @@
 /**
  * A stored copy chosen to answer a request, and how it was obtained.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -23,7 +23,7 @@ final class Served {
 
 	/**
 	 * @param Entry  $entry The copy to send.
-	 * @param string $cache One of HIT, STALE or MISS, sent in the X-AgentReady-Cache header.
+	 * @param string $cache One of HIT, STALE or MISS, sent in the X-AgentWelcome-Cache header.
 	 */
 	public function __construct(
 		public Entry $entry,

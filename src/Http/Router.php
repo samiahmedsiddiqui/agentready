@@ -2,21 +2,21 @@
 /**
  * Serves /llms.txt, /llms-full.txt and the .md version of pages, before WordPress runs its main query.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Http;
+namespace AgentWelcome\Http;
 
-use AgentReady\Cache\PageCache;
-use AgentReady\Content\Eligibility;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Index\LlmsFullTxt;
-use AgentReady\Index\LlmsTxt;
-use AgentReady\Index\OutputCache;
-use AgentReady\Settings\LlmsOptions;
+use AgentWelcome\Cache\PageCache;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Index\LlmsFullTxt;
+use AgentWelcome\Index\LlmsTxt;
+use AgentWelcome\Index\OutputCache;
+use AgentWelcome\Settings\LlmsOptions;
 use WP;
 
 defined( 'ABSPATH' ) || exit;
@@ -124,10 +124,10 @@ final class Router implements Hookable {
 
 		$this->response->send(
 			$served->entry->markdown,
-			(string) apply_filters( 'agentready_content_type', MarkdownResponse::MARKDOWN, $post ),
+			(string) apply_filters( 'agentwelcome_content_type', MarkdownResponse::MARKDOWN, $post ),
 			(string) $this->urls->permalink( $post ),
 			(int) strtotime( $post->post_modified_gmt . ' UTC' ),
-			array( 'X-AgentReady-Cache' => $served->cache )
+			array( 'X-AgentWelcome-Cache' => $served->cache )
 		);
 
 		$this->terminate();

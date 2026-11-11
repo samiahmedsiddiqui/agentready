@@ -2,23 +2,23 @@
 /**
  * Verify & Preview page: checks a page against its stored Markdown, and scans every stored page.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Cache\Batch;
-use AgentReady\Cache\PageCache;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Http\Urls;
-use AgentReady\Rendering\RenderResult;
-use AgentReady\Rendering\Selector;
-use AgentReady\Verify\Scan;
-use AgentReady\Verify\Verifier;
-use AgentReady\Verify\VerifyResult;
+use AgentWelcome\Cache\Batch;
+use AgentWelcome\Cache\PageCache;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Rendering\RenderResult;
+use AgentWelcome\Rendering\Selector;
+use AgentWelcome\Verify\Scan;
+use AgentWelcome\Verify\Verifier;
+use AgentWelcome\Verify\VerifyResult;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -27,12 +27,12 @@ defined( 'ABSPATH' ) || exit;
 final class VerifyPage implements Hookable {
 
 	/** Page slug. */
-	public const SLUG = 'agentready-verify';
+	public const SLUG = 'agentwelcome-verify';
 
 	/** Nonce action of the check form. */
-	private const NONCE = 'agentready_verify';
+	private const NONCE = 'agentwelcome_verify';
 	/** Nonce action of the scan buttons. */
-	private const SCAN_NONCE = 'agentready_scan';
+	private const SCAN_NONCE = 'agentwelcome_scan';
 
 	/**
 	 * @param Urls        $urls        Finds the page for an address.
@@ -58,7 +58,7 @@ final class VerifyPage implements Hookable {
 	 */
 	public function register(): void {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-		add_action( 'admin_post_agentready_scan', array( $this, 'handle_scan' ) );
+		add_action( 'admin_post_agentwelcome_scan', array( $this, 'handle_scan' ) );
 	}
 
 	/**
@@ -78,13 +78,13 @@ final class VerifyPage implements Hookable {
 	 * @return void
 	 */
 	public function enqueue( string $hook ): void {
-		if ( 'agentready_page_' . self::SLUG !== $hook ) {
+		if ( 'agentwelcome_page_' . self::SLUG !== $hook ) {
 			return;
 		}
 
 		Assets::style();
-		wp_enqueue_script( 'agentready-admin', AGENTREADY_URL . 'assets/js/admin.js', array(), Assets::version( 'assets/js/admin.js' ), true );
-		wp_enqueue_script( 'agentready-verify', AGENTREADY_URL . 'assets/js/verify.js', array( 'wp-api-fetch' ), Assets::version( 'assets/js/verify.js' ), true );
+		wp_enqueue_script( 'agentwelcome-admin', AGENTWELCOME_URL . 'assets/js/admin.js', array(), Assets::version( 'assets/js/admin.js' ), true );
+		wp_enqueue_script( 'agentwelcome-verify', AGENTWELCOME_URL . 'assets/js/verify.js', array( 'wp-api-fetch' ), Assets::version( 'assets/js/verify.js' ), true );
 	}
 
 	/**
@@ -105,8 +105,8 @@ final class VerifyPage implements Hookable {
 			array(
 				'tab'     => $tab,
 				'tabs'    => array(
-					'one' => array( __( 'One page', 'agentready' ), self::url() ),
-					'all' => array( __( 'All pages', 'agentready' ), self::url( array( 'tab' => 'all' ) ) ),
+					'one' => array( __( 'One page', 'agentwelcome' ), self::url() ),
+					'all' => array( __( 'All pages', 'agentwelcome' ), self::url( array( 'tab' => 'all' ) ) ),
 				),
 				'notices' => $this->notices->data(),
 				'content' => 'all' === $tab ? array( $this, 'render_all' ) : array( $this, 'render_one' ),
@@ -124,11 +124,11 @@ final class VerifyPage implements Hookable {
 		$selector = '';
 		$strip    = '';
 
-		if ( isset( $_POST['agentready_verify_url'] ) ) {
+		if ( isset( $_POST['agentwelcome_verify_url'] ) ) {
 			check_admin_referer( self::NONCE );
-			$url      = trim( sanitize_text_field( wp_unslash( $_POST['agentready_verify_url'] ) ) );
-			$selector = isset( $_POST['agentready_verify_selector'] ) ? sanitize_text_field( wp_unslash( $_POST['agentready_verify_selector'] ) ) : '';
-			$strip    = isset( $_POST['agentready_verify_strip'] ) ? sanitize_textarea_field( wp_unslash( $_POST['agentready_verify_strip'] ) ) : '';
+			$url      = trim( sanitize_text_field( wp_unslash( $_POST['agentwelcome_verify_url'] ) ) );
+			$selector = isset( $_POST['agentwelcome_verify_selector'] ) ? sanitize_text_field( wp_unslash( $_POST['agentwelcome_verify_selector'] ) ) : '';
+			$strip    = isset( $_POST['agentwelcome_verify_strip'] ) ? sanitize_textarea_field( wp_unslash( $_POST['agentwelcome_verify_strip'] ) ) : '';
 		} elseif ( isset( $_GET['url'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check, nothing is changed.
 			$url = trim( sanitize_text_field( wp_unslash( $_GET['url'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check, nothing is changed.
 		}
@@ -191,7 +191,7 @@ final class VerifyPage implements Hookable {
 		check_admin_referer( self::SCAN_NONCE );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'agentwelcome' ), 403 );
 		}
 
 		$action = isset( $_POST['scan_action'] ) ? sanitize_key( wp_unslash( $_POST['scan_action'] ) ) : '';
@@ -219,9 +219,9 @@ final class VerifyPage implements Hookable {
 		wp_safe_redirect(
 			self::url(
 				array(
-					'tab'               => 'all',
-					'agentready_notice' => $notice,
-					'agentready_count'  => $count,
+					'tab'                 => 'all',
+					'agentwelcome_notice' => $notice,
+					'agentwelcome_count'  => $count,
 				)
 			)
 		);
@@ -240,7 +240,7 @@ final class VerifyPage implements Hookable {
 		$post = $this->urls->resolve_url( $url );
 
 		if ( ! $post instanceof WP_Post ) {
-			$this->notice( 'error', __( 'No page was found for that URL on this site.', 'agentready' ) );
+			$this->notice( 'error', __( 'No page was found for that URL on this site.', 'agentwelcome' ) );
 			return;
 		}
 
@@ -258,13 +258,13 @@ final class VerifyPage implements Hookable {
 		}
 
 		if ( ! empty( $overrides ) ) {
-			$this->notice( 'info', __( 'The selectors below were applied to this check only. The comparison shows what would change if you saved them.', 'agentready' ) );
+			$this->notice( 'info', __( 'The selectors below were applied to this check only. The comparison shows what would change if you saved them.', 'agentwelcome' ) );
 		}
 
 		$result = $this->verifier->verify( $post, $overrides );
 
 		if ( null !== $result->page && RenderResult::FALLBACK === $result->page->source ) {
-			$this->notice( 'warning', '' === $result->page->notice ? __( 'Generated from the post content only.', 'agentready' ) : $result->page->notice );
+			$this->notice( 'warning', '' === $result->page->notice ? __( 'Generated from the post content only.', 'agentwelcome' ) : $result->page->notice );
 		}
 
 		$permalink = (string) $this->urls->permalink( $post );
@@ -298,13 +298,13 @@ final class VerifyPage implements Hookable {
 		return wp_nonce_url(
 			add_query_arg(
 				array(
-					'action'            => 'agentready_regenerate_post',
-					'post'              => $post->ID,
-					'agentready_return' => rawurlencode( self::url( array( 'url' => $permalink ) ) ),
+					'action'              => 'agentwelcome_regenerate_post',
+					'post'                => $post->ID,
+					'agentwelcome_return' => rawurlencode( self::url( array( 'url' => $permalink ) ) ),
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'agentready_regenerate_' . $post->ID
+			'agentwelcome_regenerate_' . $post->ID
 		);
 	}
 

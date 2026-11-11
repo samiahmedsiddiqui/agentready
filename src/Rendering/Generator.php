@@ -2,16 +2,16 @@
 /**
  * Runs the pipeline: render, extract, convert, prepend front matter.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rendering;
+namespace AgentWelcome\Rendering;
 
-use AgentReady\Content\Description;
-use AgentReady\Http\Urls;
-use AgentReady\Settings\Options;
+use AgentWelcome\Content\Description;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -105,7 +105,7 @@ final class Generator {
 			)
 		);
 
-		$markdown = (string) apply_filters( 'agentready_markdown', $front . "\n" . trim( $body ) . "\n", $post );
+		$markdown = (string) apply_filters( 'agentwelcome_markdown', $front . "\n" . trim( $body ) . "\n", $post );
 
 		return new GeneratedPage( $markdown, $render->source, $render->notice );
 	}

@@ -2,7 +2,7 @@
 /**
  * Minimal WP-CLI declarations for static analysis.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 namespace {

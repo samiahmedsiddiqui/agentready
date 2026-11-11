@@ -2,16 +2,16 @@
 /**
  * Warnings shown at the top of the plugin's admin pages.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Cache\Changes;
-use AgentReady\Environment\Environment;
-use AgentReady\Http\Urls;
+use AgentWelcome\Cache\Changes;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Http\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -38,7 +38,7 @@ final class Notices {
 
 		return array(
 			'inactive'   => null === $reason ? null : $this->environment->describe( $reason ),
-			'resume_url' => 'site_address_changed' === $reason && current_user_can( 'manage_options' ) ? wp_nonce_url( admin_url( 'admin-post.php?action=agentready_resume' ), 'agentready_resume' ) : '',
+			'resume_url' => 'site_address_changed' === $reason && current_user_can( 'manage_options' ) ? wp_nonce_url( admin_url( 'admin-post.php?action=agentwelcome_resume' ), 'agentwelcome_resume' ) : '',
 			'pretty'     => Urls::has_pretty_permalinks(),
 			'yoast_llms' => is_array( $yoast ) && ! empty( $yoast['enable_llms_txt'] ),
 			'llms_file'  => file_exists( get_home_path() . 'llms.txt' ),
@@ -65,7 +65,7 @@ final class Notices {
 			$notices[] = array(
 				'message'     => $message,
 				'check_url'   => Changes::PLUGINS === $key || $cron_off ? VerifyPage::url( array( 'tab' => 'all' ) ) : '',
-				'dismiss_url' => wp_nonce_url( admin_url( 'admin-post.php?action=agentready_dismiss&key=' . rawurlencode( (string) $key ) ), 'agentready_dismiss' ),
+				'dismiss_url' => wp_nonce_url( admin_url( 'admin-post.php?action=agentwelcome_dismiss&key=' . rawurlencode( (string) $key ) ), 'agentwelcome_dismiss' ),
 			);
 		}
 
@@ -86,7 +86,7 @@ final class Notices {
 
 			return sprintf(
 				/* translators: %s: number of plugin changes. */
-				_n( '%s plugin was activated, deactivated or updated. If it changes how your pages look, check whether any stored page is out of date.', '%s plugins were activated, deactivated or updated. If they change how your pages look, check whether any stored page is out of date.', $count, 'agentready' ),
+				_n( '%s plugin was activated, deactivated or updated. If it changes how your pages look, check whether any stored page is out of date.', '%s plugins were activated, deactivated or updated. If they change how your pages look, check whether any stored page is out of date.', $count, 'agentwelcome' ),
 				number_format_i18n( $count )
 			);
 		}
@@ -96,9 +96,9 @@ final class Notices {
 		}
 
 		$reasons = array(
-			'theme'        => __( 'The active theme changed', 'agentready' ),
-			'theme_update' => __( 'The active theme was updated', 'agentready' ),
-			'customizer'   => __( 'The Customizer was saved', 'agentready' ),
+			'theme'        => __( 'The active theme changed', 'agentwelcome' ),
+			'theme_update' => __( 'The active theme was updated', 'agentwelcome' ),
+			'customizer'   => __( 'The Customizer was saved', 'agentwelcome' ),
 		);
 		$reason  = $reasons[ (string) ( $change['reason'] ?? '' ) ] ?? '';
 
@@ -107,9 +107,9 @@ final class Notices {
 		}
 
 		if ( $cron_disabled ) {
-			return $reason . '. ' . __( 'WP-Cron is disabled, so stored pages do not refresh by themselves. Run Check all pages, then update the ones that are out of date.', 'agentready' );
+			return $reason . '. ' . __( 'WP-Cron is disabled, so stored pages do not refresh by themselves. Run Check all pages, then update the ones that are out of date.', 'agentwelcome' );
 		}
 
-		return $reason . '. ' . __( 'AgentReady is refreshing the stored Markdown of every page in the background.', 'agentready' );
+		return $reason . '. ' . __( 'AgentWelcome is refreshing the stored Markdown of every page in the background.', 'agentwelcome' );
 	}
 }

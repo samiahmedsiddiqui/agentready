@@ -1,30 +1,30 @@
 <?php
 /**
- * Editor box: stored Markdown status and refresh, hide from AgentReady, and description override.
+ * Editor box: stored Markdown status and refresh, hide from AgentWelcome, and description override.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Cache\PageStatus;
-use AgentReady\Content\PostMeta;
-use AgentReady\Content\PostTypes;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Settings\Options;
+use AgentWelcome\Cache\PageStatus;
+use AgentWelcome\Content\PostMeta;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
-/** The AgentReady box on the edit screen: shows the state of the page and saves the hide and description choices. */
+/** The AgentWelcome box on the edit screen: shows the state of the page and saves the hide and description choices. */
 final class MetaBox implements Hookable {
 
 	/** Nonce action of the box. */
-	private const NONCE_ACTION = 'agentready_save_post';
+	private const NONCE_ACTION = 'agentwelcome_save_post';
 	/** Name of the nonce field. */
-	private const NONCE_NAME = 'agentready_nonce';
+	private const NONCE_NAME = 'agentwelcome_nonce';
 
 	/**
 	 * @param PostTypes  $post_types Post types that are served.
@@ -56,7 +56,7 @@ final class MetaBox implements Hookable {
 		$types   = array_values(
 			array_filter(
 				$this->post_types->enabled(),
-				static fn( string $type ): bool => (bool) apply_filters( 'agentready_show_meta_box', $setting, $type )
+				static fn( string $type ): bool => (bool) apply_filters( 'agentwelcome_show_meta_box', $setting, $type )
 			)
 		);
 
@@ -64,7 +64,7 @@ final class MetaBox implements Hookable {
 			return;
 		}
 
-		add_meta_box( 'agentready', __( 'AgentReady', 'agentready' ), array( $this, 'render' ), $types, 'side' );
+		add_meta_box( 'agentwelcome', __( 'AgentWelcome', 'agentwelcome' ), array( $this, 'render' ), $types, 'side' );
 	}
 
 	/**
@@ -79,7 +79,7 @@ final class MetaBox implements Hookable {
 		}
 
 		Assets::style();
-		wp_enqueue_script( 'agentready-editor', AGENTREADY_URL . 'assets/js/editor.js', array( 'wp-api-fetch' ), Assets::version( 'assets/js/editor.js' ), true );
+		wp_enqueue_script( 'agentwelcome-editor', AGENTWELCOME_URL . 'assets/js/editor.js', array( 'wp-api-fetch' ), Assets::version( 'assets/js/editor.js' ), true );
 	}
 
 	/**
@@ -120,13 +120,13 @@ final class MetaBox implements Hookable {
 			return;
 		}
 
-		if ( empty( $_POST['agentready_exclude'] ) ) {
+		if ( empty( $_POST['agentwelcome_exclude'] ) ) {
 			delete_post_meta( $post_id, PostMeta::EXCLUDE );
 		} else {
 			update_post_meta( $post_id, PostMeta::EXCLUDE, 1 );
 		}
 
-		$description = isset( $_POST['agentready_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['agentready_description'] ) ) : '';
+		$description = isset( $_POST['agentwelcome_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['agentwelcome_description'] ) ) : '';
 
 		if ( '' === $description ) {
 			delete_post_meta( $post_id, PostMeta::DESCRIPTION );

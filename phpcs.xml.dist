@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="AgentReady">
+<ruleset name="AgentWelcome">
 	<file>.</file>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/tests/*</exclude-pattern>
@@ -21,9 +21,9 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="agentready"/>
-				<element value="AgentReady"/>
-				<element value="AGENTREADY"/>
+				<element value="agentwelcome"/>
+				<element value="AgentWelcome"/>
+				<element value="AGENTWELCOME"/>
 			</property>
 		</properties>
 	</rule>
@@ -44,7 +44,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="agentready"/>
+				<element value="agentwelcome"/>
 			</property>
 		</properties>
 	</rule>

@@ -2,15 +2,15 @@
 /**
  * The outcome of checking one page against its stored copy.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Verify;
+namespace AgentWelcome\Verify;
 
-use AgentReady\Cache\Entry;
-use AgentReady\Rendering\GeneratedPage;
+use AgentWelcome\Cache\Entry;
+use AgentWelcome\Rendering\GeneratedPage;
 
 defined( 'ABSPATH' ) || exit;
 

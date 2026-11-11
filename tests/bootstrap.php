@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap for the unit tests, which run without WordPress.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
@@ -27,17 +27,17 @@ if ( ! function_exists( '__' ) ) {
 	}
 }
 
-$GLOBALS['agentready_test_transients'] = array();
+$GLOBALS['agentwelcome_test_transients'] = array();
 
 if ( ! function_exists( 'get_transient' ) ) {
 	function get_transient( $name ) {
-		return $GLOBALS['agentready_test_transients'][ $name ] ?? false;
+		return $GLOBALS['agentwelcome_test_transients'][ $name ] ?? false;
 	}
 }
 
 if ( ! function_exists( 'set_transient' ) ) {
 	function set_transient( $name, $value, $expiration = 0 ) {
-		$GLOBALS['agentready_test_transients'][ $name ] = $value;
+		$GLOBALS['agentwelcome_test_transients'][ $name ] = $value;
 
 		return true;
 	}
@@ -45,17 +45,17 @@ if ( ! function_exists( 'set_transient' ) ) {
 
 if ( ! function_exists( 'delete_transient' ) ) {
 	function delete_transient( $name ) {
-		unset( $GLOBALS['agentready_test_transients'][ $name ] );
+		unset( $GLOBALS['agentwelcome_test_transients'][ $name ] );
 
 		return true;
 	}
 }
 
-$GLOBALS['agentready_test_filters'] = array();
+$GLOBALS['agentwelcome_test_filters'] = array();
 
 if ( ! function_exists( 'apply_filters' ) ) {
 	function apply_filters( $hook_name, $value, ...$args ) {
-		$callback = $GLOBALS['agentready_test_filters'][ $hook_name ] ?? null;
+		$callback = $GLOBALS['agentwelcome_test_filters'][ $hook_name ] ?? null;
 
 		return null === $callback ? $value : $callback( $value, ...$args );
 	}

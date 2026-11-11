@@ -1,4 +1,4 @@
-=== AgentReady – llms.txt & Markdown for AI Agents ===
+=== AgentWelcome – llms.txt & Markdown for AI Agents ===
 Contributors: sasiddiqui
 Tags: llms-txt, markdown, ai, llm, seo
 Requires at least: 6.0
@@ -12,7 +12,7 @@ Serves an llms.txt index and a clean Markdown version of every page, so AI agent
 
 == Description ==
 
-AgentReady builds a Markdown version of each page from its rendered output, so ACF fields, Gutenberg blocks, Elementor layouts and classic editor content are all included, whatever theme you use.
+AgentWelcome builds a Markdown version of each page from its rendered output, so ACF fields, Gutenberg blocks, Elementor layouts and classic editor content are all included, whatever theme you use.
 
 * `/llms.txt`, a Markdown index of your pages. Write your own text instead, or put it above the generated list.
 * Optional `/llms-full.txt`, the Markdown of every page in one file.
@@ -31,7 +31,7 @@ AgentReady builds a Markdown version of each page from its rendered output, so A
 
 = How it works =
 
-When an agent requests `/about.md`, AgentReady reads the public page `/about/` the same way a visitor would, keeps the main content, removes navigation, scripts and forms, and converts the result to Markdown with a short metadata header. Each Markdown response carries a canonical link to the HTML page and a `noindex` header, so search engines do not treat it as duplicate content.
+When an agent requests `/about.md`, AgentWelcome reads the public page `/about/` the same way a visitor would, keeps the main content, removes navigation, scripts and forms, and converts the result to Markdown with a short metadata header. Each Markdown response carries a canonical link to the HTML page and a `noindex` header, so search engines do not treat it as duplicate content.
 
 = Stored Markdown =
 
@@ -39,16 +39,16 @@ The generated Markdown is stored in its own database table and refreshed in the 
 
 == Installation ==
 
-1. Upload the plugin to `/wp-content/plugins/agentready`, or install it from the Plugins screen.
+1. Upload the plugin to `/wp-content/plugins/agentwelcome`, or install it from the Plugins screen.
 2. Activate the plugin.
 3. Make sure Settings > Permalinks is not set to "Plain".
-4. Open `/llms.txt` and any page URL with `.md` added to check the output, or use AgentReady > Verify & Preview.
+4. Open `/llms.txt` and any page URL with `.md` added to check the output, or use AgentWelcome > Verify & Preview.
 
 == Frequently Asked Questions ==
 
 = What are the Markdown URLs? =
 
-Add `.md` to the page URL without the trailing slash: `/about/` becomes `/about.md` and `/services/web/` becomes `/services/web.md`. The homepage is `/index.md`. `/about/index.html.md`, `/about/index.md` and `/index.html.md` also work. You can choose `/index.html.md` as the homepage URL under AgentReady > Settings > Content > Homepage; the chosen one is listed in llms.txt.
+Add `.md` to the page URL without the trailing slash: `/about/` becomes `/about.md` and `/services/web/` becomes `/services/web.md`. The homepage is `/index.md`. `/about/index.html.md`, `/about/index.md` and `/index.html.md` also work. You can choose `/index.html.md` as the homepage URL under AgentWelcome > Settings > Content > Homepage; the chosen one is listed in llms.txt.
 
 = Why do I get a 404 for a page? =
 
@@ -62,29 +62,29 @@ Yes. Pages, posts and custom post types that have a custom URL set by the Custom
 
 No. Pages that use `?p=123` style URLs are never converted. Choose another structure in Settings > Permalinks.
 
-= Why does AgentReady do nothing on my staging site? =
+= Why does AgentWelcome do nothing on my staging site? =
 
-It only runs on production by default. Open AgentReady > Settings > Environment and tick your environment, or define `WP_ENVIRONMENT_TYPE` as `production`. To limit it to certain domains, set "Allowed URLs", or define `AGENTREADY_ALLOWED_URLS` in `wp-config.php`. `define( 'AGENTREADY_ENABLED', false );` switches it off completely.
+It only runs on production by default. Open AgentWelcome > Settings > Environment and tick your environment, or define `WP_ENVIRONMENT_TYPE` as `production`. To limit it to certain domains, set "Allowed URLs", or define `AGENTWELCOME_ALLOWED_URLS` in `wp-config.php`. `define( 'AGENTWELCOME_ENABLED', false );` switches it off completely.
 
 = How do I know the stored Markdown matches my page? =
 
-Open AgentReady > Verify & Preview, enter the page address and press Check page. It builds fresh Markdown from the live page and tells you whether the stored copy is in sync, shows a preview and the changes, and checks that the text on the page is in the Markdown. If the copy is out of date, press Update stored copy. The All pages tab does the same check for every stored page in the background and lists the ones that differ. If your site disables WP-Cron, that tab runs the scan itself while it stays open.
+Open AgentWelcome > Verify & Preview, enter the page address and press Check page. It builds fresh Markdown from the live page and tells you whether the stored copy is in sync, shows a preview and the changes, and checks that the text on the page is in the Markdown. If the copy is out of date, press Update stored copy. The All pages tab does the same check for every stored page in the background and lists the ones that differ. If your site disables WP-Cron, that tab runs the scan itself while it stays open.
 
 = I changed a page but the .md or llms.txt still shows the old text. =
 
-Your host, a CDN or the browser may be keeping the file for a few minutes. AgentReady allows 5 minutes. Add a query string to the address, for example `/about.md?t=123` or `/llms.txt?t=123`, to skip that cache. Also check that the page was saved: it is refreshed in the background a few seconds after saving.
+Your host, a CDN or the browser may be keeping the file for a few minutes. AgentWelcome allows 5 minutes. Add a query string to the address, for example `/about.md?t=123` or `/llms.txt?t=123`, to skip that cache. Also check that the page was saved: it is refreshed in the background a few seconds after saving.
 
-= Why did AgentReady pause itself after I copied or moved my site? =
+= Why did AgentWelcome pause itself after I copied or moved my site? =
 
-AgentReady remembers a hash of your site address. When the address changes, as on a staging copy or after a move to a new domain, it pauses so a copy does not serve Markdown and llms.txt to AI agents. A banner on its pages has a "Resume on this address" button for administrators. If you set `AGENTREADY_ALLOWED_URLS` in `wp-config.php`, that overrides this check. Developers can turn it off with the `agentready_check_site_address` filter.
+AgentWelcome remembers a hash of your site address. When the address changes, as on a staging copy or after a move to a new domain, it pauses so a copy does not serve Markdown and llms.txt to AI agents. A banner on its pages has a "Resume on this address" button for administrators. If you set `AGENTWELCOME_ALLOWED_URLS` in `wp-config.php`, that overrides this check. Developers can turn it off with the `agentwelcome_check_site_address` filter.
 
 = Can I write my own llms.txt? =
 
-Yes. Open AgentReady > llms.txt and choose Custom to serve exactly your text, or Hybrid to serve your text followed by the list of pages AgentReady builds. You can type the text or load it from a .txt or .md file. Automatic keeps the generated file.
+Yes. Open AgentWelcome > llms.txt and choose Custom to serve exactly your text, or Hybrid to serve your text followed by the list of pages AgentWelcome builds. You can type the text or load it from a .txt or .md file. Automatic keeps the generated file.
 
 = What is llms-full.txt? =
 
-An optional file with the Markdown of every page in one place, for agents that prefer a single download. Turn it on under AgentReady > llms.txt. It uses the stored copies, so generate any missing pages first. It stops at 5 MB and says how many pages were left out.
+An optional file with the Markdown of every page in one place, for agents that prefer a single download. Turn it on under AgentWelcome > llms.txt. It uses the stored copies, so generate any missing pages first. It stops at 5 MB and says how many pages were left out.
 
 = What does the robots.txt option do? =
 
@@ -92,11 +92,11 @@ It adds comment lines that point to llms.txt (and llms-full.txt when it is on). 
 
 = How do I refresh the stored Markdown? =
 
-Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentReady box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentready cache regenerate --all`.
+Pages refresh in the background when you save them. To refresh by hand use "Regenerate now" in the AgentWelcome box on the edit screen, "Regenerate all" or "Clear cache" on the settings page, the "Regenerate Markdown" action in the post lists, or `wp agentwelcome cache regenerate --all`.
 
 = Who can edit llms.txt? =
 
-Administrators, through the `agentready_manage_files` capability that they get automatically. You can give that capability to any role or user with a role editor plugin, and those users see a menu with the llms.txt page only. Settings, Verify & Preview and the cache buttons stay with administrators. Editors can still hide a page or set its description from the AgentReady box on pages they can edit.
+Administrators, through the `agentwelcome_manage_files` capability that they get automatically. You can give that capability to any role or user with a role editor plugin, and those users see a menu with the llms.txt page only. Settings, Verify & Preview and the cache buttons stay with administrators. Editors can still hide a page or set its description from the AgentWelcome box on pages they can edit.
 
 = What is removed when I delete the plugin? =
 
@@ -104,19 +104,19 @@ The stored Markdown table is always removed, and so are any saved HTTP Basic cre
 
 = My site asks for a username and password. =
 
-Tick "This site is protected with HTTP Basic authentication" in AgentReady > Settings and enter the credentials. They are stored encrypted and only sent to your own site. You can also define `AGENTREADY_HTTP_AUTH_USER` and `AGENTREADY_HTTP_AUTH_PASSWORD` in `wp-config.php`.
+Tick "This site is protected with HTTP Basic authentication" in AgentWelcome > Settings and enter the credentials. They are stored encrypted and only sent to your own site. You can also define `AGENTWELCOME_HTTP_AUTH_USER` and `AGENTWELCOME_HTTP_AUTH_PASSWORD` in `wp-config.php`.
 
 = My staging site asks for a username and password and background refreshes never run. =
 
-Save the credentials in AgentReady > Settings > Rendering > Site access. AgentReady then sends them with the page request and with WordPress's own background request, so scheduled refreshes run. Without them, WP-Cron cannot reach the site.
+Save the credentials in AgentWelcome > Settings > Rendering > Site access. AgentWelcome then sends them with the page request and with WordPress's own background request, so scheduled refreshes run. Without them, WP-Cron cannot reach the site.
 
 = What happens if the page cannot be fetched? =
 
-AgentReady falls back to the post content. That output is thinner, because fields printed by your theme are missing. Verify & Preview shows when this happens and why.
+AgentWelcome falls back to the post content. That output is thinner, because fields printed by your theme are missing. Verify & Preview shows when this happens and why.
 
 = Why is a page I can see in the browser missing from llms.txt? =
 
-If an SEO plugin (Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework) marks the page as noindex, AgentReady leaves it out by default. The AgentReady box on the edit screen says so. To include such pages, untick "Leave out pages set to noindex" under AgentReady > Settings > Content > Exclusions.
+If an SEO plugin (Yoast SEO, Rank Math, All in One SEO, SEOPress or The SEO Framework) marks the page as noindex, AgentWelcome leaves it out by default. The AgentWelcome box on the edit screen says so. To include such pages, untick "Leave out pages set to noindex" under AgentWelcome > Settings > Content > Exclusions.
 
 = Do the stored copies update when I change my theme, ACF options or Elementor templates? =
 
@@ -124,15 +124,15 @@ Yes. Switching the theme, updating the active theme, saving the Customizer, savi
 
 = Can I exclude pages with code? =
 
-Yes. Use the `agentready_is_eligible` filter to leave out a single post, `agentready_excluded_post_types` to leave out post types, and `agentready_show_meta_box` to hide the box on the edit screen. Examples are in the plugin's GitHub README.
+Yes. Use the `agentwelcome_is_eligible` filter to leave out a single post, `agentwelcome_excluded_post_types` to leave out post types, and `agentwelcome_show_meta_box` to hide the box on the edit screen. Examples are in the plugin's GitHub README.
 
-= Can I hide the AgentReady box on the edit screen? =
+= Can I hide the AgentWelcome box on the edit screen? =
 
-Yes. Untick "Show the AgentReady box on the edit screen" in AgentReady > Settings. Anything already saved on a page, such as hiding it or its description, keeps working.
+Yes. Untick "Show the AgentWelcome box on the edit screen" in AgentWelcome > Settings. Anything already saved on a page, such as hiding it or its description, keeps working.
 
 = Can I change what counts as the main content? =
 
-Yes. Set the content selector in AgentReady > Settings. The default tries `main`, `[role="main"]`, `#content`, `#main`, `.site-content` and `article`, then the whole body.
+Yes. Set the content selector in AgentWelcome > Settings. The default tries `main`, `[role="main"]`, `#content`, `#main`, `.site-content` and `article`, then the whole body.
 
 = Can I remove parts of a page from the Markdown? =
 

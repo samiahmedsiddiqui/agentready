@@ -34,9 +34,9 @@ jobs:
 
       # Check what ships: the repository without the export-ignored files.
       - name: Build the plugin
-        run: git -C source archive --format=tar --prefix=agentready/ HEAD | tar -x
+        run: git -C source archive --format=tar --prefix=agentwelcome/ HEAD | tar -x
 
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@10857da14b6c2246d15402b3e69f777edcf8c12e # v1.1.9
         with:
-          build-dir: ./agentready
+          build-dir: ./agentwelcome

@@ -2,15 +2,15 @@
 /**
  * Tests for request routing and URL resolving.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Http\Urls;
-use AgentReady\Rendering\UrlResolver;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Rendering\UrlResolver;
 use PHPUnit\Framework\TestCase;
 
 final class UrlsTest extends TestCase {

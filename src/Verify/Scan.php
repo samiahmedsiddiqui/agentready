@@ -2,19 +2,19 @@
 /**
  * Compares every stored page with a fresh build in the background, and reports what differs. Changes nothing.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Verify;
+namespace AgentWelcome\Verify;
 
-use AgentReady\Cache\Coverage;
-use AgentReady\Cache\Lock;
-use AgentReady\Cache\Store;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Rendering\RenderResult;
+use AgentWelcome\Cache\Coverage;
+use AgentWelcome\Cache\Lock;
+use AgentWelcome\Cache\Store;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Rendering\RenderResult;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,9 +22,9 @@ defined( 'ABSPATH' ) || exit;
 final class Scan implements Hookable {
 
 	/** Cron hook of one step. */
-	public const JOB = 'agentready_scan_batch';
+	public const JOB = 'agentwelcome_scan_batch';
 	/** Option that holds the progress and result of the scan. */
-	public const OPTION = 'agentready_scan';
+	public const OPTION = 'agentwelcome_scan';
 
 	/** Pages checked in one step. */
 	private const PAGES_PER_RUN = 3;

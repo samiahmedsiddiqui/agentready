@@ -2,12 +2,12 @@
 /**
  * Reads the per-page noindex choice of the active SEO plugin.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Content;
+namespace AgentWelcome\Content;
 
 use WP_Post;
 
@@ -43,7 +43,7 @@ final class Noindex {
 
 		$noindex = self::from_meta( $values ) || $this->aioseo( $post );
 
-		return (bool) apply_filters( 'agentready_is_noindex', $noindex, $post );
+		return (bool) apply_filters( 'agentwelcome_is_noindex', $noindex, $post );
 	}
 
 	/**
@@ -74,7 +74,7 @@ final class Noindex {
 			self::TSF      => defined( 'THE_SEO_FRAMEWORK_VERSION' ) || function_exists( 'the_seo_framework' ),
 		);
 
-		return array_keys( array_filter( (array) apply_filters( 'agentready_noindex_sources', $active ) ) );
+		return array_keys( array_filter( (array) apply_filters( 'agentwelcome_noindex_sources', $active ) ) );
 	}
 
 	/**

@@ -2,14 +2,14 @@
 /**
  * Maps posts to Markdown URLs and request paths back to posts.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Http;
+namespace AgentWelcome\Http;
 
-use AgentReady\Settings\Options;
+use AgentWelcome\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -270,7 +270,7 @@ final class Urls {
 			$post = get_page_by_path( $path );
 		}
 
-		$post = apply_filters( 'agentready_resolve_post', $post, $path );
+		$post = apply_filters( 'agentwelcome_resolve_post', $post, $path );
 
 		if ( ! $post instanceof WP_Post ) {
 			return null;

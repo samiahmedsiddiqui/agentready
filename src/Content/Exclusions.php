@@ -2,14 +2,14 @@
 /**
  * Per-page, ID/URL pattern and taxonomy term exclusions.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Content;
+namespace AgentWelcome\Content;
 
-use AgentReady\Settings\Options;
+use AgentWelcome\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;

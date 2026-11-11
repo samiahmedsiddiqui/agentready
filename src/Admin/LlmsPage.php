@@ -2,19 +2,19 @@
 /**
  * The llms.txt page: choose the file mode, add your own text, and turn on llms-full.txt and the robots.txt line.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Cache\Coverage;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Http\Urls;
-use AgentReady\Index\LlmsTxt;
-use AgentReady\Settings\LlmsOptions;
+use AgentWelcome\Cache\Coverage;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Index\LlmsTxt;
+use AgentWelcome\Settings\LlmsOptions;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,10 +22,10 @@ defined( 'ABSPATH' ) || exit;
 final class LlmsPage implements Hookable {
 
 	/** Page slug. */
-	public const SLUG = 'agentready-llms';
+	public const SLUG = 'agentwelcome-llms';
 
 	/** Settings group of the form. */
-	private const GROUP = 'agentready_llms_group';
+	private const GROUP = 'agentwelcome_llms_group';
 
 	/** Longest preview of the file shown on the page, in characters. */
 	private const PREVIEW_CHARS = 20000;
@@ -78,12 +78,12 @@ final class LlmsPage implements Hookable {
 	 * @return void
 	 */
 	public function enqueue( string $hook ): void {
-		if ( ! in_array( $hook, array( 'agentready_page_' . self::SLUG, 'toplevel_page_' . self::SLUG ), true ) ) {
+		if ( ! in_array( $hook, array( 'agentwelcome_page_' . self::SLUG, 'toplevel_page_' . self::SLUG ), true ) ) {
 			return;
 		}
 
 		Assets::style();
-		wp_enqueue_script( 'agentready-admin', AGENTREADY_URL . 'assets/js/admin.js', array(), Assets::version( 'assets/js/admin.js' ), true );
+		wp_enqueue_script( 'agentwelcome-admin', AGENTWELCOME_URL . 'assets/js/admin.js', array(), Assets::version( 'assets/js/admin.js' ), true );
 	}
 
 	/**

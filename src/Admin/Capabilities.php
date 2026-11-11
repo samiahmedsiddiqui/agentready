@@ -2,14 +2,14 @@
 /**
  * The capability that controls who may manage the llms.txt files.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Contracts\Hookable;
+use AgentWelcome\Contracts\Hookable;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -19,10 +19,10 @@ defined( 'ABSPATH' ) || exit;
 final class Capabilities implements Hookable {
 
 	/** Capability that allows editing llms.txt, llms-full.txt and the robots.txt line. */
-	public const FILES = 'agentready_manage_files';
+	public const FILES = 'agentwelcome_manage_files';
 
 	/** Option that records that administrators were given the capability, so a later removal is respected. */
-	public const GRANTED_OPTION = 'agentready_files_capability_granted';
+	public const GRANTED_OPTION = 'agentwelcome_files_capability_granted';
 
 	/**
 	 * Gives administrators the capability on the first admin request after the plugin is installed. It runs before the menu is built, so the page shows at once.
@@ -39,7 +39,7 @@ final class Capabilities implements Hookable {
 	 * @return string Capability name.
 	 */
 	public static function files(): string {
-		$capability = apply_filters( 'agentready_files_capability', self::FILES );
+		$capability = apply_filters( 'agentwelcome_files_capability', self::FILES );
 
 		return is_string( $capability ) && '' !== $capability ? $capability : self::FILES;
 	}

@@ -1,6 +1,6 @@
-# Contributing to AgentReady
+# Contributing to AgentWelcome
 
-Thanks for helping improve AgentReady!
+Thanks for helping improve AgentWelcome!
 
 * **Bugs and feature requests:** open an [issue](https://github.com/samiahmedsiddiqui/agentready/issues/new/choose).
 * **Security issues:** don't open an issue; see [SECURITY.md](SECURITY.md).

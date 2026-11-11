@@ -2,12 +2,12 @@
 /**
  * Resolves relative URLs against a base URL and drops unsafe schemes.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rendering;
+namespace AgentWelcome\Rendering;
 
 defined( 'ABSPATH' ) || exit;
 

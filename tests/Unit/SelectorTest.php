@@ -2,14 +2,14 @@
 /**
  * Tests for the CSS to XPath compiler.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Rendering\Selector;
+use AgentWelcome\Rendering\Selector;
 use PHPUnit\Framework\TestCase;
 
 final class SelectorTest extends TestCase {

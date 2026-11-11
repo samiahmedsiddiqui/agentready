@@ -2,17 +2,17 @@
 /**
  * Refreshes a page when an Elementor document is saved, and every page when a saved template changes.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Integrations;
+namespace AgentWelcome\Integrations;
 
-use AgentReady\Cache\Batch;
-use AgentReady\Cache\Invalidator;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
+use AgentWelcome\Cache\Batch;
+use AgentWelcome\Cache\Invalidator;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;

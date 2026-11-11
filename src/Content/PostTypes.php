@@ -2,14 +2,14 @@
 /**
  * Resolves which post types are served as Markdown.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Content;
+namespace AgentWelcome\Content;
 
-use AgentReady\Settings\Options;
+use AgentWelcome\Settings\Options;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -48,7 +48,7 @@ final class PostTypes {
 	 * @return string[] Post type names.
 	 */
 	public function enabled(): array {
-		$excluded = array_map( 'strval', (array) apply_filters( 'agentready_excluded_post_types', $this->excluded() ) );
+		$excluded = array_map( 'strval', (array) apply_filters( 'agentwelcome_excluded_post_types', $this->excluded() ) );
 
 		return array_values( array_diff( $this->available(), $excluded ) );
 	}

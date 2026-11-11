@@ -1,19 +1,19 @@
 <?php
 /**
- * Top-level AgentReady menu with the Settings, llms.txt and Verify & Preview pages.
+ * Top-level AgentWelcome menu with the Settings, llms.txt and Verify & Preview pages.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Contracts\Hookable;
+use AgentWelcome\Contracts\Hookable;
 
 defined( 'ABSPATH' ) || exit;
 
-/** Adds the AgentReady menu and its pages, and the footer text on them. */
+/** Adds the AgentWelcome menu and its pages, and the footer text on them. */
 final class Menu implements Hookable {
 
 	/** Profile of the author, linked in the footer. */
@@ -62,8 +62,8 @@ final class Menu implements Hookable {
 	 */
 	private function add_all_pages(): void {
 		add_menu_page(
-			__( 'AgentReady', 'agentready' ),
-			__( 'AgentReady', 'agentready' ),
+			__( 'AgentWelcome', 'agentwelcome' ),
+			__( 'AgentWelcome', 'agentwelcome' ),
 			'manage_options',
 			SettingsPage::SLUG,
 			array( $this->settings, 'render' ),
@@ -71,9 +71,9 @@ final class Menu implements Hookable {
 			self::POSITION
 		);
 
-		add_submenu_page( SettingsPage::SLUG, __( 'AgentReady Settings', 'agentready' ), __( 'Settings', 'agentready' ), 'manage_options', SettingsPage::SLUG, array( $this->settings, 'render' ) );
-		add_submenu_page( SettingsPage::SLUG, __( 'llms.txt', 'agentready' ), __( 'llms.txt', 'agentready' ), Capabilities::files(), LlmsPage::SLUG, array( $this->llms, 'render' ) );
-		add_submenu_page( SettingsPage::SLUG, __( 'Verify & Preview', 'agentready' ), __( 'Verify & Preview', 'agentready' ), 'manage_options', VerifyPage::SLUG, array( $this->verify, 'render' ) );
+		add_submenu_page( SettingsPage::SLUG, __( 'AgentWelcome Settings', 'agentwelcome' ), __( 'Settings', 'agentwelcome' ), 'manage_options', SettingsPage::SLUG, array( $this->settings, 'render' ) );
+		add_submenu_page( SettingsPage::SLUG, __( 'llms.txt', 'agentwelcome' ), __( 'llms.txt', 'agentwelcome' ), Capabilities::files(), LlmsPage::SLUG, array( $this->llms, 'render' ) );
+		add_submenu_page( SettingsPage::SLUG, __( 'Verify & Preview', 'agentwelcome' ), __( 'Verify & Preview', 'agentwelcome' ), 'manage_options', VerifyPage::SLUG, array( $this->verify, 'render' ) );
 	}
 
 	/**
@@ -83,8 +83,8 @@ final class Menu implements Hookable {
 	 */
 	private function add_files_page_only(): void {
 		add_menu_page(
-			__( 'llms.txt', 'agentready' ),
-			__( 'llms.txt', 'agentready' ),
+			__( 'llms.txt', 'agentwelcome' ),
+			__( 'llms.txt', 'agentwelcome' ),
 			Capabilities::files(),
 			LlmsPage::SLUG,
 			array( $this->llms, 'render' ),
@@ -107,7 +107,7 @@ final class Menu implements Hookable {
 		return wp_kses(
 			sprintf(
 				/* translators: %s: author name, linked to their profile. */
-				__( 'Thank you for using AgentReady. Built by %s.', 'agentready' ),
+				__( 'Thank you for using AgentWelcome. Built by %s.', 'agentwelcome' ),
 				'<a href="' . esc_url( self::AUTHOR_URL ) . '" target="_blank" rel="noopener noreferrer">Sami Ahmed Siddiqui</a>'
 			),
 			array(
@@ -132,7 +132,7 @@ final class Menu implements Hookable {
 		}
 
 		/* translators: %s: plugin version. */
-		return esc_html( sprintf( __( 'AgentReady %s', 'agentready' ), AGENTREADY_VERSION ) );
+		return esc_html( sprintf( __( 'AgentWelcome %s', 'agentwelcome' ), AGENTWELCOME_VERSION ) );
 	}
 
 	/**
@@ -143,7 +143,7 @@ final class Menu implements Hookable {
 	private function is_plugin_screen(): bool {
 		$screen = get_current_screen();
 
-		return $screen instanceof \WP_Screen && in_array( $screen->id, array( 'toplevel_page_' . SettingsPage::SLUG, 'toplevel_page_' . LlmsPage::SLUG, 'agentready_page_' . LlmsPage::SLUG, 'agentready_page_' . VerifyPage::SLUG ), true );
+		return $screen instanceof \WP_Screen && in_array( $screen->id, array( 'toplevel_page_' . SettingsPage::SLUG, 'toplevel_page_' . LlmsPage::SLUG, 'agentwelcome_page_' . LlmsPage::SLUG, 'agentwelcome_page_' . VerifyPage::SLUG ), true );
 	}
 
 	/**

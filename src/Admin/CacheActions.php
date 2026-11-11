@@ -2,22 +2,22 @@
 /**
  * Cache buttons outside the editor: settings page, post list row action and bulk action.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Cache\Batch;
-use AgentReady\Cache\Changes;
-use AgentReady\Cache\PageCache;
-use AgentReady\Cache\Store;
-use AgentReady\Content\Eligibility;
-use AgentReady\Content\PostTypes;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Environment\SiteAddress;
+use AgentWelcome\Cache\Batch;
+use AgentWelcome\Cache\Changes;
+use AgentWelcome\Cache\PageCache;
+use AgentWelcome\Cache\Store;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Environment\SiteAddress;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -26,7 +26,7 @@ defined( 'ABSPATH' ) || exit;
 final class CacheActions implements Hookable {
 
 	/** Name of the bulk action. */
-	private const BULK = 'agentready_regenerate';
+	private const BULK = 'agentwelcome_regenerate';
 
 	/**
 	 * @param Store       $store       Stored copies.
@@ -51,10 +51,10 @@ final class CacheActions implements Hookable {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_agentready_cache', array( $this, 'handle_settings' ) );
-		add_action( 'admin_post_agentready_regenerate_post', array( $this, 'handle_row' ) );
-		add_action( 'admin_post_agentready_resume', array( $this, 'handle_resume' ) );
-		add_action( 'admin_post_agentready_dismiss', array( $this, 'handle_dismiss' ) );
+		add_action( 'admin_post_agentwelcome_cache', array( $this, 'handle_settings' ) );
+		add_action( 'admin_post_agentwelcome_regenerate_post', array( $this, 'handle_row' ) );
+		add_action( 'admin_post_agentwelcome_resume', array( $this, 'handle_resume' ) );
+		add_action( 'admin_post_agentwelcome_dismiss', array( $this, 'handle_dismiss' ) );
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
 		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'register_bulk' ) );
@@ -67,7 +67,7 @@ final class CacheActions implements Hookable {
 	 * @return void
 	 */
 	public function handle_settings(): void {
-		check_admin_referer( 'agentready_cache' );
+		check_admin_referer( 'agentwelcome_cache' );
 
 		$this->require_manage_options();
 
@@ -90,7 +90,7 @@ final class CacheActions implements Hookable {
 			}
 		}
 
-		wp_safe_redirect( add_query_arg( 'agentready_notice', $notice, admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
+		wp_safe_redirect( add_query_arg( 'agentwelcome_notice', $notice, admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
 		exit;
 	}
 
@@ -100,13 +100,13 @@ final class CacheActions implements Hookable {
 	 * @return void
 	 */
 	public function handle_resume(): void {
-		check_admin_referer( 'agentready_resume' );
+		check_admin_referer( 'agentwelcome_resume' );
 
 		$this->require_manage_options();
 
 		SiteAddress::remember();
 
-		wp_safe_redirect( add_query_arg( 'agentready_notice', 'resumed', admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
+		wp_safe_redirect( add_query_arg( 'agentwelcome_notice', 'resumed', admin_url( 'admin.php?page=' . SettingsPage::SLUG ) ) );
 		exit;
 	}
 
@@ -116,7 +116,7 @@ final class CacheActions implements Hookable {
 	 * @return void
 	 */
 	public function handle_dismiss(): void {
-		check_admin_referer( 'agentready_dismiss' );
+		check_admin_referer( 'agentwelcome_dismiss' );
 
 		$this->require_manage_options();
 
@@ -140,12 +140,12 @@ final class CacheActions implements Hookable {
 	public function handle_row(): void {
 		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 
-		check_admin_referer( 'agentready_regenerate_' . $post_id );
+		check_admin_referer( 'agentwelcome_regenerate_' . $post_id );
 
 		$post = get_post( $post_id );
 
 		if ( ! $post instanceof WP_Post || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'agentwelcome' ), 403 );
 		}
 
 		$notice = 'regenerated';
@@ -159,13 +159,13 @@ final class CacheActions implements Hookable {
 		}
 
 		$back   = wp_get_referer();
-		$return = isset( $_GET['agentready_return'] ) ? wp_validate_redirect( esc_url_raw( wp_unslash( $_GET['agentready_return'] ) ), '' ) : '';
+		$return = isset( $_GET['agentwelcome_return'] ) ? wp_validate_redirect( esc_url_raw( wp_unslash( $_GET['agentwelcome_return'] ) ), '' ) : '';
 
 		if ( '' !== $return ) {
 			$back = $return;
 		}
 
-		wp_safe_redirect( add_query_arg( 'agentready_notice', $notice, false === $back ? admin_url( 'edit.php' ) : remove_query_arg( array( 'agentready_notice', 'agentready_count' ), $back ) ) );
+		wp_safe_redirect( add_query_arg( 'agentwelcome_notice', $notice, false === $back ? admin_url( 'edit.php' ) : remove_query_arg( array( 'agentwelcome_notice', 'agentwelcome_count' ), $back ) ) );
 		exit;
 	}
 
@@ -176,7 +176,7 @@ final class CacheActions implements Hookable {
 	 */
 	private function require_manage_options(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'agentready' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'agentwelcome' ), 403 );
 		}
 	}
 
@@ -195,15 +195,15 @@ final class CacheActions implements Hookable {
 		$url = wp_nonce_url(
 			add_query_arg(
 				array(
-					'action' => 'agentready_regenerate_post',
+					'action' => 'agentwelcome_regenerate_post',
 					'post'   => $post->ID,
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'agentready_regenerate_' . $post->ID
+			'agentwelcome_regenerate_' . $post->ID
 		);
 
-		$actions['agentready_regenerate'] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Regenerate Markdown', 'agentready' ) . '</a>';
+		$actions['agentwelcome_regenerate'] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Regenerate Markdown', 'agentwelcome' ) . '</a>';
 
 		return $actions;
 	}
@@ -228,7 +228,7 @@ final class CacheActions implements Hookable {
 	 */
 	public function bulk_actions( array $actions ): array {
 		if ( $this->environment->is_active() ) {
-			$actions[ self::BULK ] = __( 'Regenerate Markdown', 'agentready' );
+			$actions[ self::BULK ] = __( 'Regenerate Markdown', 'agentwelcome' );
 		}
 
 		return $actions;
@@ -261,8 +261,8 @@ final class CacheActions implements Hookable {
 
 		return add_query_arg(
 			array(
-				'agentready_notice' => 'queued',
-				'agentready_count'  => count( $queued ),
+				'agentwelcome_notice' => 'queued',
+				'agentwelcome_count'  => count( $queued ),
 			),
 			$redirect
 		);
@@ -274,27 +274,27 @@ final class CacheActions implements Hookable {
 	 * @return void
 	 */
 	public function notices(): void {
-		$code = isset( $_GET['agentready_notice'] ) ? sanitize_key( wp_unslash( $_GET['agentready_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only message code.
+		$code = isset( $_GET['agentwelcome_notice'] ) ? sanitize_key( wp_unslash( $_GET['agentwelcome_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only message code.
 
 		if ( '' === $code ) {
 			return;
 		}
 
-		$count = isset( $_GET['agentready_count'] ) ? absint( $_GET['agentready_count'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only count.
+		$count = isset( $_GET['agentwelcome_count'] ) ? absint( $_GET['agentwelcome_count'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only count.
 		$map   = array(
-			'regenerated'        => array( 'success', __( 'The Markdown was regenerated.', 'agentready' ) ),
+			'regenerated'        => array( 'success', __( 'The Markdown was regenerated.', 'agentwelcome' ) ),
 			/* translators: %s: number of pages. */
-			'queued'             => array( 'success', sprintf( _n( '%s page is queued for regeneration.', '%s pages are queued for regeneration.', $count, 'agentready' ), number_format_i18n( $count ) ) ),
-			'regenerating'       => array( 'success', __( 'Every page is marked out of date and is being rebuilt in the background. Current copies keep being served meanwhile.', 'agentready' ) ),
-			'cleared_rebuilding' => array( 'success', __( 'The stored Markdown was deleted. Pages are being rebuilt in the background.', 'agentready' ) ),
-			'cleared'            => array( 'success', __( 'The stored Markdown was deleted.', 'agentready' ) ),
-			'scan_started'       => array( 'success', __( 'The scan started. It runs in the background and this page updates by itself.', 'agentready' ) ),
-			'scan_stopped'       => array( 'success', __( 'The scan was stopped.', 'agentready' ) ),
-			'missing_started'    => array( 'success', __( 'Pages without a stored copy are being generated in the background.', 'agentready' ) ),
-			'resumed'            => array( 'success', __( 'AgentReady is resumed on this address.', 'agentready' ) ),
-			'busy'               => array( 'warning', __( 'This page is being generated right now. Try again in a few seconds.', 'agentready' ) ),
-			'inactive'           => array( 'warning', __( 'AgentReady is inactive on this site, so nothing was regenerated.', 'agentready' ) ),
-			'not_served'         => array( 'warning', __( 'This page is not served as Markdown, so nothing was regenerated.', 'agentready' ) ),
+			'queued'             => array( 'success', sprintf( _n( '%s page is queued for regeneration.', '%s pages are queued for regeneration.', $count, 'agentwelcome' ), number_format_i18n( $count ) ) ),
+			'regenerating'       => array( 'success', __( 'Every page is marked out of date and is being rebuilt in the background. Current copies keep being served meanwhile.', 'agentwelcome' ) ),
+			'cleared_rebuilding' => array( 'success', __( 'The stored Markdown was deleted. Pages are being rebuilt in the background.', 'agentwelcome' ) ),
+			'cleared'            => array( 'success', __( 'The stored Markdown was deleted.', 'agentwelcome' ) ),
+			'scan_started'       => array( 'success', __( 'The scan started. It runs in the background and this page updates by itself.', 'agentwelcome' ) ),
+			'scan_stopped'       => array( 'success', __( 'The scan was stopped.', 'agentwelcome' ) ),
+			'missing_started'    => array( 'success', __( 'Pages without a stored copy are being generated in the background.', 'agentwelcome' ) ),
+			'resumed'            => array( 'success', __( 'AgentWelcome is resumed on this address.', 'agentwelcome' ) ),
+			'busy'               => array( 'warning', __( 'This page is being generated right now. Try again in a few seconds.', 'agentwelcome' ) ),
+			'inactive'           => array( 'warning', __( 'AgentWelcome is inactive on this site, so nothing was regenerated.', 'agentwelcome' ) ),
+			'not_served'         => array( 'warning', __( 'This page is not served as Markdown, so nothing was regenerated.', 'agentwelcome' ) ),
 		);
 
 		if ( ! isset( $map[ $code ] ) ) {
@@ -302,10 +302,10 @@ final class CacheActions implements Hookable {
 		}
 
 		if ( $this->environment->cron_disabled() && in_array( $code, array( 'queued', 'regenerating', 'cleared_rebuilding', 'missing_started', 'scan_started' ), true ) ) {
-			$map[ $code ][1] .= ' ' . __( 'WP-Cron is disabled on this site, so this waits for a real cron job that calls wp-cron.php.', 'agentready' );
+			$map[ $code ][1] .= ' ' . __( 'WP-Cron is disabled on this site, so this waits for a real cron job that calls wp-cron.php.', 'agentwelcome' );
 
 			if ( 'scan_started' === $code ) {
-				$map[ $code ][1] = __( 'The scan started. WP-Cron is disabled on this site, so this page runs it while it stays open.', 'agentready' );
+				$map[ $code ][1] = __( 'The scan started. WP-Cron is disabled on this site, so this page runs it while it stays open.', 'agentwelcome' );
 			}
 		}
 

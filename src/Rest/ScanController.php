@@ -2,16 +2,16 @@
 /**
  * REST route that reports the all-pages scan progress.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rest;
+namespace AgentWelcome\Rest;
 
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Verify\Scan;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Verify\Scan;
 use WP_REST_Response;
 use WP_REST_Server;
 
@@ -43,7 +43,7 @@ final class ScanController implements Hookable {
 	 */
 	public function routes(): void {
 		register_rest_route(
-			'agentready/v1',
+			'agentwelcome/v1',
 			'/scan',
 			array(
 				'methods'             => WP_REST_Server::READABLE,

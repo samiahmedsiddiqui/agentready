@@ -2,12 +2,12 @@
 /**
  * Public taxonomy terms grouped for the exclusion checkboxes.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
 use WP_Taxonomy;
 use WP_Term;

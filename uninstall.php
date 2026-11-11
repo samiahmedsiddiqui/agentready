@@ -2,7 +2,7 @@
 /**
  * Removes plugin data on uninstall.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
@@ -10,14 +10,14 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 /**
  * Removes the llms.txt management capability from every role and from users who were given it directly.
  */
-function agentready_remove_files_capability(): void {
+function agentwelcome_remove_files_capability(): void {
 	foreach ( wp_roles()->role_objects as $role ) {
-		$role->remove_cap( 'agentready_manage_files' );
+		$role->remove_cap( 'agentwelcome_manage_files' );
 	}
 
 	foreach ( get_users(
 		array(
-			'capability' => 'agentready_manage_files',
+			'capability' => 'agentwelcome_manage_files',
 			'fields'     => 'ID',
 			'number'     => -1,
 		)
@@ -25,7 +25,7 @@ function agentready_remove_files_capability(): void {
 		$user = get_user_by( 'id', (int) $user_id );
 
 		if ( $user instanceof WP_User ) {
-			$user->remove_cap( 'agentready_manage_files' );
+			$user->remove_cap( 'agentwelcome_manage_files' );
 		}
 	}
 }
@@ -33,39 +33,39 @@ function agentready_remove_files_capability(): void {
 /**
  * Removes the stored Markdown and saved credentials, and the settings, the llms.txt text and per-page choices when the user asked for it.
  */
-function agentready_uninstall_site(): void {
+function agentwelcome_uninstall_site(): void {
 	global $wpdb;
 
-	$settings = get_option( 'agentready_settings' );
+	$settings = get_option( 'agentwelcome_settings' );
 	$delete   = is_array( $settings ) && ! empty( $settings['delete_data'] );
 
-	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}agentready_pages" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Plugin-owned table.
-	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( 'agentready_lock_' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Locks are stored as options.
+	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}agentwelcome_pages" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Plugin-owned table.
+	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( 'agentwelcome_lock_' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Locks are stored as options.
 
-	delete_option( 'agentready_db_version' );
-	delete_option( 'agentready_site_fingerprint' );
-	delete_option( 'agentready_batch' );
-	delete_option( 'agentready_scan' );
-	delete_option( 'agentready_changes' );
-	wp_unschedule_hook( 'agentready_generate_post' );
-	wp_unschedule_hook( 'agentready_regenerate_batch' );
-	wp_unschedule_hook( 'agentready_prune' );
-	wp_unschedule_hook( 'agentready_scan_batch' );
+	delete_option( 'agentwelcome_db_version' );
+	delete_option( 'agentwelcome_site_fingerprint' );
+	delete_option( 'agentwelcome_batch' );
+	delete_option( 'agentwelcome_scan' );
+	delete_option( 'agentwelcome_changes' );
+	wp_unschedule_hook( 'agentwelcome_generate_post' );
+	wp_unschedule_hook( 'agentwelcome_regenerate_batch' );
+	wp_unschedule_hook( 'agentwelcome_prune' );
+	wp_unschedule_hook( 'agentwelcome_scan_batch' );
 
 	if ( $delete ) {
-		delete_option( 'agentready_settings' );
-		delete_option( 'agentready_llms' );
-		delete_post_meta_by_key( '_agentready_exclude' );
-		delete_post_meta_by_key( '_agentready_description' );
-		delete_option( 'agentready_files_capability_granted' );
-		agentready_remove_files_capability();
+		delete_option( 'agentwelcome_settings' );
+		delete_option( 'agentwelcome_llms' );
+		delete_post_meta_by_key( '_agentwelcome_exclude' );
+		delete_post_meta_by_key( '_agentwelcome_description' );
+		delete_option( 'agentwelcome_files_capability_granted' );
+		agentwelcome_remove_files_capability();
 	} elseif ( is_array( $settings ) ) {
 		// Saved HTTP Basic credentials are secrets, so they never outlive the plugin.
 		$settings['http_auth_enabled']  = false;
 		$settings['http_auth_user']     = '';
 		$settings['http_auth_password'] = '';
 
-		update_option( 'agentready_settings', $settings );
+		update_option( 'agentwelcome_settings', $settings );
 	}
 }
 
@@ -75,11 +75,11 @@ if ( is_multisite() ) {
 			'fields' => 'ids',
 			'number' => 0,
 		)
-	) as $agentready_site_id ) {
-		switch_to_blog( (int) $agentready_site_id );
-		agentready_uninstall_site();
+	) as $agentwelcome_site_id ) {
+		switch_to_blog( (int) $agentwelcome_site_id );
+		agentwelcome_uninstall_site();
 		restore_current_blog();
 	}
 } else {
-	agentready_uninstall_site();
+	agentwelcome_uninstall_site();
 }
