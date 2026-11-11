@@ -44,11 +44,16 @@ final class Renderer {
 	}
 
 	private function loopback( string $url ): RenderResult|string {
-		$auth = $this->options->http_auth();
+		$auth   = $this->options->http_auth();
+		$secure = 'https' === wp_parse_url( $url, PHP_URL_SCHEME );
 
 		for ( $hop = 0; $hop <= self::MAX_REDIRECTS; $hop++ ) {
 			if ( ! $this->is_same_site( $url ) ) {
 				return 'redirect_off_site';
+			}
+
+			if ( null !== $auth && $secure && 'https' !== wp_parse_url( $url, PHP_URL_SCHEME ) ) {
+				return 'redirect_insecure';
 			}
 
 			$response = wp_remote_get( add_query_arg( 'agentready_render', (string) wp_rand(), $url ), $this->request_args( $auth ) );
@@ -154,6 +159,8 @@ final class Renderer {
 				return __( 'The site asked for HTTP Basic authentication. Enable it in the AgentReady settings. Using the post content instead.', 'agentready' );
 			case 'http_auth_failed':
 				return __( 'The HTTP Basic authentication credentials were rejected. Using the post content instead.', 'agentready' );
+			case 'redirect_insecure':
+				return __( 'The page redirected from https to http, so the saved credentials were not sent. Using the post content instead.', 'agentready' );
 			case 'redirect_off_site':
 				return __( 'The page redirected to a different site. Using the post content instead.', 'agentready' );
 			case 'no_permalink':

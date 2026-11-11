@@ -137,6 +137,9 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 == Changelog ==
 
 = Unreleased =
+* `llms.txt` and `llms-full.txt` are kept for up to five minutes instead of being built on every request, and are rebuilt at once when a page, an SEO field or a related setting changes.
+* At most three pages are rendered at the same time for visitors. When all slots are busy and a page has no stored copy yet, the visitor gets a short "try again" answer and the page is queued.
+* Saved HTTP Basic credentials are no longer sent if the page redirects from https to http.
 * Pages that an SEO plugin marks as noindex are left out of llms.txt, llms-full.txt and the Markdown files by default. A new setting in the Exclusions card turns this off.
 * Saving an ACF options page, or an Elementor saved template, refreshes every stored page. Saving a page in Elementor refreshes that page.
 * Changing a page's SEO meta description or noindex setting refreshes that page.

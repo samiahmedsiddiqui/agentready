@@ -15,6 +15,7 @@ use AgentReady\Contracts\Hookable;
 use AgentReady\Environment\Environment;
 use AgentReady\Index\LlmsFullTxt;
 use AgentReady\Index\LlmsTxt;
+use AgentReady\Index\OutputCache;
 use AgentReady\Settings\LlmsOptions;
 use WP;
 
@@ -49,7 +50,7 @@ final class Router implements Hookable {
 		}
 
 		if ( Urls::ROUTE_LLMS === $route['type'] ) {
-			$this->response->send( $this->llms->build(), MarkdownResponse::TEXT );
+			$this->response->send( OutputCache::remember( OutputCache::LLMS, fn(): string => $this->llms->build() ), MarkdownResponse::TEXT );
 			$this->terminate();
 		}
 
@@ -58,7 +59,7 @@ final class Router implements Hookable {
 				return;
 			}
 
-			$this->response->send( $this->llms_full->build(), MarkdownResponse::TEXT );
+			$this->response->send( OutputCache::remember( OutputCache::FULL, fn(): string => $this->llms_full->build() ), MarkdownResponse::TEXT );
 			$this->terminate();
 		}
 

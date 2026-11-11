@@ -146,14 +146,15 @@ Uninstalling always drops the table and clears any saved HTTP Basic credentials.
 | `agentready_resolve_post` | Map a request path to a post. |
 | `agentready_use_loopback` | Return `false` to skip fetching the page and use the post content. |
 | `agentready_loopback_timeout` | Seconds to wait for the page request (default 15). |
+| `agentready_max_concurrent_renders` | Pages that may be rendered at the same time for visitors (default 3). |
 | `agentready_strip_selectors` | CSS selectors for elements to remove. |
 | `agentready_markdown` | Final Markdown for a page. |
 | `agentready_description` | The description used in the metadata and `llms.txt`. |
 | `agentready_meta_description_keys` | Post meta keys read as the SEO meta description, in order. |
 | `agentready_check_site_address` | Return `false` to turn off the automatic pause when the site address changes. |
 | `agentready_compare_ignore` | Regular expressions for text that Verify & Preview and the scan leave out when comparing. |
-| `agentready_llms_txt` | Final `llms.txt` content. |
-| `agentready_llms_full_txt` | Final `llms-full.txt` content. |
+| `agentready_llms_txt` | Final `llms.txt` content. The result is kept for up to five minutes. |
+| `agentready_llms_full_txt` | Final `llms-full.txt` content. The result is kept for up to five minutes. |
 | `agentready_llms_full_max_bytes` | Size limit of `llms-full.txt` (default 5,000,000 bytes). |
 | `agentready_llms_max_items` | Entries per post type in `llms.txt` (default 500). |
 | `agentready_content_type` | Content type of the Markdown response. |

@@ -26,3 +26,27 @@ if ( ! function_exists( '__' ) ) {
 		return $text;
 	}
 }
+
+$GLOBALS['agentready_test_transients'] = array();
+
+if ( ! function_exists( 'get_transient' ) ) {
+	function get_transient( $name ) {
+		return $GLOBALS['agentready_test_transients'][ $name ] ?? false;
+	}
+}
+
+if ( ! function_exists( 'set_transient' ) ) {
+	function set_transient( $name, $value, $expiration = 0 ) {
+		$GLOBALS['agentready_test_transients'][ $name ] = $value;
+
+		return true;
+	}
+}
+
+if ( ! function_exists( 'delete_transient' ) ) {
+	function delete_transient( $name ) {
+		unset( $GLOBALS['agentready_test_transients'][ $name ] );
+
+		return true;
+	}
+}

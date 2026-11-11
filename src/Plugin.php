@@ -43,6 +43,7 @@ use AgentReady\Http\Router;
 use AgentReady\Http\Urls;
 use AgentReady\Index\LlmsFullTxt;
 use AgentReady\Index\LlmsTxt;
+use AgentReady\Index\OutputCache;
 use AgentReady\Integrations\Acf;
 use AgentReady\Integrations\CustomPermalinks;
 use AgentReady\Integrations\Elementor;
@@ -126,6 +127,7 @@ final class Plugin {
 			$batch,
 			$invalidator,
 			$changes,
+			new OutputCache(),
 			new Router( $urls, $eligibility, $pages, $environment, $llms, $llms_full, $llms_options, new MarkdownResponse() ),
 			new DiscoveryTags( $eligibility, $urls, $environment ),
 			new CronAuth( $options ),

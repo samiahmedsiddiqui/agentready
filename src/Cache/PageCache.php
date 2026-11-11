@@ -27,6 +27,7 @@ final class PageCache implements Hookable {
 	private const REFRESH_DELAY  = 10;
 	private const FALLBACK_DELAY = 300;
 	private const QUEUE_SPACING  = 5;
+	private const MAX_RENDERS    = 3;
 
 	public function __construct(
 		private Store $store,
@@ -60,7 +61,19 @@ final class PageCache implements Hookable {
 		$deadline = microtime( true ) + self::WAIT_SECONDS;
 
 		do {
-			$made = $this->regenerate( $post, false );
+			$slot = $this->lock->take_slot( max( 1, (int) apply_filters( 'agentready_max_concurrent_renders', self::MAX_RENDERS ) ) );
+
+			if ( null === $slot ) {
+				$this->schedule( $post->ID, self::REFRESH_DELAY );
+
+				return null !== $entry ? new Served( $entry, Served::STALE ) : null;
+			}
+
+			try {
+				$made = $this->regenerate( $post, false );
+			} finally {
+				$this->lock->release_slot( $slot );
+			}
 
 			if ( null !== $made ) {
 				return new Served( $made, Served::MISS );
