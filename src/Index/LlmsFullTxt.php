@@ -63,7 +63,8 @@ final class LlmsFullTxt {
 		$cursor = 0;
 
 		do {
-			$ids = $this->store->ids( $cursor, self::BATCH );
+			$ids   = $this->store->ids( $cursor, self::BATCH );
+			$count = count( $ids );
 
 			foreach ( $ids as $id ) {
 				$cursor = $id;
@@ -73,7 +74,7 @@ final class LlmsFullTxt {
 					yield $block;
 				}
 			}
-		} while ( self::BATCH === count( $ids ) );
+		} while ( self::BATCH === $count );
 	}
 
 	private function block_for( int $id ): ?string {
