@@ -2,15 +2,15 @@
 /**
  * Sends the saved HTTP Basic credentials with WordPress's own background request, so scheduled work runs on a protected site.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Http;
+namespace AgentWelcome\Http;
 
-use AgentReady\Contracts\Hookable;
-use AgentReady\Settings\Options;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Settings\Options;
 
 defined( 'ABSPATH' ) || exit;
 

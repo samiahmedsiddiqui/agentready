@@ -2,15 +2,15 @@
 /**
  * Counts of fresh, stale and not yet generated pages for the Status card.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Content\Eligibility;
-use AgentReady\Content\PostTypes;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Content\PostTypes;
 
 defined( 'ABSPATH' ) || exit;
 

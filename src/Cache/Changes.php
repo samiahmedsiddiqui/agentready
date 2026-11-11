@@ -2,15 +2,15 @@
 /**
  * Notices a theme or plugin change, which can change how every page renders.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 final class Changes implements Hookable {
 
 	/** Option that holds the notices that have not been dismissed. */
-	public const OPTION = 'agentready_changes';
+	public const OPTION = 'agentwelcome_changes';
 
 	/** Notice key for a change that refreshed every page: a theme switch, a theme update or a Customizer save. */
 	public const REFRESH = 'refresh';
@@ -70,7 +70,7 @@ final class Changes implements Hookable {
 	 * @return void
 	 */
 	public function on_plugin( mixed $plugin ): void {
-		if ( ! is_string( $plugin ) || plugin_basename( AGENTREADY_FILE ) === $plugin ) {
+		if ( ! is_string( $plugin ) || plugin_basename( AGENTWELCOME_FILE ) === $plugin ) {
 			return;
 		}
 
@@ -100,7 +100,7 @@ final class Changes implements Hookable {
 		}
 
 		if ( 'plugin' === ( $extra['type'] ?? '' ) ) {
-			$plugins = array_diff( array_map( 'strval', (array) ( $extra['plugins'] ?? array() ) ), array( plugin_basename( AGENTREADY_FILE ) ) );
+			$plugins = array_diff( array_map( 'strval', (array) ( $extra['plugins'] ?? array() ) ), array( plugin_basename( AGENTWELCOME_FILE ) ) );
 
 			if ( array() !== $plugins ) {
 				$this->note_plugins( count( $plugins ) );

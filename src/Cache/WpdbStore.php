@@ -1,21 +1,21 @@
 <?php
 /**
- * Stores generated Markdown in the agentready_pages table.
+ * Stores generated Markdown in the agentwelcome_pages table.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Index\OutputCache;
+use AgentWelcome\Index\OutputCache;
 
 defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin-owned table.
 
-/** Store backed by the agentready_pages table. The cached llms files are cleared whenever stored copies change. */
+/** Store backed by the agentwelcome_pages table. The cached llms files are cleared whenever stored copies change. */
 final class WpdbStore implements Store {
 
 	/**

@@ -2,14 +2,14 @@
 /**
  * Tests for comparing Markdown copies and checking page text coverage.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Verify\Comparison;
+use AgentWelcome\Verify\Comparison;
 use PHPUnit\Framework\TestCase;
 
 final class ComparisonTest extends TestCase {

@@ -1,28 +1,28 @@
 <?php
 /**
- * WP-CLI commands: wp agentready cache clear | regenerate | status.
+ * WP-CLI commands: wp agentwelcome cache clear | regenerate | status.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cli;
+namespace AgentWelcome\Cli;
 
-use AgentReady\Cache\Candidates;
-use AgentReady\Cache\Coverage;
-use AgentReady\Cache\PageCache;
-use AgentReady\Cache\Store;
-use AgentReady\Content\Eligibility;
-use AgentReady\Content\PostTypes;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
+use AgentWelcome\Cache\Candidates;
+use AgentWelcome\Cache\Coverage;
+use AgentWelcome\Cache\PageCache;
+use AgentWelcome\Cache\Store;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
 use WP_CLI;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
-/** WP-CLI commands to inspect, clear and rebuild the stored Markdown. Run them with: wp agentready cache. */
+/** WP-CLI commands to inspect, clear and rebuild the stored Markdown. Run them with: wp agentwelcome cache. */
 final class Command implements Hookable {
 
 	/** Page IDs read from the database at a time. */
@@ -51,7 +51,7 @@ final class Command implements Hookable {
 	 * @return void
 	 */
 	public function register(): void {
-		WP_CLI::add_command( 'agentready cache', $this );
+		WP_CLI::add_command( 'agentwelcome cache', $this );
 	}
 
 	/**
@@ -59,7 +59,7 @@ final class Command implements Hookable {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp agentready cache clear
+	 *     wp agentwelcome cache clear
 	 *
 	 * @param string[]             $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Named arguments.
@@ -82,8 +82,8 @@ final class Command implements Hookable {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp agentready cache regenerate 42 57
-	 *     wp agentready cache regenerate --all
+	 *     wp agentwelcome cache regenerate 42 57
+	 *     wp agentwelcome cache regenerate --all
 	 *
 	 * @param string[]             $args       Post IDs.
 	 * @param array<string, mixed> $assoc_args Named arguments.
@@ -92,7 +92,7 @@ final class Command implements Hookable {
 		$reason = $this->environment->reason();
 
 		if ( null !== $reason ) {
-			WP_CLI::error( 'AgentReady is inactive here. ' . $this->environment->describe( $reason ) );
+			WP_CLI::error( 'AgentWelcome is inactive here. ' . $this->environment->describe( $reason ) );
 		}
 
 		$ids = ! empty( $assoc_args['all'] ) ? $this->all_ids() : array_values( array_unique( array_map( 'absint', $args ) ) );
@@ -127,7 +127,7 @@ final class Command implements Hookable {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp agentready cache status
+	 *     wp agentwelcome cache status
 	 *
 	 * @param string[]             $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Named arguments.

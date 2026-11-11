@@ -2,12 +2,12 @@
 /**
  * Sends Markdown with the correct headers (type, canonical, noindex, caching).
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Http;
+namespace AgentWelcome\Http;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -47,7 +47,7 @@ final class MarkdownResponse {
 			$headers['Last-Modified'] = gmdate( 'D, d M Y H:i:s', $modified ) . ' GMT';
 		}
 
-		$headers = (array) apply_filters( 'agentready_response_headers', $headers );
+		$headers = (array) apply_filters( 'agentwelcome_response_headers', $headers );
 
 		if ( $this->is_not_modified( $etag, $modified ) ) {
 			status_header( 304 );
@@ -80,7 +80,7 @@ final class MarkdownResponse {
 		);
 
 		if ( 'HEAD' !== $this->method() ) {
-			echo esc_html__( 'The Markdown for this page is being generated. Try again in a few seconds.', 'agentready' ) . "\n";
+			echo esc_html__( 'The Markdown for this page is being generated. Try again in a few seconds.', 'agentwelcome' ) . "\n";
 		}
 	}
 

@@ -2,12 +2,12 @@
 /**
  * Per-page generation lock, taken with an atomic insert into the options table.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,7 +37,7 @@ final class Lock {
 	 */
 	public function take_slot( int $max ): ?int {
 		for ( $slot = 1; $slot <= $max; $slot++ ) {
-			if ( $this->take( 'agentready_slot_' . $slot ) ) {
+			if ( $this->take( 'agentwelcome_slot_' . $slot ) ) {
 				return $slot;
 			}
 		}
@@ -54,7 +54,7 @@ final class Lock {
 	public function release_slot( int $slot ): void {
 		global $wpdb;
 
-		$wpdb->delete( $wpdb->options, array( 'option_name' => 'agentready_slot_' . $slot ) );
+		$wpdb->delete( $wpdb->options, array( 'option_name' => 'agentwelcome_slot_' . $slot ) );
 	}
 
 	/**
@@ -122,6 +122,6 @@ final class Lock {
 	 * @return string Option name.
 	 */
 	private function name( int $post_id ): string {
-		return 'agentready_lock_' . $post_id;
+		return 'agentwelcome_lock_' . $post_id;
 	}
 }

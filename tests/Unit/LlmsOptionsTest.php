@@ -2,14 +2,14 @@
 /**
  * Tests for the llms.txt page settings helpers.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Settings\LlmsOptions;
+use AgentWelcome\Settings\LlmsOptions;
 use PHPUnit\Framework\TestCase;
 
 final class LlmsOptionsTest extends TestCase {

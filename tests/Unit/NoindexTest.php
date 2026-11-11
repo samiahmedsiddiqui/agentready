@@ -2,15 +2,15 @@
 /**
  * Tests for reading a noindex choice from SEO plugin meta, and for spotting ACF options saves.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Content\Noindex;
-use AgentReady\Integrations\Acf;
+use AgentWelcome\Content\Noindex;
+use AgentWelcome\Integrations\Acf;
 use PHPUnit\Framework\TestCase;
 
 final class NoindexTest extends TestCase {

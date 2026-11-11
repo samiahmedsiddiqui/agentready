@@ -1,15 +1,15 @@
 <?php
 /**
- * Decides whether AgentReady is active on this site and environment.
+ * Decides whether AgentWelcome is active on this site and environment.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Environment;
+namespace AgentWelcome\Environment;
 
-use AgentReady\Settings\Options;
+use AgentWelcome\Settings\Options;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -91,14 +91,14 @@ final class Environment {
 	 */
 	public function describe( string $reason ): string {
 		$labels = array(
-			'disabled_constant'       => __( 'AGENTREADY_ENABLED is set to false in wp-config.php.', 'agentready' ),
+			'disabled_constant'       => __( 'AGENTWELCOME_ENABLED is set to false in wp-config.php.', 'agentwelcome' ),
 			'environment_not_allowed' => sprintf(
 				/* translators: %s: environment type such as staging. */
-				__( 'The environment type is "%s", which is not allowed in the AgentReady settings.', 'agentready' ),
+				__( 'The environment type is "%s", which is not allowed in the AgentWelcome settings.', 'agentwelcome' ),
 				$this->type()
 			),
-			'url_not_allowed'         => __( 'This site\'s address does not match the allowed URLs.', 'agentready' ),
-			'site_address_changed'    => __( 'The site address changed since AgentReady was set up. This looks like a copy or a move, so AgentReady is paused.', 'agentready' ),
+			'url_not_allowed'         => __( 'This site\'s address does not match the allowed URLs.', 'agentwelcome' ),
+			'site_address_changed'    => __( 'The site address changed since AgentWelcome was set up. This looks like a copy or a move, so AgentWelcome is paused.', 'agentwelcome' ),
 		);
 
 		return $labels[ $reason ] ?? $reason;
@@ -107,10 +107,10 @@ final class Environment {
 	/**
 	 * Whether the allowed addresses are set in wp-config.php.
 	 *
-	 * @return bool True when AGENTREADY_ALLOWED_URLS is defined.
+	 * @return bool True when AGENTWELCOME_ALLOWED_URLS is defined.
 	 */
 	public function urls_from_constant(): bool {
-		return defined( 'AGENTREADY_ALLOWED_URLS' );
+		return defined( 'AGENTWELCOME_ALLOWED_URLS' );
 	}
 
 	/**
@@ -119,7 +119,7 @@ final class Environment {
 	 * @return string[] Host patterns.
 	 */
 	public function allowed_urls(): array {
-		$raw = $this->urls_from_constant() ? constant( 'AGENTREADY_ALLOWED_URLS' ) : $this->options->get( 'allowed_urls', '' );
+		$raw = $this->urls_from_constant() ? constant( 'AGENTWELCOME_ALLOWED_URLS' ) : $this->options->get( 'allowed_urls', '' );
 
 		return self::parse_urls( $raw );
 	}
@@ -139,7 +139,7 @@ final class Environment {
 	 * @return string|null A reason code, or null when the plugin is on.
 	 */
 	private function detect(): ?string {
-		if ( defined( 'AGENTREADY_ENABLED' ) && false === filter_var( constant( 'AGENTREADY_ENABLED' ), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE ) ) {
+		if ( defined( 'AGENTWELCOME_ENABLED' ) && false === filter_var( constant( 'AGENTWELCOME_ENABLED' ), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE ) ) {
 			return 'disabled_constant';
 		}
 
@@ -155,7 +155,7 @@ final class Environment {
 		}
 
 		// An allowed-URLs constant is an explicit choice, so the automatic copy check steps aside.
-		if ( ! $this->urls_from_constant() && (bool) apply_filters( 'agentready_check_site_address', true ) && ! SiteAddress::matches() ) {
+		if ( ! $this->urls_from_constant() && (bool) apply_filters( 'agentwelcome_check_site_address', true ) && ! SiteAddress::matches() ) {
 			return 'site_address_changed';
 		}
 

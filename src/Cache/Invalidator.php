@@ -2,17 +2,17 @@
 /**
  * Keeps stored Markdown in step with content and settings changes.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Content\PostMeta;
-use AgentReady\Content\PostTypes;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Settings\Options;
+use AgentWelcome\Content\PostMeta;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;

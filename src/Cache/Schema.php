@@ -2,14 +2,14 @@
 /**
  * Creates and upgrades the pages table.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Contracts\Hookable;
+use AgentWelcome\Contracts\Hookable;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -19,7 +19,7 @@ final class Schema implements Hookable {
 	/** Version of the table layout. Raise it when the columns change. */
 	public const DB_VERSION = '1';
 	/** Option that records the installed table version. */
-	public const OPTION = 'agentready_db_version';
+	public const OPTION = 'agentwelcome_db_version';
 
 	/**
 	 * Name of the table, with the site prefix.
@@ -29,7 +29,7 @@ final class Schema implements Hookable {
 	public static function table(): string {
 		global $wpdb;
 
-		return $wpdb->prefix . 'agentready_pages';
+		return $wpdb->prefix . 'agentwelcome_pages';
 	}
 
 	/**

@@ -2,14 +2,14 @@
 /**
  * Tests for the front matter block.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Rendering\FrontMatter;
+use AgentWelcome\Rendering\FrontMatter;
 use PHPUnit\Framework\TestCase;
 
 final class FrontMatterTest extends TestCase {

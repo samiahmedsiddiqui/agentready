@@ -2,15 +2,15 @@
 /**
  * Tests for collecting the text blocks of a page's content area.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Rendering\Extractor;
-use AgentReady\Rendering\Selector;
+use AgentWelcome\Rendering\Extractor;
+use AgentWelcome\Rendering\Selector;
 use PHPUnit\Framework\TestCase;
 
 final class TextBlocksTest extends TestCase {

@@ -2,19 +2,19 @@
 /**
  * REST routes behind the editor box buttons.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rest;
+namespace AgentWelcome\Rest;
 
-use AgentReady\Cache\PageCache;
-use AgentReady\Cache\PageStatus;
-use AgentReady\Cache\Store;
-use AgentReady\Content\Eligibility;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
+use AgentWelcome\Cache\PageCache;
+use AgentWelcome\Cache\PageStatus;
+use AgentWelcome\Cache\Store;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
 use WP_Error;
 use WP_Post;
 use WP_REST_Request;
@@ -27,7 +27,7 @@ defined( 'ABSPATH' ) || exit;
 final class PagesController implements Hookable {
 
 	/** Namespace of the plugin routes. */
-	private const NAMESPACE = 'agentready/v1';
+	private const NAMESPACE = 'agentwelcome/v1';
 
 	/**
 	 * @param Store       $store       Stored copies.
@@ -136,17 +136,17 @@ final class PagesController implements Hookable {
 		$reason = $this->environment->reason();
 
 		if ( null !== $reason ) {
-			return new WP_Error( 'agentready_inactive', $this->environment->describe( $reason ), array( 'status' => 409 ) );
+			return new WP_Error( 'agentwelcome_inactive', $this->environment->describe( $reason ), array( 'status' => 409 ) );
 		}
 
 		$reason = $this->eligibility->reason( $post );
 
 		if ( null !== $reason ) {
-			return new WP_Error( 'agentready_not_served', $this->eligibility->describe( $reason ), array( 'status' => 409 ) );
+			return new WP_Error( 'agentwelcome_not_served', $this->eligibility->describe( $reason ), array( 'status' => 409 ) );
 		}
 
 		if ( null === $this->pages->regenerate( $post ) ) {
-			return new WP_Error( 'agentready_busy', __( 'This page is being generated right now. Try again in a few seconds.', 'agentready' ), array( 'status' => 409 ) );
+			return new WP_Error( 'agentwelcome_busy', __( 'This page is being generated right now. Try again in a few seconds.', 'agentwelcome' ), array( 'status' => 409 ) );
 		}
 
 		return $this->respond( $post );
@@ -179,7 +179,7 @@ final class PagesController implements Hookable {
 	private function post( WP_REST_Request $request ): WP_Post|WP_Error {
 		$post = get_post( (int) $request['id'] );
 
-		return $post instanceof WP_Post ? $post : new WP_Error( 'agentready_not_found', __( 'Page not found.', 'agentready' ), array( 'status' => 404 ) );
+		return $post instanceof WP_Post ? $post : new WP_Error( 'agentwelcome_not_found', __( 'Page not found.', 'agentwelcome' ), array( 'status' => 404 ) );
 	}
 
 	/**

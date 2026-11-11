@@ -1,5 +1,5 @@
 name: Bug report
-description: Report something in AgentReady that doesn't work as expected.
+description: Report something in AgentWelcome that doesn't work as expected.
 labels: [ bug ]
 body:
   - type: markdown
@@ -27,7 +27,7 @@ body:
   - type: input
     id: plugin-version
     attributes:
-      label: AgentReady version
+      label: AgentWelcome version
       placeholder: '1.0.0'
     validations:
       required: true
@@ -68,7 +68,7 @@ body:
     attributes:
       label: Before submitting
       options:
-        - label: I checked the problem still happens with the latest version of AgentReady.
+        - label: I checked the problem still happens with the latest version of AgentWelcome.
           required: true
         - label: This isn't a security vulnerability. Those are reported privately; see SECURITY.md.
           required: true

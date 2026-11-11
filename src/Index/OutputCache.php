@@ -2,19 +2,19 @@
 /**
  * Keeps the built llms.txt and llms-full.txt for a few minutes, so public requests do not rebuild them every time.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Index;
+namespace AgentWelcome\Index;
 
-use AgentReady\Content\Description;
-use AgentReady\Content\Noindex;
-use AgentReady\Content\PostMeta;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Settings\LlmsOptions;
-use AgentReady\Settings\Options;
+use AgentWelcome\Content\Description;
+use AgentWelcome\Content\Noindex;
+use AgentWelcome\Content\PostMeta;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Settings\LlmsOptions;
+use AgentWelcome\Settings\Options;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,9 +22,9 @@ defined( 'ABSPATH' ) || exit;
 final class OutputCache implements Hookable {
 
 	/** Transient that holds llms.txt. */
-	public const LLMS = 'agentready_out_llms';
+	public const LLMS = 'agentwelcome_out_llms';
 	/** Transient that holds llms-full.txt. */
-	public const FULL = 'agentready_out_full';
+	public const FULL = 'agentwelcome_out_full';
 
 	/** Seconds a saved file is kept. */
 	private const TTL = 300;

@@ -2,12 +2,12 @@
 /**
  * Turns text from the editor into one plain line, for titles and descriptions in the llms files.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Index;
+namespace AgentWelcome\Index;
 
 defined( 'ABSPATH' ) || exit;
 

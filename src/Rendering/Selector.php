@@ -5,12 +5,12 @@
  * Supports tag, #id, .class, [attr], [attr=v], [attr^=v], [attr$=v], [attr*=v],
  * compound selectors, descendant and child (>) combinators, and comma lists.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rendering;
+namespace AgentWelcome\Rendering;
 
 defined( 'ABSPATH' ) || exit;
 

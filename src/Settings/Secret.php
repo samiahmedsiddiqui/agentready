@@ -2,12 +2,12 @@
 /**
  * Encrypts stored secrets with a key derived from the site's auth salt.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Settings;
+namespace AgentWelcome\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -64,6 +64,6 @@ final class Secret {
 	 * @return string Binary key.
 	 */
 	private static function key(): string {
-		return sodium_crypto_generichash( wp_salt( 'auth' ) . 'agentready', '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES );
+		return sodium_crypto_generichash( wp_salt( 'auth' ) . 'agentwelcome', '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES );
 	}
 }

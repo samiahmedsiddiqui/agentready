@@ -2,16 +2,16 @@
 /**
  * Tests for the HTML to Markdown pipeline (extractor and converter).
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Rendering\Converter;
-use AgentReady\Rendering\Extractor;
-use AgentReady\Rendering\Selector;
+use AgentWelcome\Rendering\Converter;
+use AgentWelcome\Rendering\Extractor;
+use AgentWelcome\Rendering\Selector;
 use PHPUnit\Framework\TestCase;
 
 final class ConverterTest extends TestCase {

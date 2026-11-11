@@ -2,12 +2,12 @@
 /**
  * A component that attaches itself to WordPress hooks.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Contracts;
+namespace AgentWelcome\Contracts;
 
 defined( 'ABSPATH' ) || exit;
 

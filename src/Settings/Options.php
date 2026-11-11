@@ -2,12 +2,12 @@
 /**
  * Reads plugin settings with defaults applied.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Settings;
+namespace AgentWelcome\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 final class Options {
 
 	/** Option name. */
-	public const KEY = 'agentready_settings';
+	public const KEY = 'agentwelcome_settings';
 
 	/** Selectors tried, in order, to find the main content of a page. An empty setting means these are used. */
 	public const DEFAULT_SELECTOR = 'main, [role="main"], #content, #main, .site-content, article';
@@ -85,7 +85,7 @@ final class Options {
 	 * @return bool True when both constants are defined.
 	 */
 	public function http_auth_from_constants(): bool {
-		return defined( 'AGENTREADY_HTTP_AUTH_USER' ) && defined( 'AGENTREADY_HTTP_AUTH_PASSWORD' );
+		return defined( 'AGENTWELCOME_HTTP_AUTH_USER' ) && defined( 'AGENTWELCOME_HTTP_AUTH_PASSWORD' );
 	}
 
 	/**
@@ -99,8 +99,8 @@ final class Options {
 		}
 
 		if ( $this->http_auth_from_constants() ) {
-			$user     = (string) constant( 'AGENTREADY_HTTP_AUTH_USER' );
-			$password = (string) constant( 'AGENTREADY_HTTP_AUTH_PASSWORD' );
+			$user     = (string) constant( 'AGENTWELCOME_HTTP_AUTH_USER' );
+			$password = (string) constant( 'AGENTWELCOME_HTTP_AUTH_PASSWORD' );
 		} else {
 			$user     = (string) $this->get( 'http_auth_user', '' );
 			$password = Secret::decrypt( (string) $this->get( 'http_auth_password', '' ) );

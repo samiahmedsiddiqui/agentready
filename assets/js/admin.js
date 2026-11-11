@@ -2,17 +2,17 @@
 	'use strict';
 
 	document.addEventListener( 'click', function ( event ) {
-		var chip = event.target.closest( '[data-agentready-add]' );
-		var copy = event.target.closest( '[data-agentready-copy]' );
-		var confirmButton = event.target.closest( '[data-agentready-confirm]' );
+		var chip = event.target.closest( '[data-agentwelcome-add]' );
+		var copy = event.target.closest( '[data-agentwelcome-copy]' );
+		var confirmButton = event.target.closest( '[data-agentwelcome-confirm]' );
 
-		if ( confirmButton && ! window.confirm( confirmButton.getAttribute( 'data-agentready-confirm' ) ) ) {
+		if ( confirmButton && ! window.confirm( confirmButton.getAttribute( 'data-agentwelcome-confirm' ) ) ) {
 			event.preventDefault();
 		}
 
 		if ( chip ) {
 			var field = document.getElementById( chip.getAttribute( 'data-target' ) );
-			var value = chip.getAttribute( 'data-agentready-add' );
+			var value = chip.getAttribute( 'data-agentwelcome-add' );
 			var separator = chip.getAttribute( 'data-separator' ) === 'line' ? '\n' : ', ';
 			var pattern = separator === '\n' ? /\n/ : /\s*,\s*/;
 
@@ -31,7 +31,7 @@
 		}
 
 		if ( copy ) {
-			var source = document.getElementById( copy.getAttribute( 'data-agentready-copy' ) );
+			var source = document.getElementById( copy.getAttribute( 'data-agentwelcome-copy' ) );
 
 			if ( source && navigator.clipboard ) {
 				navigator.clipboard.writeText( source.value ).then( function () {
@@ -46,8 +46,8 @@
 	} );
 
 	function initTerms( root ) {
-		var chosen = root.querySelector( '[data-agentready-chosen]' );
-		var search = root.querySelector( '[data-agentready-term-search]' );
+		var chosen = root.querySelector( '[data-agentwelcome-chosen]' );
+		var search = root.querySelector( '[data-agentwelcome-term-search]' );
 
 		function renderChips() {
 			var checked = root.querySelectorAll( 'input[type="checkbox"]:checked' );
@@ -60,7 +60,7 @@
 			}
 
 			var label = document.createElement( 'span' );
-			label.className = 'agentready-chips-label';
+			label.className = 'agentwelcome-chips-label';
 			label.textContent = chosen.getAttribute( 'data-label' ) || '';
 			chosen.appendChild( label );
 
@@ -69,7 +69,7 @@
 				var name = box.getAttribute( 'data-name' ) + ' (' + box.getAttribute( 'data-group' ) + ')';
 
 				chip.type = 'button';
-				chip.className = 'agentready-chip';
+				chip.className = 'agentwelcome-chip';
 				chip.setAttribute( 'data-term', box.value );
 				chip.setAttribute( 'aria-label', name );
 				chip.textContent = name + ' ×';
@@ -80,7 +80,7 @@
 		root.addEventListener( 'change', renderChips );
 
 		root.addEventListener( 'click', function ( event ) {
-			var chip = event.target.closest( '.agentready-chip' );
+			var chip = event.target.closest( '.agentwelcome-chip' );
 
 			if ( ! chip ) {
 				return;
@@ -103,7 +103,7 @@
 		search.addEventListener( 'input', function () {
 			var query = search.value.trim().toLowerCase();
 
-			root.querySelectorAll( '.agentready-term-group' ).forEach( function ( group ) {
+			root.querySelectorAll( '.agentwelcome-term-group' ).forEach( function ( group ) {
 				var visible = 0;
 
 				group.querySelectorAll( 'li' ).forEach( function ( item ) {
@@ -125,11 +125,11 @@
 	}
 
 	function initLlms( form ) {
-		var area = document.getElementById( 'agentready-llms-custom' );
-		var custom = form.querySelector( '[data-agentready-custom]' );
-		var load = form.querySelector( '[data-agentready-load]' );
-		var file = form.querySelector( '[data-agentready-file]' );
-		var count = form.querySelector( '[data-agentready-count]' );
+		var area = document.getElementById( 'agentwelcome-llms-custom' );
+		var custom = form.querySelector( '[data-agentwelcome-custom]' );
+		var load = form.querySelector( '[data-agentwelcome-load]' );
+		var file = form.querySelector( '[data-agentwelcome-file]' );
+		var count = form.querySelector( '[data-agentwelcome-count]' );
 		var encoder = window.TextEncoder ? new window.TextEncoder() : null;
 
 		function update() {
@@ -141,7 +141,7 @@
 		}
 
 		form.addEventListener( 'change', function ( event ) {
-			if ( event.target.hasAttribute( 'data-agentready-mode' ) ) {
+			if ( event.target.hasAttribute( 'data-agentwelcome-mode' ) ) {
 				custom.hidden = event.target.value === 'automatic';
 			}
 		} );
@@ -178,25 +178,25 @@
 	}
 
 	function initTabs( form ) {
-		var panels = form.querySelectorAll( '[data-agentready-panel]' );
-		var tabs = document.querySelectorAll( '[data-agentready-tab]' );
+		var panels = form.querySelectorAll( '[data-agentwelcome-panel]' );
+		var tabs = document.querySelectorAll( '[data-agentwelcome-tab]' );
 		var referer = form.querySelector( 'input[name="_wp_http_referer"]' );
 
 		function show() {
 			var slug = window.location.hash.replace( '#', '' );
 
-			if ( ! form.querySelector( '[data-agentready-panel="' + slug + '"]' ) ) {
+			if ( ! form.querySelector( '[data-agentwelcome-panel="' + slug + '"]' ) ) {
 				slug = 'content';
 			}
 
 			form.classList.add( 'is-tabbed' );
 
 			panels.forEach( function ( panel ) {
-				panel.classList.toggle( 'is-active', panel.getAttribute( 'data-agentready-panel' ) === slug );
+				panel.classList.toggle( 'is-active', panel.getAttribute( 'data-agentwelcome-panel' ) === slug );
 			} );
 
 			tabs.forEach( function ( tab ) {
-				tab.classList.toggle( 'nav-tab-active', tab.getAttribute( 'data-agentready-tab' ) === slug );
+				tab.classList.toggle( 'nav-tab-active', tab.getAttribute( 'data-agentwelcome-tab' ) === slug );
 			} );
 
 			if ( referer ) {
@@ -209,11 +209,11 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', function () {
-		var tabbed = document.querySelector( '[data-agentready-tabs]' );
-		var toggle = document.getElementById( 'agentready-http-auth' );
-		var fields = document.getElementById( 'agentready-http-auth-fields' );
-		var terms = document.querySelector( '[data-agentready-terms]' );
-		var llms = document.querySelector( '.agentready-llms' );
+		var tabbed = document.querySelector( '[data-agentwelcome-tabs]' );
+		var toggle = document.getElementById( 'agentwelcome-http-auth' );
+		var fields = document.getElementById( 'agentwelcome-http-auth-fields' );
+		var terms = document.querySelector( '[data-agentwelcome-terms]' );
+		var llms = document.querySelector( '.agentwelcome-llms' );
 
 		if ( llms ) {
 			initLlms( llms );

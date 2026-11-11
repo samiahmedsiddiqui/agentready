@@ -2,18 +2,18 @@
 /**
  * Serves stored Markdown and generates it on demand or in the background.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
-use AgentReady\Content\Eligibility;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Rendering\Generator;
-use AgentReady\Rendering\RenderResult;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Rendering\Generator;
+use AgentWelcome\Rendering\RenderResult;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
 final class PageCache implements Hookable {
 
 	/** Cron hook that refreshes one page. */
-	public const JOB = 'agentready_generate_post';
+	public const JOB = 'agentwelcome_generate_post';
 
 	/** Seconds a request waits for another request that is generating the same page. */
 	private const WAIT_SECONDS = 5;
@@ -67,7 +67,7 @@ final class PageCache implements Hookable {
 	 */
 	public function fetch( WP_Post $post ): ?Served {
 		$entry = $this->store->get( $post->ID );
-		$state = Freshness::classify( $entry, AGENTREADY_VERSION );
+		$state = Freshness::classify( $entry, AGENTWELCOME_VERSION );
 
 		if ( null !== $entry && Freshness::FRESH === $state ) {
 			return new Served( $entry, Served::HIT );
@@ -108,7 +108,7 @@ final class PageCache implements Hookable {
 
 			$current = $this->store->get( $post->ID );
 
-			if ( null !== $current && Freshness::OUTDATED !== Freshness::classify( $current, AGENTREADY_VERSION ) ) {
+			if ( null !== $current && Freshness::OUTDATED !== Freshness::classify( $current, AGENTWELCOME_VERSION ) ) {
 				return new Served( $current, Served::HIT );
 			}
 		} while ( microtime( true ) < $deadline );
@@ -122,7 +122,7 @@ final class PageCache implements Hookable {
 	 * @return int|null Slot number, or null when every slot is busy.
 	 */
 	private function take_render_slot(): ?int {
-		return $this->lock->take_slot( max( 1, (int) apply_filters( 'agentready_max_concurrent_renders', self::MAX_RENDERS ) ) );
+		return $this->lock->take_slot( max( 1, (int) apply_filters( 'agentwelcome_max_concurrent_renders', self::MAX_RENDERS ) ) );
 	}
 
 	/**
@@ -141,7 +141,7 @@ final class PageCache implements Hookable {
 			if ( ! $force ) {
 				$current = $this->store->get( $post->ID );
 
-				if ( null !== $current && Freshness::FRESH === Freshness::classify( $current, AGENTREADY_VERSION ) ) {
+				if ( null !== $current && Freshness::FRESH === Freshness::classify( $current, AGENTWELCOME_VERSION ) ) {
 					return $current;
 				}
 			}
@@ -221,7 +221,7 @@ final class PageCache implements Hookable {
 			$page->markdown,
 			sha1( $page->markdown ),
 			$page->source,
-			AGENTREADY_VERSION,
+			AGENTWELCOME_VERSION,
 			gmdate( 'Y-m-d H:i:s' ),
 			$fallback ? Entry::STALE : Entry::FRESH
 		);

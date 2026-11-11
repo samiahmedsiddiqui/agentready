@@ -2,15 +2,15 @@
 /**
  * Tests for classifying stored copies.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Cache\Entry;
-use AgentReady\Cache\Freshness;
+use AgentWelcome\Cache\Entry;
+use AgentWelcome\Cache\Freshness;
 use PHPUnit\Framework\TestCase;
 
 final class FreshnessTest extends TestCase {

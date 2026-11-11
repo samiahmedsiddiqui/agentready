@@ -2,15 +2,15 @@
 /**
  * Tests for the pieces of llms-full.txt and the robots.txt lines.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Index\LlmsFullTxt;
-use AgentReady\Robots\RobotsTxt;
+use AgentWelcome\Index\LlmsFullTxt;
+use AgentWelcome\Robots\RobotsTxt;
 use PHPUnit\Framework\TestCase;
 
 final class LlmsFullTxtTest extends TestCase {
@@ -58,12 +58,12 @@ final class LlmsFullTxtTest extends TestCase {
 	}
 
 	public function test_robots_lines_for_llms_txt_only(): void {
-		$this->assertSame( "\n# AgentReady\n# llms.txt: https://example.com/llms.txt\n", RobotsTxt::lines( 'https://example.com/llms.txt', null ) );
+		$this->assertSame( "\n# AgentWelcome\n# llms.txt: https://example.com/llms.txt\n", RobotsTxt::lines( 'https://example.com/llms.txt', null ) );
 	}
 
 	public function test_robots_lines_with_the_full_file(): void {
 		$this->assertSame(
-			"\n# AgentReady\n# llms.txt: https://example.com/llms.txt\n# llms-full.txt: https://example.com/llms-full.txt\n",
+			"\n# AgentWelcome\n# llms.txt: https://example.com/llms.txt\n# llms-full.txt: https://example.com/llms-full.txt\n",
 			RobotsTxt::lines( 'https://example.com/llms.txt', 'https://example.com/llms-full.txt' )
 		);
 	}

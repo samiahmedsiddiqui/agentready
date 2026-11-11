@@ -2,12 +2,12 @@
 /**
  * PSR-4 autoloader used when Composer's autoloader is not present.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady;
+namespace AgentWelcome;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -17,7 +17,7 @@ final class Autoloader {
 	/**
 	 * Registers an autoloader for a namespace.
 	 *
-	 * @param string $prefix   Namespace prefix, such as AgentReady\.
+	 * @param string $prefix   Namespace prefix, such as AgentWelcome\.
 	 * @param string $base_dir Folder that holds the classes, with a trailing slash.
 	 * @return void
 	 */

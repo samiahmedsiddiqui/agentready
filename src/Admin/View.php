@@ -2,12 +2,12 @@
 /**
  * Loads admin templates from the views folder.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,7 +22,7 @@ final class View {
 	 * @return void
 	 */
 	public static function render( string $name, array $vars = array() ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Templates read $vars.
-		$file = AGENTREADY_PATH . 'src/Admin/views/' . $name . '.php';
+		$file = AGENTWELCOME_PATH . 'src/Admin/views/' . $name . '.php';
 
 		if ( is_readable( $file ) ) {
 			include $file;

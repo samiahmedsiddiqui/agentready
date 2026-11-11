@@ -2,14 +2,14 @@
 /**
  * Tests for the environment gate's pure helpers.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Environment\Environment;
+use AgentWelcome\Environment\Environment;
 use PHPUnit\Framework\TestCase;
 
 final class EnvironmentTest extends TestCase {

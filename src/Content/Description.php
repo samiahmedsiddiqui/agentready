@@ -2,12 +2,12 @@
 /**
  * One-line page description for llms.txt: editor override, then SEO meta description, then the excerpt. Never the page content.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Content;
+namespace AgentWelcome\Content;
 
 use WP_Post;
 
@@ -48,7 +48,7 @@ final class Description {
 		$text = $this->seo( $post );
 		$text = '' !== $text ? $text : $this->clean( $post->post_excerpt );
 
-		return (string) apply_filters( 'agentready_description', $text, $post );
+		return (string) apply_filters( 'agentwelcome_description', $text, $post );
 	}
 
 	/**
@@ -58,7 +58,7 @@ final class Description {
 	 * @return string The description, or an empty string.
 	 */
 	private function seo( WP_Post $post ): string {
-		$keys = (array) apply_filters( 'agentready_meta_description_keys', self::SEO_META_KEYS, $post );
+		$keys = (array) apply_filters( 'agentwelcome_meta_description_keys', self::SEO_META_KEYS, $post );
 
 		foreach ( $keys as $key ) {
 			$raw = trim( (string) get_post_meta( $post->ID, (string) $key, true ) );

@@ -2,21 +2,21 @@
 /**
  * Verify & Preview shell: title, notices, tabs and the active tab's content.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
-use AgentReady\Admin\View;
+use AgentWelcome\Admin\View;
 
 defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
 ?>
-<div class="wrap agentready">
-	<h1 class="agentready-title">
-		<?php esc_html_e( 'Verify & Preview', 'agentready' ); ?>
-		<span class="agentready-version">v<?php echo esc_html( AGENTREADY_VERSION ); ?></span>
+<div class="wrap agentwelcome">
+	<h1 class="agentwelcome-title">
+		<?php esc_html_e( 'Verify & Preview', 'agentwelcome' ); ?>
+		<span class="agentwelcome-version">v<?php echo esc_html( AGENTWELCOME_VERSION ); ?></span>
 	</h1>
-	<p class="agentready-tagline"><?php esc_html_e( 'Check that the stored Markdown matches what a visitor sees, preview it, and refresh anything that is out of date.', 'agentready' ); ?></p>
+	<p class="agentwelcome-tagline"><?php esc_html_e( 'Check that the stored Markdown matches what a visitor sees, preview it, and refresh anything that is out of date.', 'agentwelcome' ); ?></p>
 	<?php View::render( 'notices', $vars['notices'] ); ?>
 	<nav class="nav-tab-wrapper">
 		<?php foreach ( $vars['tabs'] as $slug => $entry ) : ?>

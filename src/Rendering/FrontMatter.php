@@ -2,12 +2,12 @@
 /**
  * Builds the metadata block placed at the top of each Markdown page.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rendering;
+namespace AgentWelcome\Rendering;
 
 defined( 'ABSPATH' ) || exit;
 

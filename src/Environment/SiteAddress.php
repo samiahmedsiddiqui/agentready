@@ -2,12 +2,12 @@
 /**
  * Remembers the site address as a hash, so a copy or a move is noticed even when a host rewrites the database.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Environment;
+namespace AgentWelcome\Environment;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 final class SiteAddress {
 
 	/** Option that holds the hash of the saved address. */
-	public const OPTION = 'agentready_site_fingerprint';
+	public const OPTION = 'agentwelcome_site_fingerprint';
 
 	/**
 	 * Reduces an address to its host, port and path, so a change of scheme, "www." or a trailing slash does not count as a move.

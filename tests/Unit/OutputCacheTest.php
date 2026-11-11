@@ -2,20 +2,20 @@
 /**
  * Tests for the short-lived copy of llms.txt and llms-full.txt.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Tests\Unit;
+namespace AgentWelcome\Tests\Unit;
 
-use AgentReady\Index\OutputCache;
+use AgentWelcome\Index\OutputCache;
 use PHPUnit\Framework\TestCase;
 
 final class OutputCacheTest extends TestCase {
 
 	protected function setUp(): void {
-		$GLOBALS['agentready_test_transients'] = array();
+		$GLOBALS['agentwelcome_test_transients'] = array();
 	}
 
 	public function test_builds_once_and_reuses_the_saved_copy(): void {
@@ -73,8 +73,8 @@ final class OutputCacheTest extends TestCase {
 		return array(
 			'SEO description'  => array( '_yoast_wpseo_metadesc', true ),
 			'noindex'          => array( '_genesis_noindex', true ),
-			'hidden page'      => array( '_agentready_exclude', true ),
-			'own description'  => array( '_agentready_description', true ),
+			'hidden page'      => array( '_agentwelcome_exclude', true ),
+			'own description'  => array( '_agentwelcome_description', true ),
 			'unrelated'        => array( '_thumbnail_id', false ),
 		);
 	}
@@ -95,8 +95,8 @@ final class OutputCacheTest extends TestCase {
 	 */
 	public function options(): array {
 		return array(
-			'plugin settings' => array( 'agentready_settings', true ),
-			'llms page'       => array( 'agentready_llms', true ),
+			'plugin settings' => array( 'agentwelcome_settings', true ),
+			'llms page'       => array( 'agentwelcome_llms', true ),
 			'site title'      => array( 'blogname', true ),
 			'unrelated'       => array( 'posts_per_page', false ),
 		);

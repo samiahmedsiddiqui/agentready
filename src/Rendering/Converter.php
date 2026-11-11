@@ -2,12 +2,12 @@
 /**
  * Converts a DOM subtree to Markdown. Only text is emitted, never raw HTML.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rendering;
+namespace AgentWelcome\Rendering;
 
 use DOMElement;
 use DOMNode;

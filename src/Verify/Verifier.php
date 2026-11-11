@@ -2,17 +2,17 @@
 /**
  * Builds fresh Markdown for a page and compares it with the stored copy and the page text.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Verify;
+namespace AgentWelcome\Verify;
 
-use AgentReady\Cache\Store;
-use AgentReady\Content\Eligibility;
-use AgentReady\Rendering\Generator;
-use AgentReady\Rendering\Renderer;
+use AgentWelcome\Cache\Store;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Rendering\Generator;
+use AgentWelcome\Rendering\Renderer;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -67,7 +67,7 @@ final class Verifier {
 			return $result;
 		}
 
-		$ignore      = array_map( 'strval', (array) apply_filters( 'agentready_compare_ignore', array(), $post ) );
+		$ignore      = array_map( 'strval', (array) apply_filters( 'agentwelcome_compare_ignore', array(), $post ) );
 		$stored_text = Comparison::normalise( $entry->markdown, $ignore );
 		$fresh_text  = Comparison::normalise( $page->markdown, $ignore );
 

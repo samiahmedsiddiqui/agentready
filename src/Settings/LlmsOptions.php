@@ -2,12 +2,12 @@
 /**
  * Settings of the llms.txt page: the file mode, the custom text, llms-full.txt and the robots.txt line.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Settings;
+namespace AgentWelcome\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 final class LlmsOptions {
 
 	/** Option name. */
-	public const KEY = 'agentready_llms';
+	public const KEY = 'agentwelcome_llms';
 
 	/** Mode: the file is generated from the pages. */
 	public const AUTOMATIC = 'automatic';

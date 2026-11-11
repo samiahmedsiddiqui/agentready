@@ -41,7 +41,7 @@
 				inline( el( 'em', parent ), match[ 4 ] );
 			} else if ( match[ 6 ] !== undefined ) {
 				node = el( 'span', parent, '[image: ' + match[ 5 ] + ']' );
-				node.className = 'agentready-img';
+				node.className = 'agentwelcome-img';
 			} else if ( match[ 8 ] !== undefined ) {
 				node = el( 'a', parent );
 				inline( node, match[ 7 ] );
@@ -229,16 +229,16 @@
 	}
 
 	function initPanes( root ) {
-		var tabs = root.querySelectorAll( '[data-agentready-pane-tab]' );
-		var panes = root.querySelectorAll( '[data-agentready-pane]' );
+		var tabs = root.querySelectorAll( '[data-agentwelcome-pane-tab]' );
+		var panes = root.querySelectorAll( '[data-agentwelcome-pane]' );
 
 		function show( name ) {
 			panes.forEach( function ( pane ) {
-				pane.hidden = pane.getAttribute( 'data-agentready-pane' ) !== name;
+				pane.hidden = pane.getAttribute( 'data-agentwelcome-pane' ) !== name;
 			} );
 
 			tabs.forEach( function ( tab ) {
-				var on = tab.getAttribute( 'data-agentready-pane-tab' ) === name;
+				var on = tab.getAttribute( 'data-agentwelcome-pane-tab' ) === name;
 
 				tab.classList.toggle( 'button-primary', on );
 				tab.setAttribute( 'aria-selected', on ? 'true' : 'false' );
@@ -247,7 +247,7 @@
 
 		tabs.forEach( function ( tab ) {
 			tab.addEventListener( 'click', function () {
-				show( tab.getAttribute( 'data-agentready-pane-tab' ) );
+				show( tab.getAttribute( 'data-agentwelcome-pane-tab' ) );
 			} );
 		} );
 
@@ -262,7 +262,7 @@
 		}
 
 		function count( name, value ) {
-			var node = root.querySelector( '[data-agentready-count="' + name + '"]' );
+			var node = root.querySelector( '[data-agentwelcome-count="' + name + '"]' );
 
 			if ( node ) {
 				node.textContent = node.textContent.replace( /[\d., ]+/, String( value ) );
@@ -293,10 +293,10 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', function () {
-		var panes = document.querySelector( '[data-agentready-panes]' );
-		var source = document.getElementById( 'agentready-markdown' );
-		var target = document.getElementById( 'agentready-rendered' );
-		var scan = document.querySelector( '[data-agentready-scan]' );
+		var panes = document.querySelector( '[data-agentwelcome-panes]' );
+		var source = document.getElementById( 'agentwelcome-markdown' );
+		var target = document.getElementById( 'agentwelcome-rendered' );
+		var scan = document.querySelector( '[data-agentwelcome-scan]' );
 
 		if ( source && target ) {
 			render( source.value, target );
@@ -311,5 +311,5 @@
 		}
 	} );
 
-	window.agentreadyRenderMarkdown = render;
+	window.agentwelcomeRenderMarkdown = render;
 }() );

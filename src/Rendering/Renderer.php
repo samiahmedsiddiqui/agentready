@@ -5,15 +5,15 @@
  * Fetches the public page as a logged-out visitor so theme templates, ACF output,
  * page builders and shortcodes are all included. Falls back to the_content.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Rendering;
+namespace AgentWelcome\Rendering;
 
-use AgentReady\Http\Urls;
-use AgentReady\Settings\Options;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Settings\Options;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -46,7 +46,7 @@ final class Renderer {
 			return $this->fallback( $post, 'no_permalink' );
 		}
 
-		if ( ! apply_filters( 'agentready_use_loopback', true, $post ) ) {
+		if ( ! apply_filters( 'agentwelcome_use_loopback', true, $post ) ) {
 			return $this->fallback( $post, '' );
 		}
 
@@ -74,7 +74,7 @@ final class Renderer {
 				return 'redirect_insecure';
 			}
 
-			$response = wp_remote_get( add_query_arg( 'agentready_render', (string) wp_rand(), $url ), $this->request_args( $auth ) );
+			$response = wp_remote_get( add_query_arg( 'agentwelcome_render', (string) wp_rand(), $url ), $this->request_args( $auth ) );
 
 			if ( is_wp_error( $response ) ) {
 				return 'request_failed:' . $response->get_error_message();
@@ -117,9 +117,9 @@ final class Renderer {
 	 */
 	private function request_args( ?array $auth ): array {
 		$headers = array(
-			'Accept'              => 'text/html,application/xhtml+xml',
-			'Cache-Control'       => 'no-cache',
-			'X-AgentReady-Render' => '1',
+			'Accept'                => 'text/html,application/xhtml+xml',
+			'Cache-Control'         => 'no-cache',
+			'X-AgentWelcome-Render' => '1',
 		);
 
 		if ( null !== $auth ) {
@@ -127,12 +127,12 @@ final class Renderer {
 		}
 
 		return array(
-			'timeout'             => (int) apply_filters( 'agentready_loopback_timeout', 15 ),
+			'timeout'             => (int) apply_filters( 'agentwelcome_loopback_timeout', 15 ),
 			'redirection'         => 0,
 			'sslverify'           => (bool) apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core hook.
 			'limit_response_size' => 5 * MB_IN_BYTES,
 			'cookies'             => array(),
-			'user-agent'          => 'AgentReady/' . AGENTREADY_VERSION . '; ' . home_url( '/' ),
+			'user-agent'          => 'AgentWelcome/' . AGENTWELCOME_VERSION . '; ' . home_url( '/' ),
 			'headers'             => $headers,
 		);
 	}
@@ -190,23 +190,23 @@ final class Renderer {
 
 		if ( 0 === strpos( $code, 'request_failed:' ) ) {
 			/* translators: %s: error message. */
-			return sprintf( __( 'The page could not be fetched (%s). Using the post content instead.', 'agentready' ), substr( $code, 15 ) );
+			return sprintf( __( 'The page could not be fetched (%s). Using the post content instead.', 'agentwelcome' ), substr( $code, 15 ) );
 		}
 
 		switch ( $code ) {
 			case 'http_auth_required':
-				return __( 'The site asked for HTTP Basic authentication. Enable it in the AgentReady settings. Using the post content instead.', 'agentready' );
+				return __( 'The site asked for HTTP Basic authentication. Enable it in the AgentWelcome settings. Using the post content instead.', 'agentwelcome' );
 			case 'http_auth_failed':
-				return __( 'The HTTP Basic authentication credentials were rejected. Using the post content instead.', 'agentready' );
+				return __( 'The HTTP Basic authentication credentials were rejected. Using the post content instead.', 'agentwelcome' );
 			case 'redirect_insecure':
-				return __( 'The page redirected from https to http, so the saved credentials were not sent. Using the post content instead.', 'agentready' );
+				return __( 'The page redirected from https to http, so the saved credentials were not sent. Using the post content instead.', 'agentwelcome' );
 			case 'redirect_off_site':
-				return __( 'The page redirected to a different site. Using the post content instead.', 'agentready' );
+				return __( 'The page redirected to a different site. Using the post content instead.', 'agentwelcome' );
 			case 'no_permalink':
-				return __( 'The post has no pretty permalink. Using the post content instead.', 'agentready' );
+				return __( 'The post has no pretty permalink. Using the post content instead.', 'agentwelcome' );
 			default:
 				/* translators: %s: error code. */
-				return sprintf( __( 'The page could not be fetched (%s). Using the post content instead.', 'agentready' ), $code );
+				return sprintf( __( 'The page could not be fetched (%s). Using the post content instead.', 'agentwelcome' ), $code );
 		}
 	}
 }

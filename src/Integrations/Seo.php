@@ -2,17 +2,17 @@
 /**
  * Refreshes a page when its SEO description or noindex setting changes.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Integrations;
+namespace AgentWelcome\Integrations;
 
-use AgentReady\Cache\Invalidator;
-use AgentReady\Content\Description;
-use AgentReady\Content\Noindex;
-use AgentReady\Contracts\Hookable;
+use AgentWelcome\Cache\Invalidator;
+use AgentWelcome\Content\Description;
+use AgentWelcome\Content\Noindex;
+use AgentWelcome\Contracts\Hookable;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;

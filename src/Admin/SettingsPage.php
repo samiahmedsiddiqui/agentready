@@ -1,22 +1,22 @@
 <?php
 /**
- * Settings page of the AgentReady menu.
+ * Settings page of the AgentWelcome menu.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Admin;
+namespace AgentWelcome\Admin;
 
-use AgentReady\Cache\Batch;
-use AgentReady\Cache\Coverage;
-use AgentReady\Content\PostTypes;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Http\Urls;
-use AgentReady\Settings\Options;
-use AgentReady\Settings\Sanitizer;
+use AgentWelcome\Cache\Batch;
+use AgentWelcome\Cache\Coverage;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Settings\Options;
+use AgentWelcome\Settings\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -24,10 +24,10 @@ defined( 'ABSPATH' ) || exit;
 final class SettingsPage implements Hookable {
 
 	/** Page slug, also the slug of the top-level menu. */
-	public const SLUG = 'agentready';
+	public const SLUG = 'agentwelcome';
 
 	/** Settings group of the form. */
-	private const GROUP = 'agentready_group';
+	private const GROUP = 'agentwelcome_group';
 
 	/** Selectors offered as examples for the main content. */
 	private const COMMON_CONTENT = array( 'main', '[role="main"]', 'article', '#content', '#main', '#primary', '.site-content', '.entry-content', '.post-content', '.page-content' );
@@ -64,7 +64,7 @@ final class SettingsPage implements Hookable {
 	public function register(): void {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-		add_filter( 'plugin_action_links_' . plugin_basename( AGENTREADY_FILE ), array( $this, 'action_links' ) );
+		add_filter( 'plugin_action_links_' . plugin_basename( AGENTWELCOME_FILE ), array( $this, 'action_links' ) );
 	}
 
 	/**
@@ -96,7 +96,7 @@ final class SettingsPage implements Hookable {
 		}
 
 		Assets::style();
-		wp_enqueue_script( 'agentready-admin', AGENTREADY_URL . 'assets/js/admin.js', array(), Assets::version( 'assets/js/admin.js' ), true );
+		wp_enqueue_script( 'agentwelcome-admin', AGENTWELCOME_URL . 'assets/js/admin.js', array(), Assets::version( 'assets/js/admin.js' ), true );
 	}
 
 	/**
@@ -106,7 +106,7 @@ final class SettingsPage implements Hookable {
 	 * @return string[] The links, with Settings first.
 	 */
 	public function action_links( array $links ): array {
-		array_unshift( $links, '<a href="' . esc_url( $this->url() ) . '">' . esc_html__( 'Settings', 'agentready' ) . '</a>' );
+		array_unshift( $links, '<a href="' . esc_url( $this->url() ) . '">' . esc_html__( 'Settings', 'agentwelcome' ) . '</a>' );
 
 		return $links;
 	}
@@ -134,9 +134,9 @@ final class SettingsPage implements Hookable {
 			'page',
 			array(
 				'tabs'          => array(
-					'content'     => __( 'Content', 'agentready' ),
-					'rendering'   => __( 'Rendering', 'agentready' ),
-					'environment' => __( 'Environment', 'agentready' ),
+					'content'     => __( 'Content', 'agentwelcome' ),
+					'rendering'   => __( 'Rendering', 'agentwelcome' ),
+					'environment' => __( 'Environment', 'agentwelcome' ),
 				),
 				'settings_url'  => $this->url(),
 				'notices'       => $this->notices->data(),
@@ -195,10 +195,10 @@ final class SettingsPage implements Hookable {
 			'verify_url'    => VerifyPage::url(),
 			'home_file'     => $this->urls->home_file(),
 			'system'        => array(
-				__( 'WordPress', 'agentready' )   => (string) $wp_version,
-				__( 'PHP', 'agentready' )         => PHP_VERSION,
-				__( 'AgentReady', 'agentready' )  => AGENTREADY_VERSION,
-				__( 'Environment', 'agentready' ) => $this->environment->type(),
+				__( 'WordPress', 'agentwelcome' )    => (string) $wp_version,
+				__( 'PHP', 'agentwelcome' )          => PHP_VERSION,
+				__( 'AgentWelcome', 'agentwelcome' ) => AGENTWELCOME_VERSION,
+				__( 'Environment', 'agentwelcome' )  => $this->environment->type(),
 			),
 		);
 	}
@@ -236,6 +236,6 @@ final class SettingsPage implements Hookable {
 		$total  = is_object( $counts ) && isset( $counts->publish ) ? (int) $counts->publish : 0;
 
 		/* translators: %s: number of published posts. */
-		return sprintf( _n( '%s published', '%s published', $total, 'agentready' ), number_format_i18n( $total ) );
+		return sprintf( _n( '%s published', '%s published', $total, 'agentwelcome' ), number_format_i18n( $total ) );
 	}
 }

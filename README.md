@@ -1,4 +1,4 @@
-# AgentReady – llms.txt & Markdown for AI Agents
+# AgentWelcome – llms.txt & Markdown for AI Agents
 
 A WordPress plugin that serves an `llms.txt` index and a clean Markdown version of every page, so AI agents can read your content.
 
@@ -29,10 +29,10 @@ The Markdown is built from the rendered page, so ACF fields, Gutenberg blocks, E
 Composer:
 
 ```bash
-composer require wpackagist-plugin/agentready
+composer require wpackagist-plugin/agentwelcome
 ```
 
-Or copy the plugin folder to `wp-content/plugins/agentready` and activate it.
+Or copy the plugin folder to `wp-content/plugins/agentwelcome` and activate it.
 
 ## Documentation
 

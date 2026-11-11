@@ -2,12 +2,12 @@
 /**
  * Storage for generated Markdown.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Cache;
+namespace AgentWelcome\Cache;
 
 defined( 'ABSPATH' ) || exit;
 

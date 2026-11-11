@@ -2,16 +2,16 @@
 /**
  * Builds /llms-full.txt, the stored Markdown of all eligible pages in one file.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady\Index;
+namespace AgentWelcome\Index;
 
-use AgentReady\Cache\Store;
-use AgentReady\Content\Eligibility;
-use AgentReady\Http\Urls;
+use AgentWelcome\Cache\Store;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Http\Urls;
 use Generator;
 use WP_Post;
 
@@ -48,7 +48,7 @@ final class LlmsFullTxt {
 	 * @return string The text of llms-full.txt.
 	 */
 	public function build(): string {
-		$max  = max( 100000, (int) apply_filters( 'agentready_llms_full_max_bytes', self::MAX_BYTES ) );
+		$max  = max( 100000, (int) apply_filters( 'agentwelcome_llms_full_max_bytes', self::MAX_BYTES ) );
 		$text = '# ' . SingleLine::from( get_bloginfo( 'name' ) ) . "\n";
 		$left = 0;
 
@@ -63,10 +63,10 @@ final class LlmsFullTxt {
 
 		if ( $left > 0 ) {
 			/* translators: %d: number of pages left out. */
-			$text .= "\n" . sprintf( _n( 'Note: %d page is not included because this file reached its size limit. The full list is in llms.txt.', 'Note: %d pages are not included because this file reached its size limit. The full list is in llms.txt.', $left, 'agentready' ), $left ) . "\n";
+			$text .= "\n" . sprintf( _n( 'Note: %d page is not included because this file reached its size limit. The full list is in llms.txt.', 'Note: %d pages are not included because this file reached its size limit. The full list is in llms.txt.', $left, 'agentwelcome' ), $left ) . "\n";
 		}
 
-		return (string) apply_filters( 'agentready_llms_full_txt', $text );
+		return (string) apply_filters( 'agentwelcome_llms_full_txt', $text );
 	}
 
 	/**

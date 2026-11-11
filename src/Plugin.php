@@ -2,67 +2,67 @@
 /**
  * Plugin bootstrap and component wiring.
  *
- * @package AgentReady
+ * @package AgentWelcome
  */
 
 declare(strict_types=1);
 
-namespace AgentReady;
+namespace AgentWelcome;
 
 defined( 'ABSPATH' ) || exit;
 
-use AgentReady\Admin\CacheActions;
-use AgentReady\Admin\Capabilities;
-use AgentReady\Admin\LlmsPage;
-use AgentReady\Admin\Menu;
-use AgentReady\Admin\MetaBox;
-use AgentReady\Admin\Notices;
-use AgentReady\Admin\SettingsPage;
-use AgentReady\Admin\TermList;
-use AgentReady\Admin\VerifyPage;
-use AgentReady\Cache\Batch;
-use AgentReady\Cache\Candidates;
-use AgentReady\Cache\Changes;
-use AgentReady\Cache\Coverage;
-use AgentReady\Cache\Invalidator;
-use AgentReady\Cache\Lock;
-use AgentReady\Cache\PageCache;
-use AgentReady\Cache\PageStatus;
-use AgentReady\Cache\Schema;
-use AgentReady\Cache\WpdbStore;
-use AgentReady\Cli\Command;
-use AgentReady\Content\Description;
-use AgentReady\Content\Eligibility;
-use AgentReady\Content\Exclusions;
-use AgentReady\Content\PostTypes;
-use AgentReady\Contracts\Hookable;
-use AgentReady\Environment\Environment;
-use AgentReady\Http\CronAuth;
-use AgentReady\Http\DiscoveryTags;
-use AgentReady\Http\MarkdownResponse;
-use AgentReady\Http\Router;
-use AgentReady\Http\Urls;
-use AgentReady\Index\LlmsFullTxt;
-use AgentReady\Index\LlmsTxt;
-use AgentReady\Index\OutputCache;
-use AgentReady\Integrations\Acf;
-use AgentReady\Integrations\CustomPermalinks;
-use AgentReady\Integrations\Elementor;
-use AgentReady\Integrations\Seo;
-use AgentReady\Rendering\Converter;
-use AgentReady\Rendering\Extractor;
-use AgentReady\Rendering\FrontMatter;
-use AgentReady\Rendering\Generator;
-use AgentReady\Rendering\Renderer;
-use AgentReady\Rendering\Selector;
-use AgentReady\Rest\PagesController;
-use AgentReady\Rest\ScanController;
-use AgentReady\Robots\RobotsTxt;
-use AgentReady\Settings\LlmsOptions;
-use AgentReady\Settings\Options;
-use AgentReady\Settings\Sanitizer;
-use AgentReady\Verify\Scan;
-use AgentReady\Verify\Verifier;
+use AgentWelcome\Admin\CacheActions;
+use AgentWelcome\Admin\Capabilities;
+use AgentWelcome\Admin\LlmsPage;
+use AgentWelcome\Admin\Menu;
+use AgentWelcome\Admin\MetaBox;
+use AgentWelcome\Admin\Notices;
+use AgentWelcome\Admin\SettingsPage;
+use AgentWelcome\Admin\TermList;
+use AgentWelcome\Admin\VerifyPage;
+use AgentWelcome\Cache\Batch;
+use AgentWelcome\Cache\Candidates;
+use AgentWelcome\Cache\Changes;
+use AgentWelcome\Cache\Coverage;
+use AgentWelcome\Cache\Invalidator;
+use AgentWelcome\Cache\Lock;
+use AgentWelcome\Cache\PageCache;
+use AgentWelcome\Cache\PageStatus;
+use AgentWelcome\Cache\Schema;
+use AgentWelcome\Cache\WpdbStore;
+use AgentWelcome\Cli\Command;
+use AgentWelcome\Content\Description;
+use AgentWelcome\Content\Eligibility;
+use AgentWelcome\Content\Exclusions;
+use AgentWelcome\Content\PostTypes;
+use AgentWelcome\Contracts\Hookable;
+use AgentWelcome\Environment\Environment;
+use AgentWelcome\Http\CronAuth;
+use AgentWelcome\Http\DiscoveryTags;
+use AgentWelcome\Http\MarkdownResponse;
+use AgentWelcome\Http\Router;
+use AgentWelcome\Http\Urls;
+use AgentWelcome\Index\LlmsFullTxt;
+use AgentWelcome\Index\LlmsTxt;
+use AgentWelcome\Index\OutputCache;
+use AgentWelcome\Integrations\Acf;
+use AgentWelcome\Integrations\CustomPermalinks;
+use AgentWelcome\Integrations\Elementor;
+use AgentWelcome\Integrations\Seo;
+use AgentWelcome\Rendering\Converter;
+use AgentWelcome\Rendering\Extractor;
+use AgentWelcome\Rendering\FrontMatter;
+use AgentWelcome\Rendering\Generator;
+use AgentWelcome\Rendering\Renderer;
+use AgentWelcome\Rendering\Selector;
+use AgentWelcome\Rest\PagesController;
+use AgentWelcome\Rest\ScanController;
+use AgentWelcome\Robots\RobotsTxt;
+use AgentWelcome\Settings\LlmsOptions;
+use AgentWelcome\Settings\Options;
+use AgentWelcome\Settings\Sanitizer;
+use AgentWelcome\Verify\Scan;
+use AgentWelcome\Verify\Verifier;
 
 /** Starts the plugin: builds the components and lets each one attach its hooks. */
 final class Plugin {
@@ -120,7 +120,7 @@ final class Plugin {
 			new Extractor(
 				new Selector(),
 				(array) apply_filters(
-					'agentready_strip_selectors',
+					'agentwelcome_strip_selectors',
 					array_merge( Extractor::DEFAULT_STRIP, ( new Selector() )->parse_list( (string) $options->get( 'strip_selectors', '' ) )['valid'] )
 				)
 			),
@@ -204,7 +204,7 @@ final class Plugin {
 	 */
 	public function missing_dom_notice(): void {
 		if ( current_user_can( 'manage_options' ) ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'AgentReady needs the PHP DOM extension, which is not available on this server. The plugin is inactive.', 'agentready' ) . '</p></div>';
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'AgentWelcome needs the PHP DOM extension, which is not available on this server. The plugin is inactive.', 'agentwelcome' ) . '</p></div>';
 		}
 	}
 }
