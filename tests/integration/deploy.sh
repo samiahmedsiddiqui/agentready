@@ -1,6 +1,6 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 # ./deploy.sh [repo path]  Builds the zip from the repo's HEAD (committed files only, as CI and wp.org do) and installs it into the test site.
-KIT=${0:A:h}; ROOT=$KIT/wp-test; REPO=${1:-${KIT:h:h}}
+KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd); ROOT=$KIT/wp-test; REPO=${1:-$(cd "$KIT/../.." && pwd)}
 ZIP=$ROOT/plugin.zip
 wpcli() { php -d error_reporting=0 -d display_errors=0 ${WP_CLI:-/usr/local/bin/wp} --path=$ROOT/wp "$@" 2>&1 | grep -v "^Deprecated\|^PHP Deprecated"; }
 rm -f $ZIP && git -C $REPO archive --format=zip --prefix=agentwelcome/ -o $ZIP HEAD

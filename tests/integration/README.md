@@ -4,7 +4,7 @@ These suites run the plugin on a real WordPress with a SQLite database, served b
 
 ## Run them
 
-You need `php` with the DOM and SQLite extensions, [WP-CLI](https://wp-cli.org), `curl`, `unzip`, `zsh`, Python 3 and Node.js. WP-CLI is expected at `/usr/local/bin/wp`; set `WP_CLI` to another path if needed.
+You need `php` with the DOM and SQLite extensions, [WP-CLI](https://wp-cli.org), `curl`, `unzip`, `bash`, Python 3 and Node.js. WP-CLI is expected at `/usr/local/bin/wp`; set `WP_CLI` to another path if needed.
 
 ```bash
 tests/integration/setup.sh      # builds the test site in tests/integration/wp-test (about a minute)

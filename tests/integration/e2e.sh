@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 B=http://127.0.0.1:8899
 PASS=0; FAIL=0
 ok()   { PASS=$((PASS+1)); }

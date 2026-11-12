@@ -1,10 +1,11 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 # Runs the integration suites against the running test site. Reset the site first with ./deploy.sh.
 # Prints one line per suite, shows the full output of a suite that fails, and exits with 1 if anything failed.
-KIT=${0:A:h}; cd $KIT
+KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd); cd $KIT
 failed=0
 run() {
   local name=$1; shift
+  rm -f "$KIT/wp-test/wp/wp-content/kit-env.json"
   local out; out=$("$@" 2>&1); local code=$?
   echo "=== $name"
   if [[ $code -ne 0 ]]; then
