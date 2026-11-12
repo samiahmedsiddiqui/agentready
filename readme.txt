@@ -37,6 +37,10 @@ When an agent requests `/about.md`, AgentWelcome reads the public page `/about/`
 
 The generated Markdown is stored in its own database table and refreshed in the background when you save a page. You can regenerate or clear it from the settings page, the edit screen, the post lists and WP-CLI.
 
+= Source code =
+
+The source code, the tests and the issue tracker are on GitHub: https://github.com/samiahmedsiddiqui/agentwelcome
+
 == Installation ==
 
 1. Upload the plugin to `/wp-content/plugins/agentwelcome`, or install it from the Plugins screen.
@@ -149,6 +153,13 @@ Yes. Add CSS selectors, one per line, under "Elements to exclude". They are remo
 = How is this plugin developed? =
 
 Developed with AI coding tools and maintained by Sami Ahmed Siddiqui. Every change is reviewed by the author and checked with automated tests, PHPCS, PHPStan and Plugin Check before release.
+
+== Screenshots ==
+
+1. The settings page: what is left out, the status of the stored Markdown and system information.
+2. The llms.txt page in Hybrid mode, with a preview of the file.
+3. Verify & Preview checks a page against its stored Markdown and previews it.
+4. The scan of all pages reports which ones have drifted from their stored copy.
 
 == Changelog ==
 
