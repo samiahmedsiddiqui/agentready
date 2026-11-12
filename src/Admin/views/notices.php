@@ -66,3 +66,6 @@ if ( null !== $vars['inactive'] ) :
 <?php elseif ( $vars['llms_file'] ) : ?>
 	<div class="notice notice-warning"><p><?php esc_html_e( 'A physical llms.txt file exists in the site root. The web server serves it before WordPress runs, so AgentWelcome cannot replace it. Delete or rename the file to use the generated one.', 'agentwelcome' ); ?></p></div>
 <?php endif; ?>
+<?php if ( $vars['full_file'] ) : ?>
+	<div class="notice notice-warning"><p><?php esc_html_e( 'A physical llms-full.txt file exists in the site root. The web server serves it before WordPress runs, so AgentWelcome cannot replace it. Delete or rename the file to use the generated one.', 'agentwelcome' ); ?></p></div>
+<?php endif; ?>

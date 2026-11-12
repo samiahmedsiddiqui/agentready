@@ -74,7 +74,7 @@ try:
     save("custom", text)
     c, h, body, _ = llms()
     check("serves exactly the text", c == 200 and body == text + "\n", body[:120])
-    check("the saved option holds the mode and text", option() == {"mode": "custom", "custom": text, "full": False, "robots_line": False}, option())
+    check("the saved option holds the mode and text", option() == {"mode": "custom", "custom": text, "full": False, "full_mode": "automatic", "full_custom": "", "robots_line": False}, option())
     check("custom text does not query pages (no generated list)", "## Pages" not in body)
     save("custom", "# CRLF\r\n\r\nline\r\n\x00\x07tab\there\r\n  ")
     check("line endings are unified and control characters removed", llms()[2] == "# CRLF\n\nline\ntab\there\n", repr(llms()[2]))
@@ -138,6 +138,32 @@ try:
     save("automatic", full=False)
     check("turning it off returns the 404 again", full()[0] == 404)
 
+    print("--- llms-full.txt modes")
+    page = admin.get(PAGE)[2]
+    check("the llms-full.txt card has a mode choice and a text box", 'name="agentwelcome_llms[full_mode]"' in page and 'id="agentwelcome-llms-full-custom"' in page)
+    save("automatic", full=True, extra={"agentwelcome_llms[full_mode]": "custom", "agentwelcome_llms[full_custom]": "# Own full file\n\nExactly this."})
+    c, h, body, _ = full()
+    check("Custom serves exactly the text", c == 200 and body == "# Own full file\n\nExactly this.\n", body[:120])
+    check("and adds no page text", "Source:" not in body)
+    save("automatic", full=True, extra={"agentwelcome_llms[full_mode]": "hybrid", "agentwelcome_llms[full_custom]": "# Own intro\n\nBefore the pages."})
+    body = full()[2]
+    check("Hybrid starts with the text", body.startswith("# Own intro\n\nBefore the pages.\n"), body[:80])
+    check("and is followed by the stored pages", "\nSource: http://127.0.0.1:8899/llms-a/" in body)
+    save("automatic", full=True, extra={"agentwelcome_llms[full_mode]": "custom", "agentwelcome_llms[full_custom]": ""})
+    body = full()[2]
+    check("Custom with an empty text falls back to the generated file", body.startswith("# ") and "\nSource: http://127.0.0.1:8899/llms-a/" in body and "Own" not in body)
+    saved = option()
+    check("the two files keep separate modes and texts", saved["mode"] == "automatic" and saved["custom"] == "" and saved["full_mode"] == "custom" and saved["full_custom"] == "", saved)
+    save("custom", "# Only llms", full=True, extra={"agentwelcome_llms[full_mode]": "hybrid", "agentwelcome_llms[full_custom]": "# Intro"})
+    check("llms.txt and llms-full.txt use their own text", llms()[2] == "# Only llms\n" and full()[2].startswith("# Intro\n"))
+    with open(WP + "/llms-full.txt", "w") as f:
+        f.write("Physical file\n")
+    check("a real llms-full.txt file is served by the web server instead", full()[2] == "Physical file\n")
+    check("and the settings page says so", "A physical llms-full.txt file exists" in admin.get(PAGE)[2])
+    os.remove(WP + "/llms-full.txt")
+    check("without the file the page says nothing about it", "A physical llms-full.txt file exists" not in admin.get(PAGE)[2])
+    save("automatic", full=True)
+
     print("--- llms-full.txt size limit")
     big = "<p>" + ("lorem ipsum dolor sit amet " * 2500) + "</p>"
     big_ids = [create_page("llms-big-%d" % i, big, post_name="llms-big-%d" % i) for i in range(3)]
@@ -196,7 +222,7 @@ try:
     check("saving the llms.txt page does not touch the main settings", jphp("echo json_encode(get_option('agentwelcome_settings'));") == {"excluded_posts": "checkout", "show_meta_box": False}, jphp("echo json_encode(get_option('agentwelcome_settings'));"))
     page = admin.get("/wp-admin/admin.php?page=agentwelcome")[2]
     admin.req("/wp-admin/options.php", {"option_page": "agentwelcome_group", "action": "update", "_wpnonce": nonce_from(page), "_wp_http_referer": "/wp-admin/admin.php?page=agentwelcome", "agentwelcome_settings[show_meta_box]": "1"})
-    check("and saving the main settings does not touch the llms.txt ones", option() == {"mode": "custom", "custom": "# Mine", "full": True, "robots_line": True}, option())
+    check("and saving the main settings does not touch the llms.txt ones", option() == {"mode": "custom", "custom": "# Mine", "full": True, "full_mode": "automatic", "full_custom": "", "robots_line": True}, option())
 finally:
     clear_env()
     wpcli("option", "update", "blog_public", "1")

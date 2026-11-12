@@ -124,12 +124,12 @@
 		renderChips();
 	}
 
-	function initLlms( form ) {
-		var area = document.getElementById( 'agentwelcome-llms-custom' );
-		var custom = form.querySelector( '[data-agentwelcome-custom]' );
-		var load = form.querySelector( '[data-agentwelcome-load]' );
-		var file = form.querySelector( '[data-agentwelcome-file]' );
-		var count = form.querySelector( '[data-agentwelcome-count]' );
+	function initEditor( editor ) {
+		var area = editor.querySelector( 'textarea' );
+		var custom = editor.querySelector( '[data-agentwelcome-custom]' );
+		var load = editor.querySelector( '[data-agentwelcome-load]' );
+		var file = editor.querySelector( '[data-agentwelcome-file]' );
+		var count = editor.querySelector( '[data-agentwelcome-count]' );
 		var encoder = window.TextEncoder ? new window.TextEncoder() : null;
 
 		function update() {
@@ -140,7 +140,7 @@
 				.replace( '{max}', Number( count.getAttribute( 'data-max' ) ).toLocaleString() );
 		}
 
-		form.addEventListener( 'change', function ( event ) {
+		editor.addEventListener( 'change', function ( event ) {
 			if ( event.target.hasAttribute( 'data-agentwelcome-mode' ) ) {
 				custom.hidden = event.target.value === 'automatic';
 			}
@@ -175,6 +175,10 @@
 
 		area.addEventListener( 'input', update );
 		update();
+	}
+
+	function initLlms( form ) {
+		Array.prototype.forEach.call( form.querySelectorAll( '[data-agentwelcome-editor]' ), initEditor );
 	}
 
 	function initTabs( form ) {

@@ -12,16 +12,16 @@ defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variables.
 
-$name  = $vars['name'];
-$modes = array(
+$name       = $vars['name'];
+$modes      = array(
 	LlmsOptions::AUTOMATIC => array( __( 'Automatic', 'agentwelcome' ), __( 'AgentWelcome lists your pages for you. This is the default.', 'agentwelcome' ) ),
 	LlmsOptions::CUSTOM    => array( __( 'Custom', 'agentwelcome' ), __( 'Serve exactly the text you write below.', 'agentwelcome' ) ),
 	LlmsOptions::HYBRID    => array( __( 'Hybrid', 'agentwelcome' ), __( 'Your text first, then the list of pages that AgentWelcome builds.', 'agentwelcome' ) ),
 );
-$notes = array(
-	'no_title' => __( 'The text does not start with a title line such as "# My site". Most llms.txt files do.', 'agentwelcome' ),
-	'external' => __( 'The text links to other sites. That is allowed, but check that you mean to.', 'agentwelcome' ),
-	'large'    => __( 'The text is very large. Agents read the whole file, so shorter is better.', 'agentwelcome' ),
+$full_modes = array(
+	LlmsOptions::AUTOMATIC => array( __( 'Automatic', 'agentwelcome' ), __( 'AgentWelcome joins the stored Markdown of your pages. This is the default.', 'agentwelcome' ) ),
+	LlmsOptions::CUSTOM    => array( __( 'Custom', 'agentwelcome' ), __( 'Serve exactly the text you write below.', 'agentwelcome' ) ),
+	LlmsOptions::HYBRID    => array( __( 'Hybrid', 'agentwelcome' ), __( 'Your text first, then the stored Markdown of your pages.', 'agentwelcome' ) ),
 );
 ?>
 <div class="wrap agentwelcome">
@@ -43,35 +43,23 @@ $notes = array(
 					<?php esc_html_e( 'Plain permalinks are on, so nothing is served. Switch to pretty permalinks first.', 'agentwelcome' ); ?>
 				<?php endif; ?>
 			</p>
-			<div class="agentwelcome-field">
-				<span class="agentwelcome-label"><?php esc_html_e( 'Mode', 'agentwelcome' ); ?></span>
-				<?php foreach ( $modes as $value => $mode_text ) : ?>
-					<p>
-						<label>
-							<input type="radio" name="<?php echo esc_attr( $name ); ?>[mode]" value="<?php echo esc_attr( $value ); ?>" data-agentwelcome-mode <?php checked( $vars['mode'], $value ); ?> />
-							<strong><?php echo esc_html( $mode_text[0] ); ?></strong>
-							<span class="description"> &mdash; <?php echo esc_html( $mode_text[1] ); ?></span>
-						</label>
-					</p>
-				<?php endforeach; ?>
-			</div>
-			<div class="agentwelcome-field" data-agentwelcome-custom <?php echo LlmsOptions::AUTOMATIC === $vars['mode'] ? 'hidden' : ''; ?>>
-				<label for="agentwelcome-llms-custom"><?php esc_html_e( 'Your text', 'agentwelcome' ); ?></label>
-				<textarea id="agentwelcome-llms-custom" name="<?php echo esc_attr( $name ); ?>[custom]" rows="14" class="large-text code" placeholder="# My site&#10;&#10;> One sentence about what the site is.&#10;&#10;## Docs&#10;&#10;- [Getting started](https://example.com/start.md): The basics"><?php echo esc_textarea( $vars['custom'] ); ?></textarea>
-				<p>
-					<button type="button" class="button" data-agentwelcome-load="agentwelcome-llms-custom" data-max="<?php echo esc_attr( (string) $vars['max_bytes'] ); ?>" data-too-big="<?php esc_attr_e( 'That file is too large.', 'agentwelcome' ); ?>"><?php esc_html_e( 'Load from file', 'agentwelcome' ); ?></button>
-					<input type="file" accept=".txt,.md,text/plain,text/markdown" hidden data-agentwelcome-file />
-					<span class="description" data-agentwelcome-count data-template="<?php /* translators: 1: used bytes, 2: maximum bytes. */ echo esc_attr( sprintf( __( '%1$s of %2$s bytes', 'agentwelcome' ), '{used}', '{max}' ) ); ?>" data-max="<?php echo esc_attr( (string) $vars['max_bytes'] ); ?>"></span>
-				</p>
-				<p class="description">
-					<?php esc_html_e( 'Plain Markdown, served as text. In Hybrid mode, leave out the page list, because AgentWelcome adds it below your text. If this is empty, the generated file is served.', 'agentwelcome' ); ?>
-				</p>
-				<?php foreach ( $vars['notes'] as $code ) : ?>
-					<?php if ( isset( $notes[ $code ] ) ) : ?>
-						<div class="notice notice-info inline"><p><?php echo esc_html( $notes[ $code ] ); ?></p></div>
-					<?php endif; ?>
-				<?php endforeach; ?>
-			</div>
+			<?php
+			View::render(
+				'llms-editor',
+				array(
+					'name'       => $name,
+					'mode_field' => 'mode',
+					'text_field' => 'custom',
+					'id'         => 'agentwelcome-llms-custom',
+					'mode'       => $vars['mode'],
+					'text'       => $vars['custom'],
+					'notes'      => $vars['notes'],
+					'modes'      => $modes,
+					'max_bytes'  => $vars['max_bytes'],
+					'help'       => __( 'Plain Markdown, served as text. In Hybrid mode, leave out the page list, because AgentWelcome adds it below your text. If this is empty, the generated file is served.', 'agentwelcome' ),
+				)
+			);
+			?>
 			<details>
 				<summary><?php esc_html_e( 'What the file contains now (saved settings)', 'agentwelcome' ); ?></summary>
 				<pre class="agentwelcome-code"><?php echo esc_html( $vars['preview'] ); ?></pre>
@@ -116,6 +104,23 @@ $notes = array(
 					<p class="description"><a href="<?php echo esc_url( $vars['full_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $vars['full_url'] ); ?></a></p>
 				<?php endif; ?>
 			</div>
+			<?php
+			View::render(
+				'llms-editor',
+				array(
+					'name'       => $name,
+					'mode_field' => 'full_mode',
+					'text_field' => 'full_custom',
+					'id'         => 'agentwelcome-llms-full-custom',
+					'mode'       => $vars['full_mode'],
+					'text'       => $vars['full_custom'],
+					'notes'      => $vars['full_notes'],
+					'modes'      => $full_modes,
+					'max_bytes'  => $vars['max_bytes'],
+					'help'       => __( 'Plain Markdown, served as text. In Hybrid mode, leave out the pages, because AgentWelcome adds them below your text. The file stops at 5 MB. If this is empty, the generated file is served.', 'agentwelcome' ),
+				)
+			);
+			?>
 		</section>
 
 		<section class="agentwelcome-card">

@@ -84,7 +84,11 @@ Yes. Open AgentWelcome > llms.txt and choose Custom to serve exactly your text, 
 
 = What is llms-full.txt? =
 
-An optional file with the Markdown of every page in one place, for agents that prefer a single download. Turn it on under AgentWelcome > llms.txt. It uses the stored copies, so generate any missing pages first. It stops at 5 MB and says how many pages were left out.
+An optional file with the Markdown of every page in one place, for agents that prefer a single download. Turn it on under AgentWelcome > llms.txt. It has the same modes as llms.txt (Automatic, Custom and Hybrid) with its own text. It uses the stored copies, so generate any missing pages first. It stops at 5 MB and says how many pages were left out.
+
+= I already have an llms.txt file on my server. =
+
+A real file in the site root is served by the web server before WordPress runs, so AgentWelcome cannot replace it. The llms.txt page shows a notice when it finds llms.txt or llms-full.txt there. Delete or rename the file to use the one AgentWelcome generates.
 
 = What does the robots.txt option do? =
 

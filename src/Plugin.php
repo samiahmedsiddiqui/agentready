@@ -140,7 +140,7 @@ final class Plugin {
 
 		$llms_options = new LlmsOptions();
 		$llms         = new LlmsTxt( $post_types, $eligibility, $urls, $description, $llms_options );
-		$llms_full    = new LlmsFullTxt( $store, $eligibility, $urls );
+		$llms_full    = new LlmsFullTxt( $store, $eligibility, $urls, $llms_options );
 
 		$this->components = array(
 			new Schema(),

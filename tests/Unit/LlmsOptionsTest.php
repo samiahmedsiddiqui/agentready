@@ -76,4 +76,47 @@ final class LlmsOptionsTest extends TestCase {
 
 		$this->assertSame( array( 'large' ), LlmsOptions::check( $text, 'example.com' ) );
 	}
+
+	public function test_the_defaults_cover_both_files(): void {
+		$defaults = LlmsOptions::defaults();
+
+		$this->assertSame( LlmsOptions::AUTOMATIC, $defaults['mode'] );
+		$this->assertSame( LlmsOptions::AUTOMATIC, $defaults['full_mode'] );
+		$this->assertSame( '', $defaults['custom'] );
+		$this->assertSame( '', $defaults['full_custom'] );
+	}
+
+	public function test_sanitize_cleans_the_text_and_mode_of_each_file(): void {
+		$saved = ( new LlmsOptions() )->sanitize(
+			array(
+				'mode'        => 'hybrid',
+				'custom'      => "# Short\r\n",
+				'full_mode'   => 'custom',
+				'full_custom' => "  # Everything\r\n\x01 ",
+			)
+		);
+
+		$this->assertSame( 'hybrid', $saved['mode'] );
+		$this->assertSame( '# Short', $saved['custom'] );
+		$this->assertSame( 'custom', $saved['full_mode'] );
+		$this->assertSame( '# Everything', $saved['full_custom'] );
+	}
+
+	public function test_sanitize_falls_back_for_a_bad_mode_and_a_bad_text(): void {
+		$saved = ( new LlmsOptions() )->sanitize(
+			array(
+				'full_mode'   => 'something else',
+				'full_custom' => array( 'not text' ),
+			)
+		);
+
+		$this->assertSame( LlmsOptions::AUTOMATIC, $saved['full_mode'] );
+		$this->assertSame( '', $saved['full_custom'] );
+	}
+
+	public function test_sanitize_cuts_a_long_text_at_the_limit(): void {
+		$saved = ( new LlmsOptions() )->sanitize( array( 'full_custom' => str_repeat( 'a', LlmsOptions::MAX_BYTES + 500 ) ) );
+
+		$this->assertSame( LlmsOptions::MAX_BYTES, strlen( $saved['full_custom'] ) );
+	}
 }

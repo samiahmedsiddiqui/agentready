@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings of the llms.txt page: the file mode, the custom text, llms-full.txt and the robots.txt line.
+ * Settings of the llms.txt page: the mode and custom text of llms.txt and of llms-full.txt, and the robots.txt line.
  *
  * @package AgentWelcome
  */
@@ -11,7 +11,7 @@ namespace AgentWelcome\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
-/** Settings of the llms.txt page: how the file is built, the custom text, llms-full.txt and the robots.txt line. They are kept apart from the main settings. */
+/** Settings of the llms.txt page: the mode and custom text of llms.txt and of llms-full.txt, and the robots.txt line. They are kept apart from the main settings. */
 final class LlmsOptions {
 
 	/** Option name. */
@@ -46,6 +46,8 @@ final class LlmsOptions {
 			'mode'        => self::AUTOMATIC,
 			'custom'      => '',
 			'full'        => false,
+			'full_mode'   => self::AUTOMATIC,
+			'full_custom' => '',
 			'robots_line' => false,
 		);
 	}
@@ -80,6 +82,24 @@ final class LlmsOptions {
 	}
 
 	/**
+	 * Current mode of llms-full.txt.
+	 *
+	 * @return string One of AUTOMATIC, CUSTOM or HYBRID.
+	 */
+	public function full_mode(): string {
+		return self::clean_mode( $this->all()['full_mode'] );
+	}
+
+	/**
+	 * Saved custom text of llms-full.txt.
+	 *
+	 * @return string The text, or an empty string.
+	 */
+	public function full_custom(): string {
+		return (string) $this->all()['full_custom'];
+	}
+
+	/**
 	 * Whether /llms-full.txt is served.
 	 *
 	 * @return bool True when it is turned on.
@@ -105,12 +125,13 @@ final class LlmsOptions {
 	 */
 	public function sanitize( mixed $input ): array {
 		$input = is_array( $input ) ? $input : array();
-		$text  = isset( $input['custom'] ) && is_string( $input['custom'] ) ? $input['custom'] : '';
 
 		return array(
 			'mode'        => self::clean_mode( $input['mode'] ?? '' ),
-			'custom'      => self::normalise( wp_check_invalid_utf8( substr( $text, 0, self::MAX_BYTES ), true ) ),
+			'custom'      => self::clean_text( $input['custom'] ?? '' ),
 			'full'        => ! empty( $input['full'] ),
+			'full_mode'   => self::clean_mode( $input['full_mode'] ?? '' ),
+			'full_custom' => self::clean_text( $input['full_custom'] ?? '' ),
 			'robots_line' => ! empty( $input['robots_line'] ),
 		);
 	}
@@ -123,6 +144,16 @@ final class LlmsOptions {
 	 */
 	public static function clean_mode( mixed $mode ): string {
 		return in_array( $mode, array( self::CUSTOM, self::HYBRID ), true ) ? (string) $mode : self::AUTOMATIC;
+	}
+
+	/**
+	 * Cleans a submitted custom text: cuts it at MAX_BYTES, drops invalid UTF-8, then normalises it.
+	 *
+	 * @param mixed $text Submitted value.
+	 * @return string Cleaned text, or an empty string when the value is not a string.
+	 */
+	private static function clean_text( mixed $text ): string {
+		return is_string( $text ) ? self::normalise( wp_check_invalid_utf8( substr( $text, 0, self::MAX_BYTES ), true ) ) : '';
 	}
 
 	/**
