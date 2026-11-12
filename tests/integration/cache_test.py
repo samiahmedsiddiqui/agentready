@@ -3,6 +3,7 @@ import calendar, hashlib, threading
 from kit import *
 
 reset_state()
+set_env(no_cron=True)
 site = anon()
 VERSION = re.search(r"Version:\s+(\S+)", open(os.path.join(WP, "wp-content/plugins/agentwelcome/agentwelcome.php")).read()).group(1)
 CACHE = "x-agentwelcome-cache"
@@ -190,4 +191,5 @@ check("other rows stay", row(5) is not None)
 php("$o = get_option('agentwelcome_settings', array()); $o['excluded_post_types'] = array(); $o['strip_selectors'] = ''; update_option('agentwelcome_settings', $o);")
 
 reset_state()
+clear_env()
 done("CACHE")
