@@ -102,6 +102,10 @@ Pages refresh in the background when you save them. To refresh by hand use "Rege
 
 Administrators, through the `agentwelcome_manage_files` capability that they get automatically. You can give that capability to any role or user with a role editor plugin, and those users see a menu with the llms.txt page only. Settings, Verify & Preview and the cache buttons stay with administrators. A tool that signs in with an application password can read and change the same settings through the REST API, for a user who has that capability. Editors can still hide a page or set its description from the AgentWelcome box on pages they can edit.
 
+= How do I let a script or an AI tool update llms.txt? =
+
+Use the REST route `/wp-json/agentwelcome/v1/llms`. Create a user, give only that user the `agentwelcome_manage_files` capability (for example with `wp user add-cap USERNAME agentwelcome_manage_files`, or with a role editor plugin), and create an application password for it under Users > Profile. Then send a GET request to read the settings, or a POST request with `mode`, `custom`, `full`, `full_mode`, `full_custom` or `robots_line` to change them. Fields you do not send keep their value. A 200 response means it works, a 403 means the user does not have the capability, and a 401 means the login is wrong. Do not upload a real llms.txt file to the server for this, because the web server would serve it instead of the plugin.
+
 = What is removed when I delete the plugin? =
 
 The stored Markdown table is always removed, and so are any saved HTTP Basic credentials. Your other settings and the choices saved on pages are removed only if you tick "Delete all data on uninstall" on the Environment tab. The llms.txt capability is removed from all roles and users in the same case.
