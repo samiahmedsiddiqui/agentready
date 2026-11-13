@@ -11,3 +11,4 @@ if ( 'cli' !== PHP_SAPI && file_exists( WP_CONTENT_DIR . '/basic-auth.flag' ) ) 
 		exit( 'Authentication required' );
 	}
 }
+add_filter( 'wp_is_application_passwords_available', '__return_true' );
