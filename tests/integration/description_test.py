@@ -2,6 +2,7 @@
 from kit import *
 
 reset_state()
+set_env(no_cron=True)
 site = anon()
 LONG = "<p>This long body text must never appear in llms.txt. " + "More body words. " * 12 + "</p>"
 BLOCKS = '<!-- wp:paragraph --><p>Block paragraph that must stay out.</p><!-- /wp:paragraph --><!-- wp:heading {"level":2} --><h2>Block heading</h2><!-- /wp:heading -->'
@@ -61,7 +62,7 @@ try:
         mk("Desc Tag Plain", excerpt="Excerpt only.", _seopress_titles_desc="Mixed %%sitetitle%% and %%unknown_tag%%."),
     ]
     ids.extend(tag_ids)
-    set_env(fake_seo=True)
+    set_env(fake_seo=True, no_cron=True)
     check("Yoast variables are resolved by Yoast", entry("Desc Tag Yoast").endswith(": Hello from Kit Site."), entry("Desc Tag Yoast"))
     check("AIOSEO tags are resolved by AIOSEO", entry("Desc Tag Aioseo").endswith(": AIOSEO welcome to Kit Site."), entry("Desc Tag Aioseo"))
     check("Rank Math variables are resolved by Rank Math", entry("Desc Tag Rank").endswith(": RM welcome to Kit Site."), entry("Desc Tag Rank"))
@@ -70,10 +71,10 @@ try:
     wpcli("agentwelcome", "cache", "regenerate", str(tag_ids[0]))
     c, h, body, _ = site.get("/desc-tag-yoast.md")
     check("front matter gets the resolved text", c == 200 and 'description: "Hello from Kit Site."' in body, body[:300])
-    set_env(fake_seo="throw")
+    set_env(fake_seo="throw", no_cron=True)
     c, h, llms_body, _ = site.get("/llms.txt")
     check("a resolver that throws does not break llms.txt", c == 200 and entry("Desc Tag Yoast") == "- [Desc Tag Yoast](http://127.0.0.1:8899/desc-tag-yoast.md)", entry("Desc Tag Yoast"))
-    clear_env()
+    set_env(no_cron=True)
 
     print("--- never the page content")
     check("no excerpt and no SEO text gives no description", entry("Desc None") == "- [Desc None](http://127.0.0.1:8899/desc-none.md)", entry("Desc None"))
