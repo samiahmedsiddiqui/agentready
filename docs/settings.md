@@ -35,6 +35,20 @@ get_role( 'editor' )->add_cap( 'agentwelcome_manage_files' );
 
 A user who has this capability but not `manage_options` sees a menu with the llms.txt page only. Settings, Verify & Preview, the scan and the cache buttons stay with administrators. To use an existing capability instead, map it with the `agentwelcome_files_capability` filter, for example `add_filter( 'agentwelcome_files_capability', fn() => 'edit_pages' );`. The capability is removed from all roles and users when you delete the plugin with "Delete all data on uninstall" ticked.
 
+## Change the llms.txt files with the REST API
+
+A tool that signs in with an [application password](https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/) can read and change the same settings as the llms.txt page. The user needs the `agentwelcome_manage_files` capability, and the site needs HTTPS for application passwords.
+
+```bash
+curl -u "user:application-password" https://example.com/wp-json/agentwelcome/v1/llms
+
+curl -u "user:application-password" -X POST https://example.com/wp-json/agentwelcome/v1/llms \
+  -H "Content-Type: application/json" \
+  -d '{"mode":"hybrid","custom":"# My site\n\nWelcome.","full":true}'
+```
+
+The fields are `mode`, `custom`, `full`, `full_mode`, `full_custom` and `robots_line`. A field that is not sent keeps its value. The text is cleaned the same way as on the page, and a text larger than 200,000 bytes is refused with a 413 error. The response holds the saved settings and the notes the page shows (`no_title`, `external`, `large`).
+
 ## Verify & Preview
 
 AgentWelcome > Verify & Preview has two tabs.

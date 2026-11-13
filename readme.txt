@@ -100,7 +100,7 @@ Pages refresh in the background when you save them. To refresh by hand use "Rege
 
 = Who can edit llms.txt? =
 
-Administrators, through the `agentwelcome_manage_files` capability that they get automatically. You can give that capability to any role or user with a role editor plugin, and those users see a menu with the llms.txt page only. Settings, Verify & Preview and the cache buttons stay with administrators. Editors can still hide a page or set its description from the AgentWelcome box on pages they can edit.
+Administrators, through the `agentwelcome_manage_files` capability that they get automatically. You can give that capability to any role or user with a role editor plugin, and those users see a menu with the llms.txt page only. Settings, Verify & Preview and the cache buttons stay with administrators. A tool that signs in with an application password can read and change the same settings through the REST API, for a user who has that capability. Editors can still hide a page or set its description from the AgentWelcome box on pages they can edit.
 
 = What is removed when I delete the plugin? =
 

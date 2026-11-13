@@ -23,6 +23,7 @@ run "verify" python3 verify_test.py
 run "scan" python3 scan_test.py
 run "scan without cron" python3 scan_nocron_test.py
 run "llms.txt page" python3 llms_test.py
+run "llms REST route" python3 llms_rest_test.py
 run "integrations and change notices" python3 integrations_test.py
 run "integrations without cron" python3 integrations_nocron_test.py
 run "capability" python3 capability_test.py

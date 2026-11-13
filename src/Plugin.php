@@ -55,6 +55,7 @@ use AgentWelcome\Rendering\FrontMatter;
 use AgentWelcome\Rendering\Generator;
 use AgentWelcome\Rendering\Renderer;
 use AgentWelcome\Rendering\Selector;
+use AgentWelcome\Rest\LlmsController;
 use AgentWelcome\Rest\PagesController;
 use AgentWelcome\Rest\ScanController;
 use AgentWelcome\Robots\RobotsTxt;
@@ -156,6 +157,7 @@ final class Plugin {
 			new PagesController( $store, $pages, $status, $eligibility, $environment ),
 			$scan,
 			new ScanController( $scan, $environment ),
+			new LlmsController( $llms_options ),
 			new RobotsTxt( $llms_options, $environment ),
 			new Seo( $invalidator ),
 			new Elementor( $invalidator, $batch, $environment ),
