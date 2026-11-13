@@ -37,17 +37,102 @@ A user who has this capability but not `manage_options` sees a menu with the llm
 
 ## Change the llms.txt files with the REST API
 
-A tool that signs in with an [application password](https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/) can read and change the same settings as the llms.txt page. The user needs the `agentwelcome_manage_files` capability, and the site needs HTTPS for application passwords.
+A script or an AI tool can read and change the same settings as the llms.txt page through the REST route `/wp-json/agentwelcome/v1/llms`. It signs in with an [application password](https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/), and the user needs the `agentwelcome_manage_files` capability. Application passwords need HTTPS.
+
+### 1. Give the capability
+
+Pick one of these. All of them can be undone later.
+
+**To one user only (recommended).** Create a user, for example `ai-editor`. A role that can sign in is enough, such as Editor. Then add the capability to that user:
+
+- With a role editor plugin: open the user's capabilities and add the custom capability `agentwelcome_manage_files`.
+- With WP-CLI: `wp user add-cap ai-editor agentwelcome_manage_files`
+- With code, run once: `get_user_by( 'login', 'ai-editor' )->add_cap( 'agentwelcome_manage_files' );`
+
+**To a whole role.** Every user with that role gets it, so use this only when that is what you want.
+
+- With a role editor plugin: open the role and add the custom capability.
+- With WP-CLI: `wp cap add editor agentwelcome_manage_files`
+- With code, run once: `get_role( 'editor' )->add_cap( 'agentwelcome_manage_files' );`
+
+**With an existing capability.** To allow everyone who has a capability WordPress already knows, map it with a filter, for example `add_filter( 'agentwelcome_files_capability', fn() => 'edit_pages' );`. This also changes who can open the llms.txt page.
+
+### 2. Create an application password
+
+Sign in as the user, open Users > Profile, and under Application Passwords enter a name and click Add. Copy the password, because WordPress shows it only once. Create one for each person or tool, so you can revoke one without touching the others.
+
+### 3. Read the settings
 
 ```bash
-curl -u "user:application-password" https://example.com/wp-json/agentwelcome/v1/llms
-
-curl -u "user:application-password" -X POST https://example.com/wp-json/agentwelcome/v1/llms \
-  -H "Content-Type: application/json" \
-  -d '{"mode":"hybrid","custom":"# My site\n\nWelcome.","full":true}'
+curl -s -u "ai-editor:application-password" https://example.com/wp-json/agentwelcome/v1/llms
 ```
 
-The fields are `mode`, `custom`, `full`, `full_mode`, `full_custom` and `robots_line`. A field that is not sent keeps its value. The text is cleaned the same way as on the page, and a text larger than 200,000 bytes is refused with a 413 error. The response holds the saved settings and the notes the page shows (`no_title`, `external`, `large`).
+The response is JSON:
+
+```json
+{
+  "mode": "custom",
+  "custom": "# My site\n\nWelcome.",
+  "full": true,
+  "full_mode": "custom",
+  "full_custom": "# My site (full)\n\nWelcome.",
+  "robots_line": false,
+  "notes": [],
+  "full_notes": [],
+  "max_bytes": 200000
+}
+```
+
+- `mode` and `custom` are for llms.txt. `full`, `full_mode` and `full_custom` are for llms-full.txt, and `robots_line` is the robots.txt option.
+- `mode` and `full_mode` are `automatic`, `custom` or `hybrid`. The text is used only in `custom` and `hybrid` mode.
+- `notes` and `full_notes` are the warnings the llms.txt page shows: `no_title`, `external` and `large`. They never stop a save.
+
+### 4. Change the settings
+
+Send a POST (or PUT) with JSON that holds only the fields to change. A field that is not sent keeps its value.
+
+```bash
+# Only llms.txt
+curl -u "ai-editor:application-password" -X POST https://example.com/wp-json/agentwelcome/v1/llms \
+  -H "Content-Type: application/json" \
+  -d '{"mode":"custom","custom":"# My site\n\nWelcome."}'
+
+# Only llms-full.txt
+curl -u "ai-editor:application-password" -X POST https://example.com/wp-json/agentwelcome/v1/llms \
+  -H "Content-Type: application/json" \
+  -d '{"full":true,"full_mode":"custom","full_custom":"# My site (full)\n\nWelcome."}'
+```
+
+To send the text of files without escaping it by hand, build the JSON from the files:
+
+```bash
+python3 -c 'import json; print(json.dumps({"mode":"custom","custom":open("llms.txt",encoding="utf-8").read(),"full":True,"full_mode":"custom","full_custom":open("llms-full.txt",encoding="utf-8").read()}))' \
+  | curl -u "ai-editor:application-password" -X POST https://example.com/wp-json/agentwelcome/v1/llms \
+      -H "Content-Type: application/json" -d @-
+```
+
+- Each text is replaced completely, not merged, so always send the whole file. Read the current text first and keep a copy.
+- The text is cleaned the same way as on the page. A text larger than 200,000 bytes is refused with a 413 error, and an unknown mode with a 400 error.
+- The response holds the saved settings. Open `/llms.txt` and `/llms-full.txt` to check them. If you still see the old text, add `?t=123` to the address or wait a few minutes, because the site may cache it.
+- A real `llms.txt` or `llms-full.txt` file in the site root is served by the web server before WordPress runs. Do not upload one for this.
+
+### 5. Test the access
+
+Read the settings as in step 3 and look at the HTTP status.
+
+| Result | Meaning |
+| --- | --- |
+| 200 and the settings | The user has the capability. |
+| 403 | The user is signed in but does not have the capability. A different user without it must get this. |
+| 401 | The username or application password is wrong, or application passwords are not available. |
+
+To see what WordPress has for the user, open `/wp-json/wp/v2/users/me?context=edit` with the same login and look for `agentwelcome_manage_files` in the capabilities.
+
+If you get a 403 although the capability is set, the host or a firewall may be blocking the request because of an unusual User-Agent. Send a normal one, such as the one `curl` sends.
+
+### 6. Take the access away
+
+Remove the capability (`wp user remove-cap ai-editor agentwelcome_manage_files`, or `wp cap remove editor agentwelcome_manage_files` for a role) and revoke the application password under Users > Profile.
 
 ## Verify & Preview
 
